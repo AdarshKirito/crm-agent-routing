@@ -23,6 +23,14 @@ from .config import DATA_DIR
 
 EMBED_MODEL = os.getenv("CRMROUTE_ROUTER_EMBED_MODEL", "BAAI/bge-small-en-v1.5")
 K_NEIGHBOURS = int(os.getenv("CRMROUTE_ROUTER_K", "15"))
+# Comma-separated example files, relative to the data dir unless absolute. A new org adds its
+# own labelled requests as a second file (scripts/add_org.py) instead of editing the shipped one.
+ROUTER_EXAMPLES = os.getenv("CRMROUTE_ROUTER_EXAMPLES", "router_examples.jsonl")
+
+
+def example_paths(spec: str = ROUTER_EXAMPLES) -> list[Path]:
+    paths = [Path(s.strip()) for s in spec.split(",") if s.strip()]
+    return [p if p.is_absolute() else DATA_DIR / p for p in paths]
 
 
 @dataclass
@@ -33,8 +41,13 @@ class Prediction:
 
 
 class TaskRouter:
-    def __init__(self, examples_path: Path = DATA_DIR / "router_examples.jsonl", cache_dir: Path | None = None):
-        self.examples_path = examples_path
+    def __init__(self, examples_path: Path | list[Path] | None = None, cache_dir: Path | None = None):
+        if examples_path is None:
+            self.examples_paths = example_paths()
+        elif isinstance(examples_path, (list, tuple)):
+            self.examples_paths = [Path(p) for p in examples_path]
+        else:
+            self.examples_paths = [Path(examples_path)]
         self.cache_dir = cache_dir or Path(os.getenv("CRMROUTE_CACHE_DIR", DATA_DIR / ".cache"))
         self._lock = threading.Lock()
         self._model = None
@@ -52,9 +65,10 @@ class TaskRouter:
         with self._lock:
             if self._matrix is not None:
                 return
-            rows = [json.loads(line) for line in self.examples_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+            texts = [p.read_text(encoding="utf-8") for p in self.examples_paths]
+            rows = [json.loads(line) for text in texts for line in text.splitlines() if line.strip()]
             self._labels = [r["task"] for r in rows]
-            digest = hashlib.sha256((EMBED_MODEL + self.examples_path.read_text(encoding="utf-8")).encode()).hexdigest()[:16]
+            digest = hashlib.sha256((EMBED_MODEL + "".join(texts)).encode()).hexdigest()[:16]
             cache = self.cache_dir / f"router_{digest}.npy"
             if cache.exists():
                 self._matrix = np.load(cache)
@@ -83,7 +97,9 @@ class TaskRouter:
         return Prediction(ranked[0][0], ranked[0][1], ranked[:3])
 
 
-def load_routing_table(path: Path = DATA_DIR / "routing.yaml") -> dict:
+def load_routing_table(path: Path | None = None) -> dict:
+    # an org's own table (fitted on its dev runs) can replace the shipped one
+    path = path or Path(os.getenv("CRMROUTE_ROUTING_TABLE") or DATA_DIR / "routing.yaml")
     if not path.exists():
         return {"default": "big", "tiers": {}}
     return yaml.safe_load(path.read_text(encoding="utf-8")) or {"default": "big", "tiers": {}}
