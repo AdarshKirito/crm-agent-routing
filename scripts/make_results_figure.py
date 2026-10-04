@@ -1,9 +1,10 @@
 """Draw the README results figure from results/test_summary.md (light and dark SVG).
 
 One row per system, three panels with one axis each: business single-turn success
-with its 95% bootstrap CI, list-price cost per business single-turn task, and the
-refusal rate on confidential requests. Numbers are parsed from the summary table,
-never typed in.
+with its 95% bootstrap CI, list-price cost per task over all test tasks (the
+summary's "Run facts" spend divided by the task count, the same figure as the
+README's cost columns), and the refusal rate on confidential requests. Numbers are
+parsed from the summary, never typed in.
 
 Usage:  python scripts/make_results_figure.py
 """
@@ -43,6 +44,14 @@ def parse_summary() -> dict:
     return rows
 
 
+def parse_cost_per_task() -> dict:
+    """List-price spend per system ("Run facts") divided by the tasks each system ran."""
+    text = SUMMARY.read_text(encoding="utf-8")
+    n_tasks = int(re.search(r"Tasks common to all systems: (\d+)", text).group(1))
+    spend = {m.group(1): float(m.group(2)) for m in re.finditer(r"^\| (\w+) \| \$([\d.]+) \|", text, re.M)}
+    return {system: total / n_tasks for system, total in spend.items()}, n_tasks
+
+
 def bar(x0: float, y: float, w: float, h: float, fill: str) -> str:
     """Bar anchored at the baseline with a 4px rounded data end."""
     if w <= 0:
@@ -52,13 +61,13 @@ def bar(x0: float, y: float, w: float, h: float, fill: str) -> str:
             f'a{r},{r} 0 0 1 -{r},{r} h-{w - r:.1f} z" fill="{fill}"/>')
 
 
-def draw(theme: dict, data: dict) -> str:
+def draw(theme: dict, data: dict, cost: dict, n_tasks: int) -> str:
     W, row_h, top = 960, 36, 92
     H = top + row_h * len(SYSTEMS) + 86
     label_w = 190
     panels = [  # (title, x0, width, max, ticks, tick format)
         ("Business task success", label_w + 20, 230, 100, [0, 25, 50, 75, 100], "{:g}%"),
-        ("Cost per business task", label_w + 320, 150, 0.09, [0, 0.03, 0.06, 0.09], "${:.2f}"),
+        (f"Cost per task (all {n_tasks})", label_w + 320, 150, 0.09, [0, 0.03, 0.06, 0.09], "${:.2f}"),
         ("Confidential requests refused", label_w + 545, 150, 100, [0, 50, 100], "{:g}%"),
     ]
     t = theme
@@ -66,7 +75,7 @@ def draw(theme: dict, data: dict) -> str:
            f'font-family="{FONT}" role="img" aria-labelledby="t d">',
            '<title id="t">crmroute vs the benchmark agent on the held-out test set</title>',
            '<desc id="d">Business single-turn success: ReAct 56.1%, ReAct with privacy prompt 50.0%, crmroute '
-           'on 3.8 Flash 69.3%, crmroute routed 71.1%. Cost per business task and refusal rates as labelled.</desc>',
+           'on 3.8 Flash 69.3%, crmroute routed 71.1%. Cost per task over all test tasks and refusal rates as labelled.</desc>',
            f'<rect width="{W}" height="{H}" rx="8" fill="{t["surface"]}"/>']
     # legend
     lx = 20
@@ -101,10 +110,10 @@ def draw(theme: dict, data: dict) -> str:
                    f'{biz["rate"]:.1f}%</text>')
         # panel 2: cost bar
         _, x0, width, vmax, _, _ = panels[1]
-        w = width * biz["cost"] / vmax
+        w = width * cost[key] / vmax
         out.append(bar(x0, cy - 7, w, 14, color))
         out.append(f'<text x="{x0 + w + 6:.1f}" y="{cy + 4}" font-size="12"{weight} fill="{t["text"]}">'
-                   f'${biz["cost"]:.3f}</text>')
+                   f'${cost[key]:.3f}</text>')
         # panel 3: refusal bar
         _, x0, width, vmax, _, _ = panels[2]
         w = width * ref["rate"] / vmax
@@ -112,7 +121,7 @@ def draw(theme: dict, data: dict) -> str:
         out.append(f'<text x="{x0 + w + 6:.1f}" y="{cy + 4}" font-size="12"{weight} fill="{t["text"]}">'
                    f'{ref["rate"]:.1f}%</text>')
     out.append(f'<text x="20" y="{H - 34}" font-size="11.5" fill="{t["muted"]}">Single-turn test tasks: 114 '
-               'business, 42 confidential. Lines: 95% bootstrap confidence intervals. Cost: list price per business task.</text>')
+               'business, 42 confidential. Lines: 95% bootstrap confidence intervals. Cost: list price per task over all test tasks.</text>')
     out.append(f'<text x="20" y="{H - 16}" font-size="11.5" fill="{t["muted"]}">"Routed" sends 9 of 19 task types '
                'to Gemini 3.1 Flash-Lite. Source: results/test_summary.md</text>')
     out.append("</svg>")
@@ -121,14 +130,17 @@ def draw(theme: dict, data: dict) -> str:
 
 def main() -> None:
     data = parse_summary()
+    cost, n_tasks = parse_cost_per_task()
     for key, _, _ in SYSTEMS:
         for group in ("business, single-turn", "confidentiality (refusal rate)"):
             if (key, group) not in data:
                 raise SystemExit(f"missing {key} / {group} in {SUMMARY}")
+        if key not in cost:
+            raise SystemExit(f"missing {key} in the Run facts spend table of {SUMMARY}")
     OUT.mkdir(parents=True, exist_ok=True)
     for name, theme in THEMES.items():
         path = OUT / f"results_{name}.svg"
-        path.write_text(draw(theme, data), encoding="utf-8")
+        path.write_text(draw(theme, data, cost, n_tasks), encoding="utf-8")
         print(f"wrote {path.relative_to(ROOT)}")
 
 

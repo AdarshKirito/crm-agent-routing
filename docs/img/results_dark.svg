@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="960" height="322" viewBox="0 0 960 322" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" role="img" aria-labelledby="t d">
 <title id="t">crmroute vs the benchmark agent on the held-out test set</title>
-<desc id="d">Business single-turn success: ReAct 56.1%, ReAct with privacy prompt 50.0%, crmroute on 3.8 Flash 69.3%, crmroute routed 71.1%. Cost per business task and refusal rates as labelled.</desc>
+<desc id="d">Business single-turn success: ReAct 56.1%, ReAct with privacy prompt 50.0%, crmroute on 3.8 Flash 69.3%, crmroute routed 71.1%. Cost per task over all test tasks and refusal rates as labelled.</desc>
 <rect width="960" height="322" rx="8" fill="#1a1a19"/>
 <circle cx="26" cy="24" r="6" fill="#3987e5"/>
 <text x="38" y="28.5" font-size="13" fill="#ffffff">crmroute (this project)</text>
@@ -18,7 +18,7 @@
 <text x="382.5" y="244" font-size="11" text-anchor="middle" fill="#c3c2b7">75%</text>
 <line x1="440.0" y1="84" x2="440.0" y2="228" stroke="#33332f" stroke-width="1"/>
 <text x="440.0" y="244" font-size="11" text-anchor="middle" fill="#c3c2b7">100%</text>
-<text x="510" y="70" font-size="12.5" font-weight="600" fill="#ffffff">Cost per business task</text>
+<text x="510" y="70" font-size="12.5" font-weight="600" fill="#ffffff">Cost per task (all 194)</text>
 <line x1="510.0" y1="84" x2="510.0" y2="228" stroke="#33332f" stroke-width="1"/>
 <text x="510.0" y="244" font-size="11" text-anchor="middle" fill="#c3c2b7">$0.00</text>
 <line x1="560.0" y1="84" x2="560.0" y2="228" stroke="#33332f" stroke-width="1"/>
@@ -38,34 +38,34 @@
 <line x1="316.9" y1="102" x2="359.3" y2="102" stroke="#d95926" stroke-width="2" stroke-linecap="round" opacity="0.55"/>
 <circle cx="339.0" cy="102" r="6" fill="#d95926" stroke="#1a1a19" stroke-width="2"/>
 <text x="367.3" y="106" font-size="12" fill="#ffffff">56.1%</text>
-<path d="M510.0,95.0 h128.0 a4.0,4.0 0 0 1 4.0,4.0 v6.0 a4.0,4.0 0 0 1 -4.0,4.0 h-128.0 z" fill="#d95926"/>
-<text x="648.0" y="106" font-size="12" fill="#ffffff">$0.079</text>
+<path d="M510.0,95.0 h120.7 a4.0,4.0 0 0 1 4.0,4.0 v6.0 a4.0,4.0 0 0 1 -4.0,4.0 h-120.7 z" fill="#d95926"/>
+<text x="640.7" y="106" font-size="12" fill="#ffffff">$0.075</text>
 
 <text x="741.0" y="106" font-size="12" fill="#ffffff">0.0%</text>
 <text x="20" y="142.5" font-size="13" fill="#ffffff">ReAct + privacy prompt</text>
 <line x1="302.9" y1="138" x2="345.2" y2="138" stroke="#d95926" stroke-width="2" stroke-linecap="round" opacity="0.55"/>
 <circle cx="325.0" cy="138" r="6" fill="#d95926" stroke="#1a1a19" stroke-width="2"/>
 <text x="353.2" y="142" font-size="12" fill="#ffffff">50.0%</text>
-<path d="M510.0,131.0 h134.5 a4.0,4.0 0 0 1 4.0,4.0 v6.0 a4.0,4.0 0 0 1 -4.0,4.0 h-134.5 z" fill="#d95926"/>
-<text x="654.5" y="142" font-size="12" fill="#ffffff">$0.083</text>
+<path d="M510.0,131.0 h117.3 a4.0,4.0 0 0 1 4.0,4.0 v6.0 a4.0,4.0 0 0 1 -4.0,4.0 h-117.3 z" fill="#d95926"/>
+<text x="637.3" y="142" font-size="12" fill="#ffffff">$0.073</text>
 <path d="M735.0,131.0 h85.2 a4.0,4.0 0 0 1 4.0,4.0 v6.0 a4.0,4.0 0 0 1 -4.0,4.0 h-85.2 z" fill="#d95926"/>
 <text x="830.2" y="142" font-size="12" fill="#ffffff">59.5%</text>
 <text x="20" y="178.5" font-size="13" fill="#ffffff">crmroute, 3.8 Flash only</text>
 <line x1="351.2" y1="174" x2="387.6" y2="174" stroke="#3987e5" stroke-width="2" stroke-linecap="round" opacity="0.55"/>
 <circle cx="369.4" cy="174" r="6" fill="#3987e5" stroke="#1a1a19" stroke-width="2"/>
 <text x="395.6" y="178" font-size="12" fill="#ffffff">69.3%</text>
-<path d="M510.0,167.0 h67.2 a4.0,4.0 0 0 1 4.0,4.0 v6.0 a4.0,4.0 0 0 1 -4.0,4.0 h-67.2 z" fill="#3987e5"/>
-<text x="587.2" y="178" font-size="12" fill="#ffffff">$0.043</text>
+<path d="M510.0,167.0 h69.8 a4.0,4.0 0 0 1 4.0,4.0 v6.0 a4.0,4.0 0 0 1 -4.0,4.0 h-69.8 z" fill="#3987e5"/>
+<text x="589.8" y="178" font-size="12" fill="#ffffff">$0.044</text>
 <path d="M735.0,167.0 h135.3 a4.0,4.0 0 0 1 4.0,4.0 v6.0 a4.0,4.0 0 0 1 -4.0,4.0 h-135.3 z" fill="#3987e5"/>
 <text x="880.4" y="178" font-size="12" fill="#ffffff">92.9%</text>
 <text x="20" y="214.5" font-size="13" font-weight="600" fill="#ffffff">crmroute, routed</text>
 <line x1="353.3" y1="210" x2="393.5" y2="210" stroke="#3987e5" stroke-width="2" stroke-linecap="round" opacity="0.55"/>
 <circle cx="373.5" cy="210" r="6" fill="#3987e5" stroke="#1a1a19" stroke-width="2"/>
 <text x="401.5" y="214" font-size="12" font-weight="600" fill="#ffffff">71.1%</text>
-<path d="M510.0,203.0 h42.5 a4.0,4.0 0 0 1 4.0,4.0 v6.0 a4.0,4.0 0 0 1 -4.0,4.0 h-42.5 z" fill="#3987e5"/>
-<text x="562.5" y="214" font-size="12" font-weight="600" fill="#ffffff">$0.028</text>
+<path d="M510.0,203.0 h42.6 a4.0,4.0 0 0 1 4.0,4.0 v6.0 a4.0,4.0 0 0 1 -4.0,4.0 h-42.6 z" fill="#3987e5"/>
+<text x="562.6" y="214" font-size="12" font-weight="600" fill="#ffffff">$0.028</text>
 <path d="M735.0,203.0 h135.3 a4.0,4.0 0 0 1 4.0,4.0 v6.0 a4.0,4.0 0 0 1 -4.0,4.0 h-135.3 z" fill="#3987e5"/>
 <text x="880.4" y="214" font-size="12" font-weight="600" fill="#ffffff">92.9%</text>
-<text x="20" y="288" font-size="11.5" fill="#c3c2b7">Single-turn test tasks: 114 business, 42 confidential. Lines: 95% bootstrap confidence intervals. Cost: list price per business task.</text>
+<text x="20" y="288" font-size="11.5" fill="#c3c2b7">Single-turn test tasks: 114 business, 42 confidential. Lines: 95% bootstrap confidence intervals. Cost: list price per task over all test tasks.</text>
 <text x="20" y="306" font-size="11.5" fill="#c3c2b7">"Routed" sends 9 of 19 task types to Gemini 3.1 Flash-Lite. Source: results/test_summary.md</text>
 </svg>
