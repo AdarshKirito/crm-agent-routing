@@ -56,6 +56,9 @@ def main():
                  "small-model", "policy-model", "judge-model", "judge-provider", "user-model", "user-provider",
                  "thinking-level", "backend", "agent-runtime", "image", "image-id", "max-user-turns", "max-turns"):
         parser.add_argument("--" + name, required=True)
+    # an org other than the shipped two runs with its own routing table and router examples
+    parser.add_argument("--routing", default="")
+    parser.add_argument("--router-examples", default="router_examples.jsonl")
     args = parser.parse_args()
     root = Path(args.root)
     task_ids = Path(args.task_ids)
@@ -71,11 +74,15 @@ def main():
         "agent_runtime": args.agent_runtime, "image": args.image, "image_id": args.image_id,
         "max_user_turns": int(args.max_user_turns), "max_turns": int(args.max_turns),
         "source_sha256": source_digest(root),
-        "routing_sha256": digest(root / "agent/app/data/routing.yaml"),
+        "routing_sha256": digest(Path(args.routing) if args.routing else root / "agent/app/data/routing.yaml"),
         "harness_patch_sha256": digest(root / "patches/crmarena-crmroute.patch"),
         "commit": subprocess.check_output(["git", "-C", str(root), "rev-parse", "HEAD"], text=True).strip(),
         "fallback": False,
     }
+    if args.router_examples != "router_examples.jsonl":  # default runs keep their earlier manifest shape
+        files = [f.strip() for f in args.router_examples.split(",") if f.strip()]
+        pins["router_examples"] = args.router_examples
+        pins["router_examples_sha256"] = {f: digest(root / "agent/app/data" / f) for f in files}
     print(ensure_manifest(Path(args.output), pins))
 
 
