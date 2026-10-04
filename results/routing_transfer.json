@@ -1,0 +1,327 @@
+{
+ "source": {
+  "big": "runs/dev3/full",
+  "small": "runs/dev3/agent_small"
+ },
+ "margin_points": 2.0,
+ "business_dev_tasks_per_org": {
+  "b2b": 105,
+  "b2c": 105
+ },
+ "median_tasks_per_type_per_org": {
+  "b2b": 6,
+  "b2c": 6
+ },
+ "results": [
+  {
+   "min_n": 8,
+   "target": "b2c",
+   "fitted_on": "source org (out of sample)",
+   "types_small": [],
+   "n": 105,
+   "sent_to_small": 0,
+   "big_success": 61.9,
+   "routed_success": 61.9,
+   "diff_points": 0.0,
+   "diff_ci95": [
+    0.0,
+    0.0
+   ],
+   "big_cost": 5.0611,
+   "routed_cost": 5.0611,
+   "cost_change_pct": 0.0
+  },
+  {
+   "min_n": 8,
+   "target": "b2c",
+   "fitted_on": "target org (in sample)",
+   "types_small": [],
+   "n": 105,
+   "sent_to_small": 0,
+   "big_success": 61.9,
+   "routed_success": 61.9,
+   "diff_points": 0.0,
+   "diff_ci95": [
+    0.0,
+    0.0
+   ],
+   "big_cost": 5.0611,
+   "routed_cost": 5.0611,
+   "cost_change_pct": 0.0
+  },
+  {
+   "min_n": 8,
+   "target": "b2c",
+   "fitted_on": "both orgs (in sample)",
+   "types_small": [
+    "activity_priority",
+    "invalid_config",
+    "lead_qualification",
+    "lead_routing",
+    "named_entity_disambiguation",
+    "sales_amount_understanding",
+    "sales_insight_mining",
+    "top_issue_identification",
+    "wrong_stage_rectification"
+   ],
+   "n": 105,
+   "sent_to_small": 49,
+   "big_success": 61.9,
+   "routed_success": 66.7,
+   "diff_points": 4.8,
+   "diff_ci95": [
+    0.0,
+    9.5
+   ],
+   "big_cost": 5.0611,
+   "routed_cost": 3.3309,
+   "cost_change_pct": -34.2
+  },
+  {
+   "min_n": 8,
+   "target": "b2b",
+   "fitted_on": "source org (out of sample)",
+   "types_small": [],
+   "n": 105,
+   "sent_to_small": 0,
+   "big_success": 73.3,
+   "routed_success": 73.3,
+   "diff_points": 0.0,
+   "diff_ci95": [
+    0.0,
+    0.0
+   ],
+   "big_cost": 4.7563,
+   "routed_cost": 4.7563,
+   "cost_change_pct": 0.0
+  },
+  {
+   "min_n": 8,
+   "target": "b2b",
+   "fitted_on": "target org (in sample)",
+   "types_small": [],
+   "n": 105,
+   "sent_to_small": 0,
+   "big_success": 73.3,
+   "routed_success": 73.3,
+   "diff_points": 0.0,
+   "diff_ci95": [
+    0.0,
+    0.0
+   ],
+   "big_cost": 4.7563,
+   "routed_cost": 4.7563,
+   "cost_change_pct": 0.0
+  },
+  {
+   "min_n": 8,
+   "target": "b2b",
+   "fitted_on": "both orgs (in sample)",
+   "types_small": [
+    "activity_priority",
+    "invalid_config",
+    "lead_qualification",
+    "lead_routing",
+    "named_entity_disambiguation",
+    "sales_amount_understanding",
+    "sales_insight_mining",
+    "top_issue_identification",
+    "wrong_stage_rectification"
+   ],
+   "n": 105,
+   "sent_to_small": 51,
+   "big_success": 73.3,
+   "routed_success": 78.1,
+   "diff_points": 4.8,
+   "diff_ci95": [
+    1.0,
+    9.5
+   ],
+   "big_cost": 4.7563,
+   "routed_cost": 3.1675,
+   "cost_change_pct": -33.4
+  },
+  {
+   "min_n": 4,
+   "target": "b2c",
+   "fitted_on": "source org (out of sample)",
+   "types_small": [
+    "activity_priority",
+    "case_routing",
+    "invalid_config",
+    "knowledge_qa",
+    "lead_qualification",
+    "lead_routing",
+    "named_entity_disambiguation",
+    "policy_violation_identification",
+    "sales_amount_understanding",
+    "sales_insight_mining",
+    "top_issue_identification",
+    "wrong_stage_rectification"
+   ],
+   "n": 105,
+   "sent_to_small": 66,
+   "big_success": 61.9,
+   "routed_success": 63.8,
+   "diff_points": 1.9,
+   "diff_ci95": [
+    -4.8,
+    8.6
+   ],
+   "big_cost": 5.0611,
+   "routed_cost": 2.6055,
+   "cost_change_pct": -48.5
+  },
+  {
+   "min_n": 4,
+   "target": "b2c",
+   "fitted_on": "target org (in sample)",
+   "types_small": [
+    "activity_priority",
+    "best_region_identification",
+    "conversion_rate_comprehension",
+    "invalid_config",
+    "lead_qualification",
+    "lead_routing",
+    "named_entity_disambiguation",
+    "quote_approval",
+    "sales_amount_understanding",
+    "sales_cycle_understanding",
+    "sales_insight_mining",
+    "transfer_count",
+    "wrong_stage_rectification"
+   ],
+   "n": 105,
+   "sent_to_small": 71,
+   "big_success": 61.9,
+   "routed_success": 68.6,
+   "diff_points": 6.7,
+   "diff_ci95": [
+    1.9,
+    12.4
+   ],
+   "big_cost": 5.0611,
+   "routed_cost": 2.2514,
+   "cost_change_pct": -55.5
+  },
+  {
+   "min_n": 4,
+   "target": "b2c",
+   "fitted_on": "both orgs (in sample)",
+   "types_small": [
+    "activity_priority",
+    "invalid_config",
+    "lead_qualification",
+    "lead_routing",
+    "named_entity_disambiguation",
+    "sales_amount_understanding",
+    "sales_insight_mining",
+    "top_issue_identification",
+    "wrong_stage_rectification"
+   ],
+   "n": 105,
+   "sent_to_small": 49,
+   "big_success": 61.9,
+   "routed_success": 66.7,
+   "diff_points": 4.8,
+   "diff_ci95": [
+    0.0,
+    9.5
+   ],
+   "big_cost": 5.0611,
+   "routed_cost": 3.3309,
+   "cost_change_pct": -34.2
+  },
+  {
+   "min_n": 4,
+   "target": "b2b",
+   "fitted_on": "source org (out of sample)",
+   "types_small": [
+    "activity_priority",
+    "best_region_identification",
+    "conversion_rate_comprehension",
+    "invalid_config",
+    "lead_qualification",
+    "lead_routing",
+    "named_entity_disambiguation",
+    "quote_approval",
+    "sales_amount_understanding",
+    "sales_cycle_understanding",
+    "sales_insight_mining",
+    "transfer_count",
+    "wrong_stage_rectification"
+   ],
+   "n": 105,
+   "sent_to_small": 72,
+   "big_success": 73.3,
+   "routed_success": 68.6,
+   "diff_points": -4.8,
+   "diff_ci95": [
+    -11.4,
+    1.9
+   ],
+   "big_cost": 4.7563,
+   "routed_cost": 2.1709,
+   "cost_change_pct": -54.4
+  },
+  {
+   "min_n": 4,
+   "target": "b2b",
+   "fitted_on": "target org (in sample)",
+   "types_small": [
+    "activity_priority",
+    "case_routing",
+    "invalid_config",
+    "knowledge_qa",
+    "lead_qualification",
+    "lead_routing",
+    "named_entity_disambiguation",
+    "policy_violation_identification",
+    "sales_amount_understanding",
+    "sales_insight_mining",
+    "top_issue_identification",
+    "wrong_stage_rectification"
+   ],
+   "n": 105,
+   "sent_to_small": 67,
+   "big_success": 73.3,
+   "routed_success": 78.1,
+   "diff_points": 4.8,
+   "diff_ci95": [
+    1.0,
+    9.5
+   ],
+   "big_cost": 4.7563,
+   "routed_cost": 2.676,
+   "cost_change_pct": -43.7
+  },
+  {
+   "min_n": 4,
+   "target": "b2b",
+   "fitted_on": "both orgs (in sample)",
+   "types_small": [
+    "activity_priority",
+    "invalid_config",
+    "lead_qualification",
+    "lead_routing",
+    "named_entity_disambiguation",
+    "sales_amount_understanding",
+    "sales_insight_mining",
+    "top_issue_identification",
+    "wrong_stage_rectification"
+   ],
+   "n": 105,
+   "sent_to_small": 51,
+   "big_success": 73.3,
+   "routed_success": 78.1,
+   "diff_points": 4.8,
+   "diff_ci95": [
+    1.0,
+    9.5
+   ],
+   "big_cost": 4.7563,
+   "routed_cost": 3.1675,
+   "cost_change_pct": -33.4
+  }
+ ]
+}
