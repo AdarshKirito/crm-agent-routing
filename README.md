@@ -14,7 +14,7 @@ CRM agents, against the benchmark's own agent running on the same model.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/img/results_dark.svg">
-  <img alt="Held-out test results: crmroute 71.1% business task success at $0.028 per task and 92.9% refusals, against 56.1%, $0.079 and 0% for the benchmark's ReAct agent" src="docs/img/results_light.svg">
+  <img alt="Held-out test results: crmroute 71.1% business task success at $0.028 per task and 92.9% refusals, against 56.1%, $0.075 and 0% for the benchmark's ReAct agent" src="docs/img/results_light.svg">
 </picture>
 
 ## Results in one minute
