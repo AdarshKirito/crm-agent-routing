@@ -46,6 +46,10 @@ export CRMROUTE_FALLBACK=0  # automatic fallback is for the local demo only
 # Windows hosts Smart App Control blocks spaCy, which Presidio's name detection needs.
 AGENT_RUNTIME="${AGENT_RUNTIME:-docker}"
 IMAGE="${IMAGE:-crmroute:local}"
+# An org other than the shipped two brings its own routing table (fit_routing.py --org) and
+# router examples (scripts/add_org.py); the defaults are the shipped files.
+ROUTING_TABLE="${ROUTING_TABLE:-$ROOT/agent/app/data/routing.yaml}"
+ROUTER_EXAMPLES="${ROUTER_EXAMPLES:-router_examples.jsonl}"
 # Bare gemini names use Vertex AI when GOOGLE_GENAI_USE_VERTEXAI/_ENTERPRISE is true, else the AI Studio key.
 is_true() { case "${1,,}" in true|1) return 0 ;; *) return 1 ;; esac; }
 if is_true "${GOOGLE_GENAI_USE_VERTEXAI:-}" || is_true "${GOOGLE_GENAI_USE_ENTERPRISE:-}"; then USE_VERTEX=1; else USE_VERTEX=0; fi
@@ -78,6 +82,8 @@ trap cleanup EXIT
 mkdir -p "$OUT/logs"
 OUT="$(cd "$OUT" && pwd)"  # docker -v and run_tasks.py need absolute paths
 TASK_IDS="$(cd "$(dirname "$TASK_IDS")" && pwd)/$(basename "$TASK_IDS")"
+[ -f "$ROUTING_TABLE" ] || { echo "routing table not found: $ROUTING_TABLE" >&2; exit 2; }
+ROUTING_TABLE="$(cd "$(dirname "$ROUTING_TABLE")" && pwd)/$(basename "$ROUTING_TABLE")"  # docker -v needs an absolute path
 
 wait_http() {  # url
   for _ in $(seq 1 180); do curl -fsS -m 2 -o /dev/null "$1" 2>/dev/null && return 0; sleep 1; done
@@ -124,15 +130,17 @@ start_agent() {  # mode port
       -e OLLAMA_API_BASE=http://host.docker.internal:11434 -e CRMROUTE_MODE="$mode" \
       -e CRMROUTE_BIG_MODEL="$BIG_MODEL" -e CRMROUTE_SMALL_MODEL="$SMALL_MODEL" -e CRMROUTE_POLICY_MODEL="$POLICY_MODEL" \
       -e CRMROUTE_FALLBACK=0 -e CRMROUTE_THINKING_LEVEL="$CRMROUTE_THINKING_LEVEL" \
+      -e CRMROUTE_ROUTER_EXAMPLES="$ROUTER_EXAMPLES" \
       -e CRMROUTE_CALL_LOG="/srv/runs/agent_calls_${mode}_${STREAM}.jsonl" \
       -v "$(hostpath "$OUT/logs"):/srv/runs" \
-      -v "$(hostpath "$ROOT/agent/app/data/routing.yaml"):/srv/agent/app/data/routing.yaml:ro" \
+      -v "$(hostpath "$ROUTING_TABLE"):/srv/agent/app/data/routing.yaml:ro" \
       -v "$(hostpath "$ROOT/data/cache/sf-docker"):/tmp/sf-cache" \
       "$IMAGE" >/dev/null
     CONTAINERS+=("$name")
   else
     (cd "$ROOT/agent" && env CRMROUTE_MODE="$mode" CRMROUTE_BIG_MODEL="$BIG_MODEL" CRMROUTE_SMALL_MODEL="$SMALL_MODEL" \
         CRMROUTE_POLICY_MODEL="$POLICY_MODEL" CRMROUTE_CALL_LOG="$OUT/logs/agent_calls_${mode}_${STREAM}.jsonl" \
+        CRMROUTE_ROUTING_TABLE="$ROUTING_TABLE" CRMROUTE_ROUTER_EXAMPLES="$ROUTER_EXAMPLES" \
         "$AGENT_PY" -m uvicorn app.fast_api_app:app --host 127.0.0.1 --port "$port" \
         > "$OUT/logs/agent_${mode}_${port}.log" 2>&1) & PIDS+=($!)
   fi
@@ -151,7 +159,8 @@ manifest() {  # system: record every pin so a result can be audited later
     --thinking-level "$CRMARENA_THINKING_LEVEL" \
     --backend "$([ "$USE_VERTEX" = 1 ] && echo "vertex:${GOOGLE_CLOUD_PROJECT:-}" || echo ai_studio)" \
     --agent-runtime "$AGENT_RUNTIME" --image "$IMAGE" --image-id "$image_id" \
-    --max-user-turns "$MAX_USER_TURNS" --max-turns "$MAX_TURNS")"
+    --max-user-turns "$MAX_USER_TURNS" --max-turns "$MAX_TURNS" \
+    --routing "$ROUTING_TABLE" --router-examples "$ROUTER_EXAMPLES")"
   export CRMARENA_RUN_FINGERPRINT
 }
 
@@ -173,7 +182,10 @@ bench() {  # system strategy-args...
 }
 
 [ "$#" -gt 0 ] || { echo "usage: SPLIT=dev|test $0 system..." >&2; exit 2; }
-for org in $ORGS; do case "$org" in b2b|b2c) ;; *) echo "unknown org: $org" >&2; exit 2 ;; esac; done
+for org in $ORGS; do case "$org" in b2b|b2c|original) ;; *) echo "unknown org: $org" >&2; exit 2 ;; esac; done
+if [[ " $ORGS " == *" original "* && " $MODES " == *" multi "* ]]; then
+  echo "the original CRMArena org has no multi-turn tasks: use MODES=single" >&2; exit 2
+fi
 for mode in $MODES; do case "$mode" in single|multi) ;; *) echo "unknown mode: $mode" >&2; exit 2 ;; esac; done
 for system in "$@"; do
   case "$system" in
