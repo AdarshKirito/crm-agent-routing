@@ -81,10 +81,10 @@ index 59c7a8a..386bf29 100644
              self.messages.append({"role": "assistant", "content": message["content"].strip()})
 diff --git a/crm_sandbox/agents/remote_agent.py b/crm_sandbox/agents/remote_agent.py
 new file mode 100644
-index 0000000..088c406
+index 0000000..db9d241
 --- /dev/null
 +++ b/crm_sandbox/agents/remote_agent.py
-@@ -0,0 +1,177 @@
+@@ -0,0 +1,178 @@
 +"""Evaluate an agent served by `adk api_server` (or the agents-cli FastAPI app).
 +
 +The benchmark keeps its own environment, simulated user and graders. This adapter
@@ -259,6 +259,7 @@ index 0000000..088c406
 +        self.info["calls"] = state.get("crm_calls") or []  # every agent model call, with the model that answered
 +        self.info["route"] = state.get("crm_route")
 +        self.info["guard"] = state.get("crm_guard")
++        self.info["check"] = state.get("crm_check")  # last answer check: ok, problems, retries
 +
 +    def get_messages(self) -> List[Dict[str, str]]:
 +        return self.messages
