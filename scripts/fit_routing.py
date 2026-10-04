@@ -6,6 +6,12 @@ type, so each rate is noisy: a type with fewer than --min-n dev tasks stays big.
 
   python scripts/fit_routing.py --big runs/dev/agent_big --small runs/dev/agent_small \
       --out agent/app/data/routing.yaml
+
+An org crmroute was not built on gets its own table from its own dev runs:
+
+  python scripts/fit_routing.py --org original --big runs/original_dev/full \
+      --small runs/original_dev/agent_small --dev-split data/original_dev.json \
+      --test-split data/original_test.json --out agent/app/data/routing_original.yaml
 """
 import argparse
 import sys
@@ -41,12 +47,18 @@ def main():
     ap.add_argument("--out", default="agent/app/data/routing.yaml")
     ap.add_argument("--dev-split", default="data/dev.json", type=Path)
     ap.add_argument("--test-split", default="data/test.json", type=Path)
+    ap.add_argument("--org", default="", help="fit on this org's dev runs only")
     args = ap.parse_args()
     if args.min_n < 1 or not 0 <= args.margin <= 100 or not 0 <= args.fuzzy_threshold <= 1:
         ap.error("invalid sample count, margin or fuzzy threshold")
     big_rows, small_rows = load_system(Path(args.big)), load_system(Path(args.small))
+    expected = expected_keys(args.dev_split)
+    if args.org:
+        big_rows = {k: v for k, v in big_rows.items() if k[0] == args.org}
+        small_rows = {k: v for k, v in small_rows.items() if k[0] == args.org}
+        expected = {k for k in expected if k[0] == args.org}
     try:
-        validate_complete({"big": big_rows, "small": small_rows}, expected_keys(args.dev_split))
+        validate_complete({"big": big_rows, "small": small_rows}, expected)
         # Split IDs must be disjoint across modes, since single/multi share tasks.
         held_out = {(org, tid) for org, _, tid in expected_keys(args.test_split)}
         if any((org, tid) in held_out for org, _, tid in big_rows):
@@ -68,7 +80,8 @@ def main():
     doc = {
         "default": "big",
         "margin_points": args.margin,
-        "fitted_from": {"big": args.big, "small": args.small, "dev_split": args.dev_split.as_posix()},
+        "fitted_from": {"big": args.big, "small": args.small, "dev_split": args.dev_split.as_posix(),
+                        "org": args.org or "all"},
         "tiers": tiers,
         "dev_stats": stats,
     }

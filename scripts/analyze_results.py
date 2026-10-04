@@ -53,9 +53,9 @@ def expected_keys(path: Path) -> set[tuple]:
     """Read the fixed task identities, including org and interaction mode."""
     split = json.loads(path.read_text(encoding="utf-8"))
     keys = set()
-    for org in ("b2b", "b2c"):
+    for org in [o for o in ("b2b", "b2c", "original") if o in split]:
         for mode, interactive in (("single_turn", False), ("multi_turn", True)):
-            ids = [str(i) for i in split[org][mode]]
+            ids = [str(i) for i in split[org].get(mode, [])]
             if len(ids) != len(set(ids)):
                 raise ValueError(f"duplicate task IDs in {path}: {org}/{mode}")
             keys.update((org, interactive, i) for i in ids)

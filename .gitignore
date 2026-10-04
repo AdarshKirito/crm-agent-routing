@@ -28,3 +28,4 @@ data/smoke_ids.json
 data/policy_probe_tasks.json
 data/smoke_tasks_or.json
 data/smoke_vertex_ids.json
+data/router_eval_*_test.jsonl
