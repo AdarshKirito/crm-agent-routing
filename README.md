@@ -350,7 +350,7 @@ vendor/CRMArena/.venv/Scripts/python scripts/export_agent_assets.py
 
 **Docker.** `docker build -t crmroute:local .` builds one image with the agent and both MCP servers (the knowledge index is built into it). `scripts/run_systems.sh` runs it with the keys and Salesforce logins as env files and mounts the gcloud credentials read-only for Vertex. Windows note: with Smart App Control on, Windows blocks spaCy's compiled parser, so on the host the guard falls back to pattern-only PII detection; measured runs use the Docker image, where Presidio loads fully.
 
-**Deployment.** Local only: `./scripts/dev_up.sh` or the Docker image. The project runs against Vertex AI from a local machine; a Cloud Run deployment was dropped earlier (`agent/deployment/terraform/` is the unused agents-cli scaffold).
+**Deployment.** Local only: `./scripts/dev_up.sh` or the Docker image. The project runs against Vertex AI from a local machine; a Cloud Run deployment was dropped earlier, and its unused agents-cli Terraform scaffold has been removed.
 
 ## Run the benchmark
 
