@@ -63,3 +63,37 @@ def test_stage_answer_may_be_none_when_current_stage_is_right():
     r = run("answer", "It should be negotiation.", "wrong_stage_rectification")
     assert r.ok and r.answer == "Negotiation"
     assert not run("answer", "Quote or Negotiation", "wrong_stage_rectification").ok
+
+
+def test_unverified_ids_are_reported_and_dropped():
+    r = run("answer", "005Wt000009ZZZZIAW, 005Wt000003NDqDIAW", "activity_priority")
+    assert not r.ok and r.unverified == ["005Wt000009ZZZZIAW"] and r.answer == "005Wt000003NDqDIAW"
+
+
+def _check_node(answer, retries, task="handle_time"):
+    from types import SimpleNamespace
+
+    from app import state_keys as K
+    from app.nodes import check
+
+    state = {K.DRAFT: {"kind": "answer", "answer": answer}, K.ROUTE: {"task_type": task, "tier": "big"},
+             K.EVIDENCE: EVIDENCE, K.RETRIES: retries, K.AUDIENCE: "employee"}
+    return next(iter(check(SimpleNamespace(state=state), state[K.DRAFT]))).actions
+
+
+def test_checker_abstains_instead_of_none_when_no_id_survives_the_retry():
+    from app.checker import ABSTENTION
+
+    first = _check_node("005Wt000009ZZZZIAW", retries=0)
+    assert first.route == "retry_big" and first.state_delta["crm_check"]["abstained"] is False
+    last = _check_node("005Wt000009ZZZZIAW", retries=1)
+    assert last.route == "ok"
+    assert last.state_delta["crm_draft"]["answer"] == ABSTENTION
+    assert last.state_delta["crm_check"]["abstained"] is True
+    assert last.state_delta["crm_check"]["unverified"] == ["005Wt000009ZZZZIAW"]
+
+
+def test_checker_keeps_the_verified_ids_after_the_retry():
+    last = _check_node("005Wt000009ZZZZIAW, 005Wt000003NDqDIAW", retries=1, task="activity_priority")
+    assert last.state_delta["crm_draft"]["answer"] == "005Wt000003NDqDIAW"
+    assert last.state_delta["crm_check"]["abstained"] is False

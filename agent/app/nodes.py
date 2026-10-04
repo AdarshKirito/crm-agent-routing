@@ -9,7 +9,7 @@ from google.genai import types
 from pydantic import BaseModel, Field
 
 from . import state_keys as K
-from .checker import check_answer, has_refusal_wording
+from .checker import ABSTENTION, check_answer, has_refusal_wording
 from .config import MAX_CHECKER_RETRIES, MAX_CLARIFYING_QUESTIONS, MODE, PROMPT_GUARD_MODEL, PROMPT_GUARD_THRESHOLD, ROUTER_MIN_CONFIDENCE
 from .guard import pii
 from .guard.pii import analyze_request, scrub
@@ -225,7 +225,8 @@ def check(ctx, node_input: Any):
         max_clarifications=MAX_CLARIFYING_QUESTIONS,
     )
     retries = int(state.get(K.RETRIES) or 0)
-    summary = {"ok": result.ok, "problems": result.problems, "retries": retries, "answer": result.answer}
+    summary = {"ok": result.ok, "problems": result.problems, "retries": retries, "answer": result.answer,
+               "unverified": result.unverified, "abstained": False}
     if not result.ok and retries < MAX_CHECKER_RETRIES:
         yield Event(state={K.CHECK: summary, K.RETRIES: retries + 1, K.FEEDBACK: " ".join(result.problems)},
                     route=f"retry_{route.get('tier', 'big')}")
@@ -233,7 +234,12 @@ def check(ctx, node_input: Any):
     kind = str(draft.get("kind") or "answer").lower()
     if not result.ok and kind == "clarify":
         kind = "answer"  # out of questions (or single-turn): send what we have
-    yield Event(state={K.CHECK: summary, K.DRAFT: {**draft, "kind": kind, "answer": result.answer}}, route="ok")
+    answer = result.answer
+    if kind == "answer" and result.unverified and not answer.strip():
+        # Unverified Ids are already dropped; with none left, say so instead of a bare "None".
+        answer = ABSTENTION
+        summary = {**summary, "answer": answer, "abstained": True}
+    yield Event(state={K.CHECK: summary, K.DRAFT: {**draft, "kind": kind, "answer": answer}}, route="ok")
 
 
 def finalize(ctx):

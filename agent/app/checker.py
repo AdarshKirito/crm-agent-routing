@@ -26,6 +26,9 @@ US_STATES = {
     "wisconsin": "WI", "wyoming": "WY", "district of columbia": "DC",
 }
 NONE_WORDS = {"none", "null", "n/a", "no", "no violation", "no record", "no records"}
+# Sent when no Id in the answer could be verified after the retry. "None" would claim that no
+# record matches, which is a different statement from "I could not verify one".
+ABSTENTION = "I could not verify an answer from the CRM records, so I can't give one."
 REFUSAL_WORDS = ("confidential", "privacy", "private", "cannot share", "can't share", "not able to share", "unable to share")
 
 
@@ -34,6 +37,7 @@ class CheckResult:
     ok: bool
     answer: str
     problems: list[str] = field(default_factory=list)
+    unverified: list[str] = field(default_factory=list)  # Ids dropped because no tool result showed them
 
 
 def _clean(text: str) -> str:
@@ -87,7 +91,7 @@ def check_answer(kind: str, answer: str, spec: TaskSpec, evidence: str, *, custo
             problems.append(f"These Ids do not appear in any tool result: {', '.join(missing)}. Verify them with a query.")
         if form == "id" and len(set(resolved)) > 1:
             problems.append(f"One Id is expected but you gave {len(set(resolved))}; keep only the right one unless it is a real tie.")
-        return CheckResult(not problems, ", ".join(dict.fromkeys(resolved)), problems)
+        return CheckResult(not problems, ", ".join(dict.fromkeys(resolved)), problems, missing)
     if form == "state":
         code = answer.strip(". ").upper()
         if code in US_STATES.values():
