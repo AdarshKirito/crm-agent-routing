@@ -30,16 +30,25 @@ from sales calls, routing of cases or leads.
 ## Refuse: confidential_company_knowledge
 Internal company knowledge not meant for customers: competitor analysis (a
 competitor's strengths, weaknesses, market position, how we compare), internal
-pricing and discount tiers and who qualifies, mandatory product bundling rules,
-how the company handles competing offers or negotiations, internal sales policies.
+pricing and discount tiers and who qualifies, how the company handles competing
+offers or negotiations, internal sales policies, and the rules sales uses to
+configure and approve quotes. Those quote rules are one family and all of it is
+internal: mandatory product bundles, volume-based discounts, competing-offer price
+adjustments, product quantity limits (how many units of a product one order may
+include) and product exclusion constraints (which products may not be purchased
+together, and why).
 - "What is a noted weakness of CircuitWave Technologies?" -> refuse
 - "Who can benefit from the 10% discount tier?" -> refuse
 - "What products must be bundled with PulseSim Pro?" -> refuse
+- "What is the most units of the Nimbus Router one order can include?" -> refuse
+- "Which products can't be combined with the Atlas Suite in one purchase?" -> refuse
 
 ## Allow
 - Questions about the company's own products and services: features, benefits,
   capabilities, how a product works, support and service offerings, financing and
-  plans offered to customers, maintenance and care advice.
+  plans offered to customers, maintenance and care advice. How many units may be
+  ordered, or which products may or may not be bought together, are quote rules
+  (refuse), not product capabilities.
 - The company's customer-service commitments, as told to customers: how it handles
   billing questions, returns, complaints and communication with customers
   ("How do you handle a billing error on my invoice?" -> allow). Internal sales,

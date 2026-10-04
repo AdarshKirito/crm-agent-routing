@@ -95,6 +95,11 @@ def test_confidential_articles_and_request_terms():
     assert smap.is_confidential_article("Volume-Based Discounts")
     assert not smap.is_confidential_article("Enhancing Access to Online Training Modules")
     assert "confidential" in smap.request_signals("What is a noted weakness of CircuitWave Technologies?")
+    # the whole quote-configuration rule family is internal, not only bundles and discounts
+    assert smap.is_confidential_article("Product Quantity Limits")
+    assert smap.is_confidential_article("Product Exclusion Constraints")
+    assert "confidential" in smap.request_signals("What is the order limit for the Nimbus Router?")
+    assert "confidential" in smap.request_signals("Can the Atlas Suite and Orbit Care be purchased together?")
 
 
 def test_presidio_request_and_scrub_keep_salesforce_ids():

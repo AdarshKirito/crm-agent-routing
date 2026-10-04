@@ -94,10 +94,13 @@ confidential_article_titles:
   - "Mandatory Bundles"
   - "Competing Offers"
   - "Installation Timeline Policy"
+  # the rest of the quote-configuration rule family (the articles present in both orgs)
+  - "Product Quantity Limits"
+  - "Product Exclusion Constraints"
 
 # Phrases in a customer's request that point at a class. These are signals for the
 # policy classifier, not decisions on their own.
 request_terms:
   pii: [email, e-mail, phone number, address, city, state is recorded, registered address, date of birth, "'s name", orders for, bought by, purchased by, order for]
   internal_ops: [handle time, transfer count, conversion rate, sales cycle, sales amount, which agent, most frequent issue, most frequent problem, lead qualified, qualified based on, 'Budget', opportunity's stage, 'Not Started', quote comply, quote adhere, against company policy, sentiment, subtopic]
-  confidential: [competitor, competitive advantage, weakness, strength of, discount tier, mandatory bundle, must be bundled, competing offers, pricing strategy, negotiation]
+  confidential: [competitor, competitive advantage, weakness, strength of, discount tier, mandatory bundle, must be bundled, competing offers, pricing strategy, negotiation, quantity limit, order limit, maximum quantity, units can be ordered, purchased together, bought together, exclusion constraint]
