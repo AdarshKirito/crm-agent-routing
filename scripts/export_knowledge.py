@@ -1,7 +1,8 @@
-"""One-time export of the knowledge articles (Knowledge__kav) from the CRMArena-Pro orgs.
+"""One-time export of the knowledge articles (Knowledge__kav) from the benchmark orgs.
 
 Writes data/knowledge/<org>.jsonl with one article per line. Uses the benchmark's
-own credentials (.env with SALESFORCE_B2B_* / SALESFORCE_B2C_*).
+own credentials (.env with SALESFORCE_B2B_* / SALESFORCE_B2C_*, and SALESFORCE_* for the
+original CRMArena org).
 
 Usage:  python scripts/export_knowledge.py --env vendor/CRMArena/.env --out-dir data/knowledge
 """
@@ -17,7 +18,7 @@ FIELDS = ["Id", "Title", "UrlName", "Summary", "FAQ_Answer__c", "LastModifiedDat
 
 
 def connect(org: str) -> Salesforce:
-    prefix = {"b2b": "SALESFORCE_B2B_", "b2c": "SALESFORCE_B2C_"}[org]
+    prefix = {"b2b": "SALESFORCE_B2B_", "b2c": "SALESFORCE_B2C_", "original": "SALESFORCE_"}[org]
     return Salesforce(
         username=os.environ[f"{prefix}USERNAME"],
         password=os.environ[f"{prefix}PASSWORD"],

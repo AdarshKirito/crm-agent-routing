@@ -3,7 +3,8 @@
     crm-knowledge-index --knowledge-dir ../data/knowledge --qdrant-path ../data/qdrant
 
 Reads <knowledge-dir>/<org>.jsonl (written by scripts/export_knowledge.py) and
-creates collection knowledge_<org> in a local Qdrant store.
+creates collection knowledge_<org> in a local Qdrant store. By default every known
+org whose export file is present is built.
 """
 import argparse
 import asyncio
@@ -14,6 +15,8 @@ from pathlib import Path
 from qdrant_client import AsyncQdrantClient
 
 from mcp_server_qdrant.hybrid import HybridKnowledgeIndex, HybridSettings
+
+KNOWN_ORGS = ("b2b", "b2c", "original")  # HybridKnowledgeIndex.collection_for accepts these
 
 
 async def build(knowledge_dir: Path, qdrant_path: str, orgs: list[str]) -> None:
@@ -34,9 +37,13 @@ def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--knowledge-dir", default="data/knowledge")
     ap.add_argument("--qdrant-path", default="data/qdrant")
-    ap.add_argument("--orgs", default="b2b,b2c")
+    ap.add_argument("--orgs", default="", help="comma-separated; default: every known org with an export file")
     args = ap.parse_args()
-    asyncio.run(build(Path(args.knowledge_dir), args.qdrant_path, args.orgs.split(",")))
+    knowledge_dir = Path(args.knowledge_dir)
+    orgs = [o for o in args.orgs.split(",") if o] or [o for o in KNOWN_ORGS if (knowledge_dir / f"{o}.jsonl").exists()]
+    if not orgs:
+        ap.error(f"no <org>.jsonl export in {knowledge_dir}")
+    asyncio.run(build(knowledge_dir, args.qdrant_path, orgs))
 
 
 if __name__ == "__main__":
