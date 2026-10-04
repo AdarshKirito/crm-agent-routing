@@ -187,3 +187,17 @@ def test_salesforce_query_error_remains_available_to_solver():
         raise SalesforceMalformedRequest("https://example.test", 400, "Case", [{"errorCode": "MALFORMED_QUERY", "message": "Bad field"}])
     connector.sf = SimpleNamespace(query_all=fail)
     assert connector.run_query("SELECT wrong FROM Case") == ("MALFORMED_QUERY: Bad field", 0)
+
+
+def test_original_crmarena_single_answers_are_scored(monkeypatch):
+    """The original CRMArena tasks store one answer (a string or None), not a list like Pro."""
+    from crm_sandbox.env.env import Evaluator
+
+    evaluator = Evaluator(model="test-judge", provider="test")
+    monkeypatch.setattr(Evaluator, "parse_answers", lambda *a, **k: pytest.fail("the judge must not be needed"))
+    assert evaluator.evaluate("March", "March", "exact_match", "monthly_trend_analysis", [])["reward"] == 1
+    assert evaluator.evaluate("None", None, "exact_match", "handle_time", [])["reward"] == 1
+    fuzzy = evaluator.evaluate("90 days.", "90 days.", "fuzzy_match", "knowledge_qa", [])["reward"]
+    assert fuzzy["f1"] == 1.0  # scored against the whole reference, not its first character
+    # Pro answers (lists) are unchanged
+    assert evaluator.evaluate("CO", ["CO"], "exact_match", "best_region_identification", [])["reward"] == 1

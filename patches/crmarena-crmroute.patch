@@ -474,7 +474,7 @@ index f6f31e0..f5e6beb 100644
          if return_df:
              return pd.DataFrame(new_data), 1
 diff --git a/crm_sandbox/env/env.py b/crm_sandbox/env/env.py
-index 41d331d..ac1ab24 100644
+index 41d331d..b3c4c31 100644
 --- a/crm_sandbox/env/env.py
 +++ b/crm_sandbox/env/env.py
 @@ -1,20 +1,45 @@
@@ -599,6 +599,19 @@ index 41d331d..ac1ab24 100644
          
          if "yes" in res.choices[0].message.content.strip().lower() :
              return 1
+@@ -525,7 +556,11 @@ class Evaluator(object):
+         
+         
+     def evaluate(self, proposed_answer: str, gt_answer: List[str], reward_metric: str, task_name: str, action_trajectory: List[str]) -> float:
+-        
++        # CRMArena-Pro answers are lists; the original CRMArena tasks store one string (or None).
++        # Without this, sorted("March") is compared with sorted(["March"]) and None[0] raises.
++        if gt_answer is None or isinstance(gt_answer, str):
++            gt_answer = [gt_answer]
++
+         
+         if gt_answer[0] == None:
+             gt_answer = ["None"]
 diff --git a/crm_sandbox/env/users.py b/crm_sandbox/env/users.py
 index cbcb371..d110d14 100644
 --- a/crm_sandbox/env/users.py
