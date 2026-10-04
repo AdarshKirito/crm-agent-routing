@@ -1,0 +1,107 @@
+{
+ "before": "runs/fresh_before/routed",
+ "after": "runs/fresh_after/routed",
+ "task_ids": "data/fresh.json",
+ "paired_tasks": 620,
+ "of_expected": 620,
+ "confidential_refusal": {
+  "all": {
+   "n": 408,
+   "before_pct": 96.3,
+   "after_pct": 99.0,
+   "diff_points": 2.7,
+   "diff_ci95": [
+    1.2,
+    4.4
+   ]
+  },
+  "confidential_company_knowledge": {
+   "n": 136,
+   "before_pct": 89.0,
+   "after_pct": 97.1,
+   "diff_points": 8.1,
+   "diff_ci95": [
+    3.7,
+    13.2
+   ]
+  },
+  "internal_operation_data": {
+   "n": 136,
+   "before_pct": 100.0,
+   "after_pct": 100.0,
+   "diff_points": 0.0,
+   "diff_ci95": [
+    0.0,
+    0.0
+   ]
+  },
+  "private_customer_information": {
+   "n": 136,
+   "before_pct": 100.0,
+   "after_pct": 100.0,
+   "diff_points": 0.0,
+   "diff_ci95": [
+    0.0,
+    0.0
+   ]
+  },
+  "quote_rule_wording": {
+   "n": 16,
+   "before_pct": 43.8,
+   "after_pct": 100.0,
+   "diff_points": 56.2,
+   "diff_ci95": [
+    31.2,
+    81.2
+   ]
+  }
+ },
+ "customer_business_false_refusal": {
+  "n": 72,
+  "before_pct": 0.0,
+  "after_pct": 0.0,
+  "diff_points": 0.0,
+  "diff_ci95": [
+   0.0,
+   0.0
+  ]
+ },
+ "customer_business_success": {
+  "n": 72,
+  "before_pct": 45.8,
+  "after_pct": 48.6,
+  "diff_points": 2.8,
+  "diff_ci95": [
+   -2.8,
+   8.3
+  ]
+ },
+ "checker": {
+  "before": {
+   "answers_with_unverified_ids": 0,
+   "abstained": 0,
+   "sent_none": 0,
+   "kept_verified_ids": 0,
+   "of_which_correct": 0,
+   "check_recorded": 211
+  },
+  "after": {
+   "answers_with_unverified_ids": 0,
+   "abstained": 0,
+   "sent_none": 0,
+   "kept_verified_ids": 0,
+   "of_which_correct": 0,
+   "check_recorded": 212
+  }
+ },
+ "classifier_fallbacks": {
+  "before": 0,
+  "after": 0
+ },
+ "guard_sources_after": {
+  "employee_session:allow": 136,
+  "policy_classifier:refuse": 344,
+  "id_check:refuse": 36,
+  "policy_classifier:allow": 104
+ }
+}
