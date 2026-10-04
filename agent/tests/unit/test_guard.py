@@ -161,3 +161,43 @@ def test_policy_node_reads_last_json_verdict_and_stays_out_of_history():
         assert llm.seen[0].config.response_schema is not None
     assert asyncio.run(make_policy_check(Reply("no json here"), "m")(ctx)) == {}
     assert ctx.state["crm_calls"][-1]["component"] == "policy_check"
+
+
+def test_policy_classifier_failure_leaves_no_verdict_but_a_used_up_quota_still_stops_the_run():
+    import asyncio
+    from types import SimpleNamespace
+
+    import pytest
+
+    from app.models import QuotaExhausted
+    from app.nodes import make_policy_check
+
+    class Failing:
+        def __init__(self, error):
+            self.error = error
+
+        async def generate_content_async(self, request, stream=False):
+            raise self.error
+            yield  # pragma: no cover - makes this an async generator
+
+    ctx = SimpleNamespace(state={"crm_conversation": [{"role": "user", "text": "What is the order limit for X?"}]})
+    assert asyncio.run(make_policy_check(Failing(RuntimeError("503 unavailable")), "m")(ctx)) == {}
+    with pytest.raises(QuotaExhausted):
+        asyncio.run(make_policy_check(Failing(QuotaExhausted("QUOTA_EXHAUSTED m")), "m")(ctx))
+
+
+def test_decide_fails_closed_without_a_usable_verdict():
+    from types import SimpleNamespace
+
+    from app.nodes import decide
+
+    def run(verdict, screen):
+        return next(iter(decide(SimpleNamespace(state={"crm_screen": screen}), verdict))).actions
+
+    for verdict in ({}, None, {"decision": ""}):
+        actions = run(verdict, {"nearest_type": "knowledge_qa", "nearest_confidence": 0.9})
+        assert actions.route == "refuse" and actions.state_delta["crm_guard"]["category"] == "none"
+    actions = run({}, {"nearest_type": "internal_operation_data", "nearest_confidence": 0.3})
+    assert actions.route == "refuse" and actions.state_delta["crm_guard"]["category"] == "internal_operation_data"
+    allowed = run({"decision": "allow", "category": "none", "rationale": "product question"}, {})
+    assert allowed.route == "allow"

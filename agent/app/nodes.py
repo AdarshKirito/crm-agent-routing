@@ -1,6 +1,7 @@
 """Function nodes of the crmroute workflow."""
 
 import asyncio
+import logging
 from typing import Any, Literal
 
 from google.adk import Event
@@ -17,6 +18,8 @@ from .guard.sensitive import PERSON_ID_PREFIXES, ids_in, in_ids, load_map
 from .guard.tool_guard import current_self_ids
 from .router import get_router, load_routing_table
 from .task_specs import CONFIDENTIALITY_TYPES, spec_for
+
+logger = logging.getLogger(__name__)
 
 REFUSALS = {
     "private_customer_information": "it concerns another customer's personal or account information, which is private",
@@ -133,7 +136,7 @@ def make_policy_check(llm, model_name: str, max_tokens: int = 2048):
     the solver sees -- as an agent node, small solvers echoed its rationale as their answer."""
     from google.adk.models.llm_request import LlmRequest
 
-    from .models import generation_config
+    from .models import QuotaExhausted, generation_config
     from .prompts import policy_instruction
     from .usage import add_usage
 
@@ -145,8 +148,14 @@ def make_policy_check(llm, model_name: str, max_tokens: int = 2048):
         request = LlmRequest(model=model_name, config=config, contents=[types.Content(role="user", parts=[
             types.Part.from_text(text="Return your verdict on the customer messages above as JSON.")])])
         last = None
-        async for response in llm.generate_content_async(request, stream=False):
-            last = response
+        try:
+            async for response in llm.generate_content_async(request, stream=False):
+                last = response
+        except QuotaExhausted:
+            raise  # a used-up daily quota stops a measured run; the task is redone on resume
+        except Exception as error:  # noqa: BLE001 - any other failure leaves no verdict; decide() fails closed
+            logger.warning("policy classifier failed: %s", error)
+            return {}
         meta = dict((last.custom_metadata if last else None) or {})
         meta["session_id"] = getattr(getattr(ctx, "session", None), "id", None)
         add_usage(ctx.state, meta.get("answered_by") or model_name, "policy_check", last.usage_metadata if last else None, meta)
@@ -167,11 +176,12 @@ def decide(ctx, node_input: Any):
     """Combine the policy classifier's verdict with the screening signals."""
     verdict = node_input if isinstance(node_input, dict) else {}
     if not verdict.get("decision"):
-        # No usable verdict: fall back to the nearest-example signal.
+        # No usable verdict (the classifier failed or returned no valid JSON). This node only runs
+        # for customer sessions, so fail closed: refuse rather than answer unchecked.
         screen_signals = ctx.state.get(K.SCREEN) or {}
-        refuse = screen_signals.get("nearest_type") in CONFIDENTIALITY_TYPES and screen_signals.get("nearest_confidence", 0) >= 0.6
-        verdict = {"decision": "refuse" if refuse else "allow",
-                   "category": screen_signals.get("nearest_type") if refuse else "none", "rationale": "classifier unavailable"}
+        nearest = screen_signals.get("nearest_type")
+        verdict = {"decision": "refuse", "category": nearest if nearest in CONFIDENTIALITY_TYPES else "none",
+                   "rationale": "classifier unavailable: refused (fail closed)"}
     decision = "refuse" if str(verdict.get("decision")).lower().startswith("refuse") else "allow"
     yield Event(state={K.GUARD: {**verdict, "decision": decision, "source": "policy_classifier"}}, route=decision)
 
