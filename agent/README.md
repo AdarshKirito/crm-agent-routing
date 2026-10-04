@@ -1,94 +1,40 @@
-# crmroute
+# crmroute agent
 
-Simple ReAct agent
-Agent generated with `agents-cli` version `1.7.0`
+The ADK 2.10 `Workflow` behind crmroute: guard → router → solver → checker. The project overview,
+results and full setup are in the [main README](../README.md).
 
-## Project Structure
+## Layout
 
 ```
-crmroute/
-├── app/         # Core agent code
-│   ├── agent.py               # Main agent logic
-│   ├── fast_api_app.py        # FastAPI Backend server
-│   └── app_utils/             # App utilities and helpers
-├── .github/                   # CI/CD pipeline configurations for GitHub Actions
-├── deployment/                # Infrastructure and deployment scripts
-├── tests/                     # Unit, integration, and load tests
-├── GEMINI.md                  # AI-assisted development guide
-└── pyproject.toml             # Project dependencies
+agent/
+├── app/
+│   ├── agent.py          # builds the Workflow graph
+│   ├── nodes.py          # function nodes: intake, screen, policy check, decide, refuse, route_task, check, finalize
+│   ├── models.py         # one pinned model per role (retries on the same model); demo-only fallback
+│   ├── guard/            # Presidio, sensitive-field map, policy, Prompt Guard 2, tool-call guard
+│   ├── router.py         # nearest-neighbour task-type vote (no LLM call)
+│   ├── checker.py        # Ids in tool evidence, answer form, one retry
+│   ├── task_specs.py     # per-task hints tuned on dev
+│   ├── prompts.py
+│   ├── tools.py          # McpToolset connections to the two MCP servers
+│   ├── usage.py          # logs and prices every model call
+│   ├── tracing.py        # Phoenix / OpenTelemetry export
+│   ├── fast_api_app.py   # ADK API server (also serves the ADK web UI at /dev-ui/)
+│   └── data/             # routing table, router examples, schema text
+└── tests/                # unit and integration tests (offline by default)
 ```
 
-> 💡 **Tip:** Use [Antigravity CLI](https://antigravity.google/) for AI-assisted development - project context is pre-configured in `GEMINI.md`.
-
-## Requirements
-
-Before you begin, ensure you have:
-- **uv**: Python package manager (used for all dependency management in this project) - [Install](https://docs.astral.sh/uv/getting-started/installation/) ([add packages](https://docs.astral.sh/uv/concepts/dependencies/) with `uv add <package>`)
-- **agents-cli**: Agents CLI - Install with `uv tool install google-agents-cli`
-- **Google Cloud SDK**: For GCP services - [Install](https://cloud.google.com/sdk/docs/install)
-- **Terraform**: For infrastructure deployment - [Install](https://developer.hashicorp.com/terraform/downloads)
-
-
-## Quick Start
-
-Install `agents-cli` and its skills if not already installed:
+## Run
 
 ```bash
-uvx google-agents-cli setup
+uv sync
+uv run pytest                      # unit + integration; live tests are skipped without their env flags
+uv run uvicorn app.fast_api_app:app --host 127.0.0.1 --port 8000
 ```
 
-Install required packages:
+The agent expects the Salesforce MCP server at `CRMROUTE_SALESFORCE_MCP_URL` (default
+`http://127.0.0.1:3333/mcp`) and the knowledge search server at `CRMROUTE_SEARCH_MCP_URL` (default
+`http://127.0.0.1:8765/mcp`); `../scripts/dev_up.sh` starts all three. Models and keys come from the
+repo-root `.env` (see `../.env.example`).
 
-```bash
-agents-cli install
-```
-
-Test the agent with a local web server:
-
-```bash
-agents-cli playground
-```
-
-You can also use features from the [ADK](https://adk.dev/) CLI with `uv run adk`.
-
-## Commands
-
-| Command              | Description                                                                                 |
-| -------------------- | ------------------------------------------------------------------------------------------- |
-| `agents-cli install` | Install dependencies using uv                                                         |
-| `agents-cli playground` | Launch local development environment                                                  |
-| `agents-cli lint`    | Run code quality checks                                                               |
-| `agents-cli eval`    | Evaluate agent behavior (generate, grade, analyze, and more — see `agents-cli eval --help`) |
-| `uv run pytest tests/unit tests/integration` | Run unit and integration tests                                                        |
-| `agents-cli deploy`  | Deploy agent to Cloud Run                                                                   || [A2A Inspector](https://github.com/a2aproject/a2a-inspector) | Launch A2A Protocol Inspector                                                        |
-| `agents-cli infra single-project` | Set up single-project infrastructure using Terraform                              |
-
-## 🛠️ Project Management
-
-| Command | What It Does |
-|---------|--------------|
-| `agents-cli infra cicd` | One-command setup of entire CI/CD pipeline + infrastructure |
-| `agents-cli scaffold upgrade` | Auto-upgrade to latest version while preserving customizations |
-
----
-
-## Development
-
-Edit your agent logic in `app/agent.py` and test with `agents-cli playground` - it auto-reloads on save.
-
-## Deployment
-
-```bash
-gcloud config set project <your-project-id>
-agents-cli deploy
-```
-To set up your production infrastructure, run `agents-cli infra cicd`.
-
-## Observability
-
-Built-in telemetry exports to Cloud Trace, BigQuery, and Cloud Logging.
-
-## A2A Inspector
-
-This agent supports the [A2A Protocol](https://a2a-protocol.org/). Use the [A2A Inspector](https://github.com/a2aproject/a2a-inspector) to test interoperability.
-See the [A2A Inspector docs](https://github.com/a2aproject/a2a-inspector) for details.
+Scaffolded with `agents-cli` 1.7.0; files that keep a Google LLC Apache-2.0 header come from that scaffold.
