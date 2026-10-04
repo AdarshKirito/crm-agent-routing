@@ -32,7 +32,8 @@ RUN cd /srv/search && uv sync --frozen --no-dev
 COPY data/knowledge /srv/data/knowledge
 RUN /srv/search/.venv/bin/crm-knowledge-index --knowledge-dir /srv/data/knowledge --qdrant-path /srv/data/qdrant
 
-# Agent
+# Agent. An org's own router examples (router_examples_<org>.jsonl) load next to the shipped
+# ones, so each such set is embedded here too, not on the first request.
 COPY agent/pyproject.toml agent/uv.lock agent/README.md /srv/agent/
 RUN cd /srv/agent && uv sync --frozen --no-dev --no-install-project
 COPY agent/app /srv/agent/app
@@ -40,7 +41,6 @@ RUN cd /srv/agent && uv sync --frozen --no-dev \
  && /srv/agent/.venv/bin/python -c "from app.router import get_router; get_router().warm_up(); from app.guard.pii import warm_up; warm_up()" \
  && for extra in app/data/router_examples_*.jsonl; do \
       [ -e "$extra" ] || continue; \
-      # an org's own examples load next to the shipped ones: embed that set now, not on the first request
       CRMROUTE_ROUTER_EXAMPLES="router_examples.jsonl,$(basename "$extra")" \
         /srv/agent/.venv/bin/python -c "from app.router import TaskRouter; TaskRouter().warm_up()"; \
     done
