@@ -51,10 +51,11 @@ Paired differences vs `react` (same task ids; win claimed only if the CI exclude
 - **The org's own routing table works.** Fitted on 90 of the org's dev tasks with the shipped rule, it sent
   30 of the 90 test tasks (3 task types) to Flash-Lite and cut cost 24% against 3.8 Flash only, with no
   measurable loss (+1.1 points, interval spanning zero).
-- **The router needed no new examples.** It named the right task type for all 90 test requests; built from the
-  CRMArena-Pro examples alone it also scores 90/90 offline (`results/router_transfer.json`). The original
-  org's questions come from the same benchmark family, so this is transfer within it, not to a company's
-  own phrasing.
+- **The router was not the bottleneck.** With the org's own examples added, it named the right task type for
+  all 90 test requests; built from the CRMArena-Pro examples alone it also scores 90/90 offline
+  (`results/router_transfer.json`). Its input includes the benchmark's task context, which is templated per
+  task type, and the original org's questions come from the same benchmark family, so this is transfer within
+  it, not to a company's own phrasing.
 
 ## Run notes
 
@@ -62,3 +63,5 @@ Paired differences vs `react` (same task ids; win claimed only if the CI exclude
   None) where CRMArena-Pro stores a list, and the shared evaluator marked every original-org answer wrong.
 - The cost column is a lower bound only because some Prompt Guard calls (Groq free tier, about $0.000003 each)
   were rate-limited and have no usage record; ReAct's latency is not recorded by the harness.
+- One ReAct task (664, handle_time) ended at the harness's 250K-token request cap and is scored as a failure;
+  no crmroute task reached the cap. Counted as a ReAct success instead, ReAct would be at 76.7%.
