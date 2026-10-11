@@ -60,7 +60,8 @@ Paired differences vs `react` (same task ids; win claimed only if the CI exclude
 ## Run notes
 
 - Scoring needed a harness fix first (`a918dc2`): the original CRMArena tasks store one answer (a string or
-  None) where CRMArena-Pro stores a list, and the shared evaluator marked every original-org answer wrong.
+  None) where CRMArena-Pro stores a list, and the shared evaluator assumed lists, so string answers never
+  matched, a None answer raised an error, and fuzzy answers were compared with their first character.
 - The cost column is a lower bound only because some Prompt Guard calls (Groq free tier, about $0.000003 each)
   were rate-limited and have no usage record; ReAct's latency is not recorded by the harness.
 - One ReAct task (664, handle_time) ended at the harness's 250K-token request cap and is scored as a failure;

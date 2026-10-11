@@ -320,6 +320,10 @@ The project's own code is MIT. The CRMArena patch and the files built from the b
   model call, including the guard's policy classifier and Prompt Guard, not only the solver.
 - Pinned, resumable runs. Each system and stream writes a manifest with every pin plus hashes of the task list,
   routing table, harness patch, source tree and image id; a resume with any changed pin is refused.
+- Live data. Every system queries the benchmark's own Salesforce orgs; nothing is mocked. ReAct queries them
+  directly through the benchmark's connector. crmroute goes through its MCP server, which caches responses on
+  disk for seven days because the shared orgs cap daily API calls, so a repeated query gets the earlier live
+  response.
 - Records. The raw run records stay local (`runs/`, git-ignored, about 0.8 GB); `results/` holds the
   summaries.
 
@@ -376,8 +380,9 @@ multi-turn tasks, one per task type and org), with the same pins as the test run
 - `--task_ids_file` for fixed task lists, and `--dry_run`;
 - fixes for upstream bugs: a missing `import re` in the grader's fallback parser, a crash on SOSL results that
   mix object types, the simulated user's cost being overwritten instead of summed, an unrecorded extra
-  simulated-user call, and the evaluator marking every original-CRMArena answer wrong (those tasks store one
-  answer, not a list);
+  simulated-user call, and the evaluator mishandling the original CRMArena's single answers (those tasks store
+  one answer, not a list: string answers never matched, a None answer raised an error, and fuzzy answers were
+  compared with their first character);
 - the agent's last answer check copied into the run record next to its guard and route;
 - JSON code fences stripped before the grader parses them; LiteLLM 1.103 (never 1.82.7/1.82.8).
 
@@ -606,7 +611,7 @@ the judge check, `python scripts/judge_agreement.py sheet ...` writes a blind 40
 - **Generalization.** Every org measured here (CRMArena-Pro's B2B and B2C, the original CRMArena) comes from the same benchmark family, with templated questions and task context. Transfer to a company's own data and phrasing is untested.
 - **knowledge_qa** stays weak: answers are graded by token F1 against short reference phrases, and the agent often grounds its answer in a different article than the reference.
 - **Costs** are list-price estimates from usage metadata (cached and thinking tokens included), not an invoice; free-tier runs are counted at list price although they were not billed. A budget alert on the Google Cloud project could not be verified from here (the Budget API is not enabled).
-- **Answer keys:** some are disputed ([CRMArena issue #24](https://github.com/SalesforceAIResearch/CRMArena/issues/24)).
+- **Answer keys** are used as released. An open issue by another user questions two of them ([CRMArena issue #24](https://github.com/SalesforceAIResearch/CRMArena/issues/24), no reply yet); I have not checked it.
 - **Guard coverage:** on test, 3 of 42 confidential requests were answered (order quantity limits and a product
   exclusion rule). The policy now covers that rule family; the 4 fresh confidential requests still answered read
   like customer-service and financing questions the policy allows, a trade-off kept so that ordinary
