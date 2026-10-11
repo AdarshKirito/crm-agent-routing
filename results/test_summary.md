@@ -77,6 +77,17 @@ Paired differences vs `react` (same task ids; win claimed only if the CI exclude
 | full | $8.59 | 0 | 0 | - |
 | routed | $5.42 | 0 | 0 | 71/152 (47%) |
 
+The cap is a patch setting, not upstream behaviour, and only ReAct reached it: react's 17 are 8 business
+single-turn, 3 multi-turn and 6 confidentiality tasks, react_privacy's 7 are 6 single-turn and 1 multi-turn.
+Counted as ReAct successes instead (its best case), crmroute's lead over react is +6.1 [-3.5, +15.8]
+(3.8 Flash only) and +7.9 [-0.9, +17.5] (routed) on single-turn and +13.2 / +10.5 on multi-turn, all with
+intervals that include zero; the lead over react_privacy stays significant (+14.0 to +26.3).
+`results/robustness_checks.md` has the table.
+
+One customer-facing business task was refused by the guard: routed, b2b/1987 (multi-turn,
+named_entity_disambiguation), where the simulated user asked about a purchase "by the contact with ID
+003Wt00000JqqEAIAZ". The 3.8 Flash-only system answered the same task.
+
 Judge and simulated user: local `ollama_chat/qwen3:8b`, $0 in API charges. The task redone after an error (react_privacy b2c/63, multi-turn) hit an IndexError in the benchmark's own grader (`parse_answers` on an empty judge extraction); the resume re-ran it and the failed attempt is kept in its record.
 
 ## Judge check
