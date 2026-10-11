@@ -419,6 +419,11 @@ use the quote's name and line items.
 | hybrid + rerank (`ms-marco-MiniLM-L-6-v2`) | 0.349 [0.30, 0.40] | 0.30 | 0.366 | 1.000 | 0.013 |
 | Salesforce SOSL (the MCP server's tool) | 0.244 [0.20, 0.29] | 0.22 | 0.150 | 0.933 | 0.000 |
 
+A re-run on 2026-10-11 reproduced every row exactly except SOSL (`results/retrieval_dev_rerun_2026-10-11.json`).
+The SOSL row was measured before the server got its 16K-character response cap; with the cap, some five-article
+answers go over it and return an error, and SOSL scores 0.226 [0.19, 0.27]. With the cap lifted it matches the
+table again. The agent's measured runs used the BM25 search, not SOSL.
+
 The agent writes its own queries, so rerun this on the queries it actually sends before changing the default.
 Every mode is switchable (`HYBRID_SEARCH_MODE`). knowledge_qa is not in this table: its answers are free text,
 and the "silver" article labels I built by word overlap were wrong in 6 of 6 spot checks, so I excluded them.
