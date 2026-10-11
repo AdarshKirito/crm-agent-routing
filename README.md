@@ -384,7 +384,8 @@ multi-turn tasks, one per task type and org), with the same pins as the test run
   one answer, not a list: string answers never matched, a None answer raised an error, and fuzzy answers were
   compared with their first character);
 - the agent's last answer check copied into the run record next to its guard and route;
-- JSON code fences stripped before the grader parses them; LiteLLM 1.103 (never 1.82.7/1.82.8).
+- JSON code fences stripped before the grader parses them; LiteLLM ≥ 1.84, never 1.82.7/1.82.8 (the measured
+  runs used 1.103).
 
 </details>
 
