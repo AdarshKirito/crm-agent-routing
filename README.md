@@ -442,16 +442,17 @@ example; the fresh set does (see [After the test run](#after-the-test-run)).
 <details>
 <summary><b>Published baselines, recomputed from CRMArena's released B2B single-turn runs</b> (<code>results/published_b2b_single_turn.md</code>)</summary>
 
-| model | business tasks success [95% CI] (n=1880) | confidentiality refusal rate (n=60) | cost/task |
+| model | business tasks success [95% CI] (n=1900) | confidentiality refusal rate (n=240) | cost/task (lower bound) |
 |---|---|---|---|
-| o1 | 45.5% [43.2, 47.8] | 1.7% | $0.381 |
-| gpt-4o | 27.3% [25.3, 29.4] | 0.0% | $0.057 |
-| gpt-4o-mini | 20.4% [18.7, 22.3] | 0.0% | $0.005 |
+| o1 | 45.8% [43.6, 48.0] | 0.4% (1 of 240) | ≥ $0.3808 |
+| gpt-4o | 27.1% [25.1, 28.9] | 0.0% | ≥ $0.0566 |
+| gpt-4o-mini | 20.2% [18.4, 22.1] | 0.0% | ≥ $0.0045 |
 
 The benchmark's agent (without its privacy prompt) almost never refuses confidential requests, which is the gap
 the guard targets. Success = reward 1; fuzzy tasks count as a success at token F1 ≥ 0.5. These come from the
 released files, not from the paper's tables, and used GPT-4o as judge, so they are not comparable with the runs
-above.
+above. The released files reuse task ids across task types, so records are keyed by type and id; an earlier
+version of this table keyed them by id alone and lost 200 of the 2,140 records per model.
 
 </details>
 
