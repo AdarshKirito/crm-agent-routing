@@ -44,6 +44,14 @@ def test_duplicate_result_identity_is_not_silently_overwritten(tmp_path):
         analysis.load_system(tmp_path)
 
 
+def test_released_runs_can_share_task_ids_across_task_types(tmp_path):
+    results(tmp_path, [row(500, task_type="confidential_company_knowledge"), row(500, task_type="invalid_config")])
+    with pytest.raises(ValueError, match="duplicate task"):
+        analysis.load_system(tmp_path)
+    rows = analysis.load_system(tmp_path, key_by_type=True)
+    assert sorted(r["task_type"] for r in rows.values()) == ["confidential_company_knowledge", "invalid_config"]
+
+
 @pytest.mark.parametrize("records", [[row()], [row(), row(2, error="HTTP 500")], [row(), row(2), row(3)]])
 def test_complete_report_rejects_missing_errors_and_unexpected_tasks(tmp_path, records):
     wanted = analysis.expected_keys(split(tmp_path))

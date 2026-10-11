@@ -35,14 +35,19 @@ def _interactive_from_name(name: str) -> bool:
     return m.group(1) == "True" if m else name.endswith("_interactive.json")
 
 
-def load_system(path: Path) -> dict[tuple, dict]:
-    """Load every results_*.json under `path`, or the files matching `path` if it is a glob."""
+def load_system(path: Path, key_by_type: bool = False) -> dict[tuple, dict]:
+    """Load every results_*.json under `path`, or the files matching `path` if it is a glob.
+
+    key_by_type adds the task type to each record's identity: CRMArena's released runs number tasks
+    per file, so records of different task types can share a task id."""
     rows = {}
     files = sorted(path.parent.glob(path.name)) if "*" in path.name else sorted(path.glob("results_*.json"))
     for f in files:
         for r in json.loads(f.read_text(encoding="utf-8")):
             interactive = r.get("interactive", _interactive_from_name(f.name))
             key = (r.get("org_type") or ("b2c" if "_b2c" in f.name else "b2b"), bool(interactive), str(r["task_id"]))
+            if key_by_type:
+                key += (r["task_type"],)
             if key in rows:
                 raise ValueError(f"duplicate task {key} in {path}; separate runs/configurations before analysis")
             rows[key] = r
@@ -175,18 +180,22 @@ def main():
     ap.add_argument("--big-model", default="flash-lite", help="substring naming the hosted (quota-limited) big model")
     ap.add_argument("--task-ids", type=Path, help="fixed split; required for a complete report")
     ap.add_argument("--allow-partial", action="store_true", help="exploratory report only; excludes API-error rows")
+    ap.add_argument("--key-by-type", action="store_true",
+                    help="identify tasks by type and id (CRMArena's released runs reuse ids across task types)")
     args = ap.parse_args()
     if args.iters < 100 or not 0 <= args.fuzzy_threshold <= 1:
         ap.error("--iters must be >= 100 and --fuzzy-threshold must be in [0, 1]")
     if not args.task_ids and not args.allow_partial:
         ap.error("provide --task-ids to verify completeness, or explicitly use --allow-partial")
+    if args.key_by_type and args.task_ids:
+        ap.error("--key-by-type is for released runs, which have no fixed split")
 
     systems = {}
     for spec in args.system:
         name, path = spec.split("=", 1)
         if name in systems:
             ap.error(f"duplicate system name: {name}")
-        systems[name] = load_system(Path(path))
+        systems[name] = load_system(Path(path), args.key_by_type)
     if args.baseline and args.baseline not in systems:
         ap.error(f"unknown baseline: {args.baseline}")
     if not args.allow_partial:
