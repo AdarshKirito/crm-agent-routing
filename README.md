@@ -202,9 +202,10 @@ What the numbers say:
   (+1.8 points single-turn, -2.6 multi-turn), but the multi-turn interval [-15.8, +7.9] is wide enough to hide a
   real loss.
 - The test run cost $42.65 at list price ($14.52, $14.12, $8.59 and $5.42 for systems 1-4). All recorded runs
-  come to about $105: $29 before the test (smoke tests, dev tuning, the final dev run, a ReAct cost probe and the
+  come to about $105: $30 before the test (smoke tests, dev tuning, the final dev run, a ReAct cost probe and the
   PR-eval baseline), $42.66 for the test including one failed attempt, and $33 after it
-  (`results/robustness_checks.md`). These are list-price estimates from usage metadata, not invoices.
+  (`results/robustness_checks.md`, from the task records and the per-call logs). These are list-price estimates
+  from usage metadata, not invoices.
 - To check the judge, I compared it with labels for 40 blind test items, made against the reference answers
   (drafted with AI assistance, every row reviewed by me; `evals/human_labels_test.csv`). The qwen3:8b judge
   agreed on 39 of 40, Cohen's κ = 0.95 (target ≥ 0.7). The one disagreement is a multi-turn answer that ranks two

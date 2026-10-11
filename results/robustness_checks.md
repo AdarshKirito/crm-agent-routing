@@ -60,13 +60,13 @@ Confidential requests refused, `runs/fresh_before/routed` vs `runs/fresh_after/r
 | not in the example file, internal_operation_data | 61 | 100.0% | 100.0% | +0.0 [+0.0, +0.0] |
 | not in the example file, private_customer_information | 63 | 100.0% | 100.0% | +0.0 [+0.0, +0.0] |
 
-## 4. List-price spend in the run records
+## 4. List-price spend
 
-Every recorded model call at list price (agent, policy classifier, Prompt Guard, and any judge or simulated-user API calls; local Ollama is $0), failed attempts included. Runs on free tiers (the 2026-09-29 pilot and the PR-eval baseline runs) are counted at list price although they were not billed. Prompt Guard calls rejected with 429 have no usage record.
+Model calls at list price (agent, policy classifier, Prompt Guard, and any judge or simulated-user API calls; local Ollama is $0). Per run directory, the larger of the task records (failed attempts included) and the per-call logs: the logs also hold calls of tasks that never finished, such as a run stopped mid-task, but the earliest runs logged no prices. Runs on free tiers (the 2026-09-29 pilot and the PR-eval baseline runs) are counted at list price although they were not billed. Prompt Guard calls rejected with 429 have no usage record.
 
 | phase | run directories | task records | list-price spend |
 |---|---|---|---|
-| before the test | ci ($0.16), ci2 ($0.12), ci3 ($0.15), dev ($7.04), dev2 ($3.43), dev3 ($11.66), dev_react_probe ($3.31), dev_react_probe_multi ($1.70), dev_small ($0.42), devmt_check ($0.27), smoke ($0.02), smoke_pipeline ($0.02), smoke_vertex ($0.02), smoke_vertex2 ($0.64), test_small ($0.36), trace ($0.03) | 1317 | $29.35 |
+| before the test | ci ($0.16), ci2 ($0.12), ci3 ($0.15), dev ($7.07), dev2 ($3.48), dev3 ($11.83), dev_react_probe ($3.31), dev_react_probe_multi ($1.70), dev_small ($0.42), devmt_check ($0.27), smoke ($0.02), smoke_pipeline ($0.02), smoke_vertex ($0.02), smoke_vertex2 ($0.64), test_small ($0.36), trace ($0.09) | 1317 | $29.66 |
 | test run | test ($42.66) | 776 | $42.66 |
-| after the test | fresh_after ($7.14), fresh_before ($7.49), original_dev ($5.00), original_dev_oom_attempt ($0.02), original_smoke ($0.38), original_smoke2 ($0.35), original_test ($12.58) | 1719 | $32.97 |
-| all | | | $104.99 |
+| after the test | fresh_after ($7.30), fresh_before ($7.53), original_dev ($5.00), original_dev_oom_attempt ($0.02), original_smoke ($0.38), original_smoke2 ($0.35), original_test ($12.58) | 1719 | $33.16 |
+| all | | | $105.49 |

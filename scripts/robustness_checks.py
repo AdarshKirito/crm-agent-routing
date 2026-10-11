@@ -11,8 +11,10 @@ Reads the run records in runs/ (git-ignored, not in the repository) and writes a
    before data/fresh.json existed, and the router's nearest task type is passed to the policy
    classifier as a hint. This counts fresh tasks that are themselves labelled examples and
    reports the refusal rate on confidential requests inside and outside the example file.
-4. List-price spend in the run records (failed attempts included), split into the runs made
-   before the test run, the test run, and the runs made after it.
+4. List-price spend, split into the runs made before the test run, the test run, and the runs
+   made after it. Per run directory it takes the larger of two sums: the task records (failed
+   attempts included) and the per-call logs, which also hold calls of tasks that never finished
+   but have no prices in the earliest runs.
 
 Usage:  python scripts/robustness_checks.py --out results/robustness_checks.md
 """
@@ -145,6 +147,19 @@ def overlap_section(before: Path, after: Path, task_ids: Path, examples: Path, t
     return lines
 
 
+def logged_cost(run_dir: Path) -> float:
+    """Spend in the per-call logs: agent_calls_*.jsonl (the agent) and bench_calls_*.jsonl (the harness)."""
+    total = 0.0
+    for f in [*run_dir.rglob("agent_calls_*.jsonl"), *run_dir.rglob("bench_calls_*.jsonl")]:
+        for line in f.read_text(encoding="utf-8").splitlines():
+            try:
+                call = json.loads(line)
+            except ValueError:
+                continue
+            total += float(call.get("cost_usd") or call.get("cost") or 0.0)
+    return total
+
+
 def spend_section(runs_dir: Path, test_dir: Path) -> list[str]:
     phases: dict[str, list[tuple[str, int, float]]] = {"before the test": [], "test run": [], "after the test": []}
     for d in sorted(p for p in runs_dir.iterdir() if p.is_dir()):
@@ -160,12 +175,14 @@ def spend_section(runs_dir: Path, test_dir: Path) -> list[str]:
                     cost += sum(float(c.get("cost") or 0.0) for c in attempt.get("llm_calls") or []
                                 if c.get("role") in ("judge", "user"))
         phase = "test run" if d == test_dir else ("after the test" if d.name in AFTER_TEST else "before the test")
-        phases[phase].append((d.name, tasks, cost))
-    lines = ["", "## 4. List-price spend in the run records", "",
-             "Every recorded model call at list price (agent, policy classifier, Prompt Guard, and any judge or "
-             "simulated-user API calls; local Ollama is $0), failed attempts included. Runs on free tiers "
-             "(the 2026-09-29 pilot and the PR-eval baseline runs) are counted at list price although they were "
-             "not billed. Prompt Guard calls rejected with 429 have no usage record.", "",
+        phases[phase].append((d.name, tasks, max(cost, logged_cost(d))))
+    lines = ["", "## 4. List-price spend", "",
+             "Model calls at list price (agent, policy classifier, Prompt Guard, and any judge or simulated-user "
+             "API calls; local Ollama is $0). Per run directory, the larger of the task records (failed attempts "
+             "included) and the per-call logs: the logs also hold calls of tasks that never finished, such as a run "
+             "stopped mid-task, but the earliest runs logged no prices. Runs on free tiers (the 2026-09-29 pilot and "
+             "the PR-eval baseline runs) are counted at list price although they were not billed. Prompt Guard calls "
+             "rejected with 429 have no usage record.", "",
              "| phase | run directories | task records | list-price spend |", "|---|---|---|---|"]
     total = 0.0
     for phase, rows in phases.items():
