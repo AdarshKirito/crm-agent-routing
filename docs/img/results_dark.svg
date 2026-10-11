@@ -1,13 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="960" height="322" viewBox="0 0 960 322" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" role="img" aria-labelledby="t d">
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="340" viewBox="0 0 960 340" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" role="img" aria-labelledby="t d">
 <title id="t">crmroute vs the benchmark agent on the held-out test set</title>
 <desc id="d">Business single-turn success: ReAct 56.1%, ReAct with privacy prompt 50.0%, crmroute on 3.8 Flash 69.3%, crmroute routed 71.1%. Cost per task over all test tasks and refusal rates as labelled.</desc>
-<rect width="960" height="322" rx="8" fill="#1a1a19"/>
+<rect width="960" height="340" rx="8" fill="#1a1a19"/>
 <circle cx="26" cy="24" r="6" fill="#3987e5"/>
 <text x="38" y="28.5" font-size="13" fill="#ffffff">crmroute (this project)</text>
 <circle cx="237.6" cy="24" r="6" fill="#d95926"/>
 <text x="249.6" y="28.5" font-size="13" fill="#ffffff">ReAct, the benchmark's own agent</text>
 <text x="940" y="28.5" font-size="12" text-anchor="end" fill="#c3c2b7">Held-out test set, Gemini 3.8 Flash, 194 tasks per system</text>
-<text x="210" y="70" font-size="12.5" font-weight="600" fill="#ffffff">Business task success</text>
+<text x="210" y="70" font-size="12.5" font-weight="600" fill="#ffffff">Business task success, single-turn</text>
 <line x1="210.0" y1="84" x2="210.0" y2="228" stroke="#33332f" stroke-width="1"/>
 <text x="210.0" y="244" font-size="11" text-anchor="middle" fill="#c3c2b7">0%</text>
 <line x1="267.5" y1="84" x2="267.5" y2="228" stroke="#33332f" stroke-width="1"/>
@@ -67,5 +67,6 @@
 <path d="M735.0,203.0 h135.3 a4.0,4.0 0 0 1 4.0,4.0 v6.0 a4.0,4.0 0 0 1 -4.0,4.0 h-135.3 z" fill="#3987e5"/>
 <text x="880.4" y="214" font-size="12" font-weight="600" fill="#ffffff">92.9%</text>
 <text x="20" y="288" font-size="11.5" fill="#c3c2b7">Single-turn test tasks: 114 business, 42 confidential. Lines: 95% bootstrap confidence intervals. Cost: list price per task over all test tasks.</text>
-<text x="20" y="306" font-size="11.5" fill="#c3c2b7">"Routed" sends 9 of 19 task types to Gemini 3.1 Flash-Lite. Source: results/test_summary.md</text>
+<text x="20" y="306" font-size="11.5" fill="#c3c2b7">Tasks scored as failures at the harness's 250K-token request cap: 17 (ReAct), 7 (ReAct + privacy prompt), 0 and 0 (crmroute).</text>
+<text x="20" y="324" font-size="11.5" fill="#c3c2b7">"Routed" sends 9 of 19 task types to Gemini 3.1 Flash-Lite. Source: results/test_summary.md</text>
 </svg>

@@ -52,6 +52,12 @@ def parse_cost_per_task() -> dict:
     return {system: total / n_tasks for system, total in spend.items()}, n_tasks
 
 
+def parse_capped() -> dict:
+    """Tasks per system scored as failures at the harness's 250K-token request cap ("Run facts")."""
+    text = SUMMARY.read_text(encoding="utf-8")
+    return {m.group(1): int(m.group(2)) for m in re.finditer(r"^\| (\w+) \| \$[\d.]+ \| (\d+) \|", text, re.M)}
+
+
 def bar(x0: float, y: float, w: float, h: float, fill: str) -> str:
     """Bar anchored at the baseline with a 4px rounded data end."""
     if w <= 0:
@@ -61,12 +67,12 @@ def bar(x0: float, y: float, w: float, h: float, fill: str) -> str:
             f'a{r},{r} 0 0 1 -{r},{r} h-{w - r:.1f} z" fill="{fill}"/>')
 
 
-def draw(theme: dict, data: dict, cost: dict, n_tasks: int) -> str:
+def draw(theme: dict, data: dict, cost: dict, n_tasks: int, capped: dict) -> str:
     W, row_h, top = 960, 36, 92
-    H = top + row_h * len(SYSTEMS) + 86
+    H = top + row_h * len(SYSTEMS) + 104
     label_w = 190
     panels = [  # (title, x0, width, max, ticks, tick format)
-        ("Business task success", label_w + 20, 230, 100, [0, 25, 50, 75, 100], "{:g}%"),
+        ("Business task success, single-turn", label_w + 20, 230, 100, [0, 25, 50, 75, 100], "{:g}%"),
         (f"Cost per task (all {n_tasks})", label_w + 320, 150, 0.09, [0, 0.03, 0.06, 0.09], "${:.2f}"),
         ("Confidential requests refused", label_w + 545, 150, 100, [0, 50, 100], "{:g}%"),
     ]
@@ -120,8 +126,11 @@ def draw(theme: dict, data: dict, cost: dict, n_tasks: int) -> str:
         out.append(bar(x0, cy - 7, w, 14, color))
         out.append(f'<text x="{x0 + w + 6:.1f}" y="{cy + 4}" font-size="12"{weight} fill="{t["text"]}">'
                    f'{ref["rate"]:.1f}%</text>')
-    out.append(f'<text x="20" y="{H - 34}" font-size="11.5" fill="{t["muted"]}">Single-turn test tasks: 114 '
+    out.append(f'<text x="20" y="{H - 52}" font-size="11.5" fill="{t["muted"]}">Single-turn test tasks: 114 '
                'business, 42 confidential. Lines: 95% bootstrap confidence intervals. Cost: list price per task over all test tasks.</text>')
+    out.append(f'<text x="20" y="{H - 34}" font-size="11.5" fill="{t["muted"]}">Tasks scored as failures at the '
+               f'harness\'s 250K-token request cap: {capped["react"]} (ReAct), {capped["react_privacy"]} (ReAct + privacy '
+               f'prompt), {capped["full"]} and {capped["routed"]} (crmroute).</text>')
     out.append(f'<text x="20" y="{H - 16}" font-size="11.5" fill="{t["muted"]}">"Routed" sends 9 of 19 task types '
                'to Gemini 3.1 Flash-Lite. Source: results/test_summary.md</text>')
     out.append("</svg>")
@@ -131,16 +140,17 @@ def draw(theme: dict, data: dict, cost: dict, n_tasks: int) -> str:
 def main() -> None:
     data = parse_summary()
     cost, n_tasks = parse_cost_per_task()
+    capped = parse_capped()
     for key, _, _ in SYSTEMS:
         for group in ("business, single-turn", "confidentiality (refusal rate)"):
             if (key, group) not in data:
                 raise SystemExit(f"missing {key} / {group} in {SUMMARY}")
-        if key not in cost:
-            raise SystemExit(f"missing {key} in the Run facts spend table of {SUMMARY}")
+        if key not in cost or key not in capped:
+            raise SystemExit(f"missing {key} in the Run facts table of {SUMMARY}")
     OUT.mkdir(parents=True, exist_ok=True)
     for name, theme in THEMES.items():
         path = OUT / f"results_{name}.svg"
-        path.write_text(draw(theme, data, cost, n_tasks), encoding="utf-8")
+        path.write_text(draw(theme, data, cost, n_tasks, capped), encoding="utf-8")
         print(f"wrote {path.relative_to(ROOT)}")
 
 
