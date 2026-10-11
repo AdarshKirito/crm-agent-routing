@@ -56,8 +56,9 @@ After the test I fixed the guard's misses and measured the fixes on 620 tasks no
 On a third org from the same benchmark family (the original CRMArena), crmroute scored 82.2% against ReAct's
 75.6% at 54% lower cost per task, a difference 90 tasks cannot confirm.
 
-The numbers are summaries in [`results/`](results/), each produced by the script and command named in it from
-the run records. The raw run records (`runs/`, about 0.8 GB) are not in the repository.
+The numbers are summaries in [`results/`](results/), made from the run records by the scripts in `scripts/`;
+the test, fresh, original-org and robustness summaries name their exact commands. The raw run records
+(`runs/`, about 0.8 GB) are not in the repository.
 
 ## Contents
 
@@ -148,7 +149,7 @@ and graders drive the agent through a `remote` agent adapter that the harness pa
 | `patches/` | The CRMArena patch (base commit pinned), described under [How it was evaluated](#how-it-was-evaluated), plus the benchmark's relaxed requirements. |
 | `scripts/` | Splits, knowledge export, retrieval / router evals, the four-system runner and its run manifests, analysis, routing fit (per org with `--org`), budget estimate, CI eval, judge agreement, the results figure, the fresh split and before/after analysis (`make_fresh_split.py`, `fresh_analysis.py`), org onboarding (`make_org_split.py`, `add_org.py`), the cross-org transfer analyses (`router_transfer.py`, `routing_transfer.py`) and the robustness checks (`robustness_checks.py`). |
 | `data/dev.json`, `data/test.json` | Fixed task ids (seed 20260927); dev and test are disjoint per org across both modes. `data/dev_run.json` is the dev subset actually run. `data/fresh.json` holds tasks used by neither; `data/original_dev.json` and `data/original_test.json` are the original CRMArena org's lists. |
-| `results/` | Summaries of the measured runs (tables and JSON), each with the command that produced it. The raw run records (`runs/`) are git-ignored. |
+| `results/` | Summaries of the measured runs (tables and JSON); most name the command that produced them. The raw run records (`runs/`) are git-ignored. |
 | `Dockerfile`, `deploy/` | One container: the agent plus both MCP servers on localhost. Measured runs use it. |
 | `.github/workflows/` | CI (tests, and the patched benchmark rebuilt from upstream) and the PR eval (15 cases, gated on `evals/ci_baseline.json`). |
 
@@ -319,8 +320,8 @@ The project's own code is MIT. The CRMArena patch and the files built from the b
   model call, including the guard's policy classifier and Prompt Guard, not only the solver.
 - Pinned, resumable runs. Each system and stream writes a manifest with every pin plus hashes of the task list,
   routing table, harness patch, source tree and image id; a resume with any changed pin is refused.
-- Records. The raw run records stay local (`runs/`, git-ignored, about 0.8 GB); `results/` holds the summaries
-  and the commands that produce them.
+- Records. The raw run records stay local (`runs/`, git-ignored, about 0.8 GB); `results/` holds the
+  summaries.
 
 <details>
 <summary><b>Dev: tuning and the routing fit</b></summary>
