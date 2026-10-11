@@ -22,7 +22,8 @@ npx @modelcontextprotocol/inspector node dist/index.js --env ../vendor/CRMArena/
 ```
 
 - **Org selection (HTTP):** each request picks its org with the `x-crm-org` header (`b2b`, `b2c` or `original`). An unknown value gets a 400.
-- **Credentials:** read from `SALESFORCE_B2B_*` / `SALESFORCE_B2C_*`, the same names the benchmark uses.
+- **Credentials:** read from `SALESFORCE_B2B_*` / `SALESFORCE_B2C_*`, and `SALESFORCE_*` for the original CRMArena org, the same names the benchmark uses.
+- **Tested with:** ADK's `McpToolset` and the official MCP TypeScript client (`test/smoke.ts`), against the benchmark's orgs only.
 - **Security:** a loopback bind is protected by the SDK's Host/Origin checks. Binding anywhere else requires `MCP_BEARER_TOKEN`, or `MCP_ALLOW_UNAUTHENTICATED=true` behind an authenticating proxy.
 - **Cache:** results are cached in memory, and on disk when `SF_CACHE_DIR` is set. The benchmark orgs are shared, read-only and capped on daily API calls.
 
