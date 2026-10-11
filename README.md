@@ -4,73 +4,99 @@
 [![PR eval](https://github.com/AdarshKirito/crm-agent-routing/actions/workflows/eval-pr.yml/badge.svg)](https://github.com/AdarshKirito/crm-agent-routing/actions/workflows/eval-pr.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-crmroute is an AI assistant for a Salesforce CRM. Employees ask it business questions ("which agent
-closed cases fastest last quarter?"), customers ask about their own orders, and it answers from the live
-CRM data. It refuses anything private or confidential, and it sends the easier questions to a cheaper model.
+crmroute is a research prototype of a Salesforce CRM assistant: an agent that answers business questions from
+CRM records, refuses requests for private or confidential data, and sends some task types to a cheaper model.
+I built it with Google's Agent Development Kit (ADK), Gemini and two MCP tool servers, and evaluated it on
+[CRMArena-Pro](https://github.com/SalesforceAIResearch/CRMArena), Salesforce AI Research's benchmark for CRM
+agents, against the benchmark's own ReAct agent on the same model.
 
-I built it with Google's Agent Development Kit (ADK), Gemini and two MCP tool servers, and measured it on
-[CRMArena-Pro](https://github.com/SalesforceAIResearch/CRMArena), Salesforce AI Research's benchmark for
-CRM agents, against the benchmark's own agent running on the same model.
+Nobody has used it for real work. Every result below comes from the benchmark's templated tasks on its own
+Salesforce orgs, which hold data generated for the benchmark, with a language model playing the user and
+another grading the answers.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/img/results_dark.svg">
-  <img alt="Held-out test results: crmroute 71.1% business task success at $0.028 per task and 92.9% refusals, against 56.1%, $0.075 and 0% for the benchmark's ReAct agent" src="docs/img/results_light.svg">
+  <img alt="Held-out test, business single-turn success, cost per task and confidential requests refused: ReAct 56.1%, $0.075, 0%; ReAct with the privacy prompt 50.0%, $0.073, 59.5%; crmroute on Gemini 3.8 Flash only 69.3%, $0.044, 92.9%; crmroute routed 71.1%, $0.028, 92.9%" src="docs/img/results_light.svg">
 </picture>
 
-## Results in one minute
+## Results in brief
 
-On 194 test tasks it had never seen, with the same Gemini model on both sides:
+Held-out test set, run once after all tuning: 194 tasks per system, Gemini 3.8 Flash as every system's main
+model ([`results/test_summary.md`](results/test_summary.md)).
 
-| | the benchmark's agent (ReAct) | crmroute |
-|---|---|---|
-| business questions answered correctly | 56% | **71%** |
-| multi-turn conversations solved | 29% | **47%** |
-| requests for confidential data refused | 0 of 42 | **39 of 42** |
-| cost per task (list price) | $0.075 | **$0.028** (63% less) |
+| | ReAct (the benchmark's agent) | ReAct + the benchmark's privacy prompt | crmroute (routed) |
+|---|---|---|---|
+| business tasks solved, single-turn (n=114) | 56.1% | 50.0% | 71.1% |
+| business tasks solved, multi-turn (n=38) | 28.9% | 21.1% | 47.4% |
+| confidential requests refused (n=42) | 0% | 59.5% | 92.9% |
+| list-price cost per task (all 194) | $0.075 | $0.073 | $0.028 |
 
-After the test I fixed what it got wrong and checked the fixes on 620 tasks no run had touched: refusals of
-confidential requests went from 96.3% to 99.0%, and no ordinary customer question was refused. On a third
-Salesforce org I did not build it for, it scored 82% against 76% for the benchmark's agent at less than half
-the cost, though with 90 tasks that lead is too small to call significant.
+How far these numbers go:
 
-Every number comes from runs saved in [`results/`](results/). I tuned on one set of tasks, ran the test set
-once, and report 95% confidence intervals.
+- **Against ReAct with its privacy prompt**, the baseline that is asked to protect data, crmroute is ahead by
+  +21.1 points on single-turn and +26.3 on multi-turn business tasks and +33.3 on refusals. All three 95%
+  intervals exclude zero, also in the check described next.
+- **Against plain ReAct, the business-task lead depends on a cap I set.** The patched harness does not send a
+  request above 250K input tokens and scores the task as a failure. That ended 17 ReAct tasks (8 business
+  single-turn, 3 multi-turn) and none of crmroute's. Counted as ReAct successes instead, the lead is +7.9
+  points single-turn [-0.9, +17.5] and +10.5 multi-turn [-7.9, +28.9], no longer significant
+  ([`results/robustness_checks.md`](results/robustness_checks.md)). Plain ReAct refuses nothing because
+  nothing asks it to.
+- **crmroute's prompts were tuned on this benchmark; ReAct's were not.** Its per-task hints encode the
+  benchmark's answer conventions, learned on dev tasks. On dev, that tuning pass raised crmroute on 3.8 Flash
+  from 52.0% to 61.0% on the same 100 tasks. How much of the test-set gap it explains was not measured.
+- **The cost gap does not depend on the cap** (the capped ReAct tasks stopped early, so ReAct's cost is if
+  anything understated). crmroute bounds tool results and sends 9 of 19 task types to Gemini 3.1 Flash-Lite;
+  it used 76K tokens per business single-turn task against ReAct's 212K.
+- **Grading:** the benchmark's graders with a local qwen3:8b model as judge and simulated user for every system,
+  so these numbers compare the systems here but not with the paper's GPT-4o-graded tables.
+
+After the test I fixed the guard's misses and measured the fixes on 620 tasks no earlier run had used: on the
+188 confidential requests among them that the router had also never seen, refusals rose from 93.1% to 97.9%.
+On a third org from the same benchmark family (the original CRMArena), crmroute scored 82.2% against ReAct's
+75.6% at 54% lower cost per task, a difference 90 tasks cannot confirm.
+
+The numbers are summaries in [`results/`](results/), each produced by the script and command named in it from
+the run records. The raw run records (`runs/`, about 0.8 GB) are not in the repository.
 
 ## Contents
 
 [How it works](#how-it-works) · [Architecture](#architecture) · [Results](#results-on-the-held-out-test-set) ·
-[After the test run](#after-the-test-run) · [What you can reuse](#what-you-can-reuse-from-this-project) ·
+[After the test run](#after-the-test-run) · [Reusable parts](#reusable-parts) ·
 [How it was evaluated](#how-it-was-evaluated) · [Design decisions](#design-decisions-and-what-did-not-work) ·
 [Tracing](#tracing) · [Tests and CI](#tests-and-ci) · [Setup](#setup) · [Run the benchmark](#run-the-benchmark) ·
 [Limitations](#limitations) · [License](#license)
 
 ## How it works
 
-A CRM assistant has to get three things right at once. It has to answer from real records, which means exact
-Ids, the right time window and the company's own policy articles. It must never leak data: one customer may not
-see another's records, and internal numbers stay internal. And it has to be cheap enough to run on every
-question.
+A CRM assistant has to answer from real records (exact Ids, the right time window, the company's policy
+articles), must not show one customer another's data or internal numbers, and has to be cheap enough to run on
+every question. crmroute is an ADK 2.10 graph `Workflow` that handles each user turn in four steps:
 
-The benchmark's own ReAct agent struggles with all three on the same model (Gemini 3.8 Flash). It solves
-56.1% of single-turn business tasks and 28.9% of multi-turn ones, refuses none of 42 confidential requests,
-and its context grows with every tool result, to 212K tokens per business task (17 requests went over 250K).
-Its privacy prompt raises refusals to 59.5% but lowers business accuracy by 6 points (not significant).
+1. **Guard.** In customer sessions, a small model (Gemini 3.1 Flash-Lite) applies a written policy
+   (`agent/app/guard/policy.md`) to the conversation, given hints from Presidio PII detection, a sensitive-field
+   map and the router's predicted task type. A request naming another customer's contact, account or lead Id
+   is refused without that call. In these sessions every tool call is checked again (`before_tool_callback`
+   refuses queries on internal objects, other customers' records and confidential articles), and Presidio
+   scrubs personal data from the answer. Employee sessions skip all three. Prompt Guard 2 (on Groq) scores
+   every request for prompt injection, but no benchmark task is an injection attempt, so that layer is
+   untested here, and it lets requests through when Groq does not answer.
 
-crmroute handles each question in four steps:
-
-1. **Guard.** Before any data is touched, the request is screened: Prompt Guard 2 for prompt injection,
-   Presidio and a sensitive-field map for personal data, and in customer sessions a small model that applies a
-   written policy. Every tool call is checked again (`before_tool_callback` blocks queries that reach other
-   customers' or internal data), and personal data is scrubbed from the answer. Refusals come from the request
-   text, never from the dataset's task label.
-2. **Route.** A nearest-neighbour vote over 1,760 labelled example requests guesses the task type (93.8% right
-   on the test set) without a model call. A routing table fitted on dev runs then sends 9 of the 19 task types
-   to the cheaper Gemini 3.1 Flash-Lite.
+   crmroute does not decide which sessions are customer sessions. The benchmark marks each task customer-facing
+   or internal by its task type (every confidentiality task, plus the knowledge_qa and
+   named_entity_disambiguation business tasks, is customer-facing), and ReAct gets the same flag. So the guard
+   has to tell confidential requests apart from those two business task types, not from every kind of question.
+2. **Route.** A nearest-neighbour vote over 1,760 labelled example requests from non-test tasks (bge-small
+   embeddings, no model call) predicts the task type. Its input includes the task context the benchmark
+   supplies, which is templated per task type: with it the vote was right on 93.8% of test requests, and on
+   84.5% from the context alone. A routing table fitted on dev runs then sends 9 of the 19 business task types
+   to Gemini 3.1 Flash-Lite and the rest to Gemini 3.8 Flash.
 3. **Solve.** The chosen model answers through two read-only MCP servers, one for Salesforce queries and one
-   for searching the knowledge articles. Tool results are capped (16K characters, at most 10 tool calls per
-   turn), so a business task takes 103K tokens instead of ReAct's 212K.
-4. **Check.** Every Id in the answer must appear in a tool result, and the answer must have the expected form
-   (one Id, a stage, or "None"). If not, the model gets one retry; if no Id can be verified, the agent says so.
+   for BM25 search over the org's knowledge articles. Tool results are capped at 16K characters, with at most
+   10 tool calls per turn. The prompt carries per-task-type hints tuned on dev (`agent/app/task_specs.py`).
+4. **Check.** Every record Id in the answer must appear in a tool result or the task's own text, and the answer
+   must have the expected form (one Id, a stage, or "None"); otherwise the model gets one retry. Since the
+   post-test fixes, an answer whose Ids cannot be verified says so instead of answering "None".
 
 ## Architecture
 
@@ -106,11 +132,13 @@ flowchart LR
   KS --> Q[(Qdrant local:<br/>one collection per org)]
 ```
 
-The agent is an ADK 2.10 graph `Workflow` with one pinned model per role and multi-turn state in
-`session.state`. It runs Gemini on Vertex AI (or with an AI Studio key), or any LiteLLM `provider/model`
-(Mistral, Groq, OpenRouter, local Ollama); automatic provider fallback exists for the local demo only and is
-off in measured runs. The benchmark's own environment, simulated user and graders drive it through a `remote`
-agent adapter.
+The agent keeps one pinned model per role and multi-turn state in `session.state`. Every measured run used
+Gemini on Vertex AI. A role's model can also be the Gemini API (AI Studio key) or a LiteLLM `provider/model`:
+a three-task smoke test on 2026-09-29 ran the agent end to end on Groq, OpenRouter and local Ollama models,
+while Mistral could not be tried (the key had no quota). Automatic provider fallback exists for the local demo
+only and is off in measured runs. The agent exposes `search_knowledge` from one backend at a time: the search
+fork by default, the Salesforce server's SOSL version otherwise. The benchmark's own environment, simulated user
+and graders drive the agent through a `remote` agent adapter that the harness patch adds.
 
 | Path | What it is |
 |---|---|
@@ -118,9 +146,9 @@ agent adapter.
 | `mcp-salesforce/` | Read-only MCP server on `@modelcontextprotocol/server` v2 + jsforce. Five tools, SELECT/FIND only (no locking or tracking clauses), row caps, a 16K-character response budget, memory + disk cache keyed by org login, org chosen per request by header. |
 | `search/` | Fork of `qdrant/mcp-server-qdrant` adding BM25 sparse vectors, RRF/DBSF fusion, a FastEmbed reranker and a `search_knowledge` tool (see `search/NOTICE.md`). |
 | `patches/` | The CRMArena patch (base commit pinned), described under [How it was evaluated](#how-it-was-evaluated), plus the benchmark's relaxed requirements. |
-| `scripts/` | Splits, knowledge export, retrieval / router evals, the four-system runner and its run manifests, analysis, routing fit (per org with `--org`), budget estimate, CI eval, judge agreement, the results figure, the fresh split and before/after analysis (`make_fresh_split.py`, `fresh_analysis.py`), org onboarding (`make_org_split.py`, `add_org.py`) and the cross-org transfer analyses (`router_transfer.py`, `routing_transfer.py`). |
+| `scripts/` | Splits, knowledge export, retrieval / router evals, the four-system runner and its run manifests, analysis, routing fit (per org with `--org`), budget estimate, CI eval, judge agreement, the results figure, the fresh split and before/after analysis (`make_fresh_split.py`, `fresh_analysis.py`), org onboarding (`make_org_split.py`, `add_org.py`), the cross-org transfer analyses (`router_transfer.py`, `routing_transfer.py`) and the robustness checks (`robustness_checks.py`). |
 | `data/dev.json`, `data/test.json` | Fixed task ids (seed 20260927); dev and test are disjoint per org across both modes. `data/dev_run.json` is the dev subset actually run. `data/fresh.json` holds tasks used by neither; `data/original_dev.json` and `data/original_test.json` are the original CRMArena org's lists. |
-| `results/` | Measured outputs committed as evidence. |
+| `results/` | Summaries of the measured runs (tables and JSON), each with the command that produced it. The raw run records (`runs/`) are git-ignored. |
 | `Dockerfile`, `deploy/` | One container: the agent plus both MCP servers on localhost. Measured runs use it. |
 | `.github/workflows/` | CI (tests, and the patched benchmark rebuilt from upstream) and the PR eval (15 cases, gated on `evals/ci_baseline.json`). |
 
@@ -137,43 +165,59 @@ The full table, commands and pins are in `results/test_summary.md`.
 | 1. ReAct (the benchmark's agent) | 56.1% [46.5, 64.9] | 28.9% [15.8, 42.1] | 0.0% | 0.075 | 6.7 |
 | 2. ReAct + privacy prompt | 50.0% [40.4, 58.8] | 21.1% [7.9, 34.2] | 59.5% [45.2, 73.8] | 0.073 | 6.9 |
 | 3. crmroute, 3.8 Flash only | 69.3% [61.4, 77.2] | 50.0% [34.2, 65.8] | 92.9% [83.3, 100] | 0.044 | 8.0 |
-| 4. crmroute, routed | **71.1%** [62.3, 79.8] | 47.4% [31.6, 63.2] | **92.9%** [83.3, 100] | **0.028** | **4.4** |
+| 4. crmroute, routed | 71.1% [62.3, 79.8] | 47.4% [31.6, 63.2] | 92.9% [83.3, 100] | 0.028 | 4.4 |
 
-Paired differences on the same task ids (95% bootstrap CI; I count a win only when the interval excludes zero):
+Paired differences on the same task ids (95% bootstrap CI; I count a difference only when the interval excludes
+zero). The last column counts every baseline task that hit the 250K-token cap as a baseline success instead:
 
-| comparison | business single-turn | business multi-turn | refusal rate |
-|---|---|---|---|
-| crmroute (3.8 Flash) vs ReAct | **+13.2** [+5.3, +21.9] | **+21.1** [+2.6, +39.5] | **+92.9** [+83.3, +100] |
-| crmroute (routed) vs ReAct | **+14.9** [+7.0, +22.8] | **+18.4** [+2.6, +34.2] | **+92.9** [+83.3, +100] |
-| crmroute (3.8 Flash) vs ReAct + privacy prompt | **+19.3** [+11.4, +28.1] | **+28.9** [+10.5, +47.4] | **+33.3** [+19.0, +47.6] |
-| routed vs 3.8 Flash only | +1.8 [-3.5, +7.0] | -2.6 [-15.8, +7.9] | +0.0 |
+| comparison | business single-turn | business multi-turn | refusal rate | business single-turn, the baseline's capped tasks counted as successes |
+|---|---|---|---|---|
+| crmroute (3.8 Flash) vs ReAct | **+13.2** [+5.3, +21.9] | **+21.1** [+2.6, +39.5] | **+92.9** [+83.3, +100] | +6.1 [-3.5, +15.8] |
+| crmroute (routed) vs ReAct | **+14.9** [+7.0, +22.8] | **+18.4** [+2.6, +34.2] | **+92.9** [+83.3, +100] | +7.9 [-0.9, +17.5] |
+| crmroute (3.8 Flash) vs ReAct + privacy prompt | **+19.3** [+11.4, +28.1] | **+28.9** [+10.5, +47.4] | **+33.3** [+19.0, +47.6] | **+14.0** [+5.3, +23.7] |
+| crmroute (routed) vs ReAct + privacy prompt | **+21.1** [+12.3, +29.8] | **+26.3** [+7.9, +42.1] | **+33.3** [+19.0, +47.6] | **+15.8** [+7.0, +25.4] |
+| routed vs 3.8 Flash only | +1.8 [-3.5, +7.0] | -2.6 [-15.8, +7.9] | +0.0 | |
 
 What the numbers say:
 
 - The guard refused 39 of 42 confidential requests. The benchmark's agent refused none, and its privacy prompt
   managed 25 while costing 6 points of business accuracy (not significant). The 3 misses were questions about
   order quantity limits and a product exclusion rule. Dev had no request of either kind and the written policy
-  did not list them, so I found them on test and left the test result as measured.
-- Same model, better agent: crmroute beats ReAct on Gemini 3.8 Flash by 13-15 points on single-turn and
-  18-21 points on multi-turn business tasks, at about 40% lower cost per task. Because its tool results are
-  bounded, a business task uses 103K tokens across all its model calls against 212K for ReAct, whose history
-  grows with every observation; 17 ReAct requests went over 250K tokens and were scored as failures.
+  did not list them, so I found them on test and left the test result as measured. The routed system also
+  refused one customer-facing business task (b2b/1987, multi-turn: the simulated user asked about a purchase
+  "by the contact with ID 003…"), which the 3.8 Flash-only system answered.
+- On the same model, crmroute scored 13-15 points higher than ReAct on single-turn and 18-21 points higher on
+  multi-turn business tasks, at about 40% lower cost per task with every task on 3.8 Flash. Two things qualify
+  this. ReAct hit the harness's 250K-token request cap on 8 single-turn and 3 multi-turn business tasks, each
+  scored as a failure; counted as ReAct successes, crmroute's lead shrinks to +6.1 to +7.9 points single-turn
+  and +10.5 to +13.2 multi-turn, with intervals that include zero (`results/robustness_checks.md`). And
+  crmroute's per-task hints were tuned on dev to the benchmark's answer conventions, which ReAct's stock
+  prompts were not. Against ReAct with the privacy prompt, every difference stays significant either way.
+- crmroute's tool results are bounded; ReAct's prompt carries every earlier observation. A business single-turn
+  task took 212K tokens across all of ReAct's model calls, against 103K for crmroute on 3.8 Flash and 76K routed.
+  I did not run an ablation, so the gap is not attributed to any single design choice.
 - Routing sent 71 of 152 business tasks (47%) to Flash-Lite, cut 3.8 Flash calls per business single-turn task
-  from 8.0 to 4.4 and the test run's cost from $8.59 to $5.42 (-37%), with no measurable loss in success
-  (paired differences +1.8 and -2.6 points, both intervals spanning zero).
-- The test run cost $42.65 at list price ($14.52, $14.12, $8.59 and $5.42 for systems 1-4), and the work up
-  to it about $71, including dev tuning, the final dev run and a ReAct cost probe. The fresh-task and new-org
-  runs after it added about $33.
-- To check the judge, I labelled 40 blind test items against the reference answers (AI-assisted, with every
-  row reviewed by me) in `evals/human_labels_test.csv`. The qwen3:8b judge agreed on 39 of 40, Cohen's κ = 0.95
-  (target ≥ 0.7). The one disagreement is a multi-turn answer that ranks two states before concluding with the
-  right one; the grader extracts every state a reply names, so it scored the answer wrong.
+  from 8.0 to 4.4 and the test run's cost from $8.59 to $5.42 (-37%). Success did not change measurably
+  (+1.8 points single-turn, -2.6 multi-turn), but the multi-turn interval [-15.8, +7.9] is wide enough to hide a
+  real loss.
+- The test run cost $42.65 at list price ($14.52, $14.12, $8.59 and $5.42 for systems 1-4). All recorded runs
+  come to about $105: $29 before the test (smoke tests, dev tuning, the final dev run, a ReAct cost probe and the
+  PR-eval baseline), $42.66 for the test including one failed attempt, and $33 after it
+  (`results/robustness_checks.md`). These are list-price estimates from usage metadata, not invoices.
+- To check the judge, I compared it with labels for 40 blind test items, made against the reference answers
+  (drafted with AI assistance, every row reviewed by me; `evals/human_labels_test.csv`). The qwen3:8b judge
+  agreed on 39 of 40, Cohen's κ = 0.95 (target ≥ 0.7). The one disagreement is a multi-turn answer that ranks two
+  states before concluding with the right one; the grader extracts every state a reply names, so it scored the
+  answer wrong.
 
 ## After the test run
 
-The test run exposed weaknesses: 3 missed refusals, a policy-classifier fallback that allowed requests, a
-checker that answered "None" when it could not verify an Id, and no evidence beyond the two benchmark orgs. I
-addressed each one and measured the result on tasks no earlier step had used, so the test set stayed untouched.
+The test run showed 3 missed refusals. Reviewing the code afterwards, I found two failure paths that had not
+triggered on test: a customer request with no usable verdict from the policy classifier was allowed unless the
+router's vote said confidential (and a classifier error crashed the request), and a checker that could not
+verify any Id answered "None", which claims that no record matches. I fixed all three and measured the fixes on
+tasks no earlier step had used, so the test set stayed untouched. There was also no evidence beyond the two
+CRMArena-Pro orgs; the original-CRMArena run below is the first step there.
 
 ### Safety fixes, measured on fresh tasks (`results/fresh_summary.md`)
 
@@ -188,24 +232,34 @@ image ran the same tasks with the test run's pins.
 | measure (same 620 fresh tasks) | n | measured agent | fixed agent | difference [95% CI] |
 |---|---|---|---|---|
 | confidential requests refused | 408 | 96.3% | 99.0% | **+2.7** [+1.2, +4.4] |
+| of those, requests not in the router's example file | 188 | 93.1% | 97.9% | **+4.8** [+2.1, +8.0] |
 | confidential company knowledge refused | 136 | 89.0% | 97.1% | **+8.1** [+3.7, +13.2] |
 | order-limit and bought-together wording refused | 16 | 7/16 | 16/16 | +56.2 [+31.2, +81.2] |
-| customer business requests refused (false refusals) | 72 | 0 | 0 | 0 |
+| customer business requests refused (false refusals), single- and multi-turn | 76 | 1 | 0 | |
 | business tasks, single-turn | 174 | 64.9% | 66.7% | +1.7 [-2.9, +6.3] |
 | business tasks, multi-turn | 38 | 50.0% | 55.3% | +5.3 [-5.3, +18.4] |
 
-The fail-closed classifier and the checker's abstention never triggered on these tasks (no missing verdict, no
-answer left with unverified Ids), so they are safeguards rather than score changes. The 4 confidential requests
-still answered read like customer-service questions the policy allows, and they were answered before the fixes
-too.
+- The fresh tasks were new to every run, but not all of them to the router. Its example file was drawn from
+  every non-test task before the fresh split existed, so 220 of the 408 confidential requests are labelled
+  examples in it, and the router's predicted type reaches the policy classifier as a hint. Those 220 were
+  refused 99.1% and 100% of the time; the 188 the router had not seen are the fairer measure, 93.1% → 97.9%.
+  The test set has no such overlap (`results/robustness_checks.md`).
+- The order-limit row is picked with a fixed regex that, on the test set, selects exactly the three missed
+  requests, so it measures the targeted gap directly.
+- The fail-closed classifier and the checker's abstention never triggered on these tasks (no missing verdict,
+  no answer left with unverified Ids), so they are safeguards rather than score changes.
+- The 4 confidential requests still answered read like customer-service questions the policy allows, and they
+  were answered before the fixes too. The one false refusal (measured agent only) was a multi-turn task in
+  which the simulated user had neither an order number nor an account name for a purchase "by the team".
 
-### An org it was not built on: the original CRMArena (`results/original_test_summary.md`)
+### Another org from the same benchmark: the original CRMArena (`results/original_test_summary.md`)
 
 The original CRMArena org has its own data, a smaller schema (16 objects, no opportunities, leads or quotes)
-and 9 task types. I left the agent's code and per-task hints unchanged and added only the org's schema text,
-router examples from its non-test tasks (`scripts/add_org.py`) and a knowledge index. Its routing table was
-fitted on its own 90 dev tasks with the shipped rule (`results/original_dev_summary.md`: 3 of 9 types to
-Flash-Lite) and committed before the 90 test tasks ran once.
+and 9 task types, all of which CRMArena-Pro also has. I left the agent's code and per-task hints unchanged and
+added only the org's schema text, router examples from its non-test tasks (`scripts/add_org.py`) and a
+knowledge index; scoring its tasks needed a harness fix first (`a918dc2`). Its routing table was fitted on its
+own 90 dev tasks with the shipped rule (`results/original_dev_summary.md`: 3 of 9 types to Flash-Lite) and
+committed before the 90 test tasks ran once.
 
 | system (90 test tasks, Gemini 3.8 Flash) | success [95% CI] | vs ReAct [95% CI] | list-price $/task | tokens/task |
 |---|---|---|---|---|
@@ -213,34 +267,36 @@ Flash-Lite) and committed before the 90 test tasks ran once.
 | crmroute, 3.8 Flash only | 81.1% [73.3, 88.9] | +5.6 [-3.3, +14.4] | 0.041 | 96K |
 | crmroute, routed with the org's own table | 82.2% [74.4, 90.0] | +6.7 [-1.1, +14.4] | 0.031 | 84K |
 
-- It stays ahead, but not significantly. The lead over ReAct shrinks from 13-15 points on CRMArena-Pro to 6-7
-  here, mainly because ReAct does much better on this simpler schema (75.6% vs 56.1%), and 90 tasks cannot
-  separate the two.
+- crmroute is ahead, but not significantly. The lead over ReAct shrinks from 13-15 points on CRMArena-Pro to
+  6-7 here, mainly because ReAct does much better on this simpler schema (75.6% vs 56.1%), and 90 tasks cannot
+  separate the two. One ReAct task hit the 250K-token cap here.
 - It is 40% (3.8 Flash only) and 54% (routed) cheaper per task than ReAct.
-- Routing carries over as a method: the org's own table sent 30 of 90 tasks to Flash-Lite and cut cost 24%
-  against 3.8 Flash only, with no measurable loss (+1.1 [-5.6, +7.8]).
-- The router needed no new examples. It named the right task type for all 90 requests, and built from the
-  CRMArena-Pro examples alone it also scores 90/90 offline (`results/router_transfer.json`). Between the two Pro
-  orgs, a router built from the other org's examples scores 0.907 (0.928-0.948 with both). The original org's
-  questions come from the same benchmark family, so this says nothing yet about a company's own phrasing.
+- The routing method carried over: the org's own table sent 30 of 90 tasks to Flash-Lite and cut cost 24%
+  against 3.8 Flash only, with no measurable difference in success (+1.1 [-5.6, +7.8]).
+- The router was not the bottleneck. With the org's examples added it named the right task type for all 90
+  requests, and built from the CRMArena-Pro examples alone it also scores 90/90 offline
+  (`results/router_transfer.json`). Between the two Pro orgs, a router built from the other org's examples
+  scores 0.907 (0.928-0.948 with both). These questions come from the same benchmark family, with the same
+  templated task context, so this says nothing yet about a company's own phrasing.
 - A routing table needs the org's own dev runs. One Pro org's dev split (median 6 tasks per type) is too small
   for the shipped rule (8 per type); with 4, a table fitted on one Pro org cut the other's dev cost by about half,
   at +1.9 and -4.8 points (intervals spanning zero; `results/routing_transfer.json`).
 
-## What you can reuse from this project
+## Reusable parts
 
-Most of the pieces work outside this benchmark. Each lives in its own folder or script:
+These pieces live in their own folders or scripts. They have only been run inside this project, against the
+benchmark's orgs, and none is packaged as a library:
 
-| piece | what it gives you | where | how to start |
+| piece | what it does | where | how to start |
 |---|---|---|---|
-| Read-only Salesforce MCP server | Safe read access to a Salesforce org for any MCP client (ADK, Claude Desktop, the MCP Inspector): SOQL, SOSL, describe, get record and knowledge search, with SELECT/FIND-only checks, row caps, a response-size budget and a cache | `mcp-salesforce/` | `node dist/index.js --http --port 3333 --env <your .env>`, or stdio without `--http`; logins are read from the `.env` file |
-| Three-layer guard for ADK agents | A written policy applied by a small model, Presidio PII detection, a field-level sensitive map, a tool-call guard (`before_tool_callback`) and an answer scrub, failing closed | `agent/app/guard/` | edit `policy.md` and `sensitive_fields.yaml` for your data; attach `before_tool` / `after_tool` to your agent as `agent/app/agent.py` does |
-| Cheap task router and routing fit | Picks a model per request type with a nearest-neighbour vote over labelled examples (no model call), and fits which types the small model can take from two dev runs | `agent/app/router.py`, `scripts/fit_routing.py` | a JSONL of `{"task", "text"}` examples, then `fit_routing.py --big <run> --small <run>` |
+| Read-only Salesforce MCP server | Read access to a Salesforce org over MCP: SOQL, SOSL, describe, get record and knowledge search, with SELECT/FIND-only checks, row caps, a response-size budget and a cache. Tested with ADK and the official MCP TypeScript client (`test/smoke.ts`) | `mcp-salesforce/` | `node dist/index.js --http --port 3333 --env <your .env>`, or stdio without `--http`; logins are read from the `.env` file |
+| Guard for ADK agents | A written policy applied by a small model, Presidio PII detection, a field-level sensitive map, a tool-call guard (`before_tool_callback`) and an answer scrub. The policy check fails closed; Prompt Guard fails open. Policy and field map were written for this benchmark's data | `agent/app/guard/` | edit `policy.md` and `sensitive_fields.yaml` for your data; attach `before_tool` / `after_tool` to your agent as `agent/app/agent.py` does |
+| Task router and routing fit | Picks a model per request type with a nearest-neighbour vote over labelled examples (no model call), and fits which types the small model can take from two dev runs | `agent/app/router.py`, `scripts/fit_routing.py` | a JSONL of `{"task", "text"}` examples, then `fit_routing.py --big <run> --small <run>` |
 | BM25 and hybrid search for Qdrant's MCP server | Sparse BM25, RRF or DBSF hybrid, and reranked search behind one setting, so you can measure which suits your data | `search/` | `HYBRID_ENABLED=true HYBRID_SEARCH_MODE=sparse` (or `dense`, `hybrid`, `hybrid_dbsf`, `hybrid_rerank`) |
-| Evaluation kit | Run manifests that refuse a resume with changed settings, paired bootstrap analysis, a judge-agreement check (Cohen's κ), a fresh split with a before/after comparison for changes made after a test run, and a cost estimate | `scripts/run_manifest.py`, `analyze_results.py`, `judge_agreement.py`, `make_fresh_split.py`, `fresh_analysis.py`, `estimate_budget.py` | each script's docstring has its command line |
-| LLM regression gate in CI | A pull-request check that runs fixed cases and fails when the success or refusal rate drops below a reviewed baseline | `.github/workflows/eval-pr.yml`, `scripts/ci_eval.py` | add the two secrets and `CRMROUTE_PR_EVAL=true`, as described under [Tests and CI](#tests-and-ci) |
-| CRMArena harness patch | Runs any agent served by ADK's API server against CRMArena, with Gemini 3 on Vertex or AI Studio, a configurable judge, resumable pinned runs and fixes for five upstream bugs | `patches/crmarena-crmroute.patch` | apply to CRMArena commit `6d84f3d` (see [Setup](#setup)) |
-| Onboarding another org | Schema text, router examples and a routing table from the org's own tasks, without touching the agent's code | `scripts/add_org.py`, `fit_routing.py --org`, `ROUTING_TABLE` / `ROUTER_EXAMPLES` in `run_systems.sh` | follow the original-org commands under [Run the benchmark](#run-the-benchmark) |
+| Evaluation scripts | Run manifests that refuse a resume with changed settings, paired bootstrap analysis, a judge-agreement check (Cohen's κ), a fresh split with a before/after comparison for changes made after a test run, robustness checks and a cost estimate | `scripts/run_manifest.py`, `analyze_results.py`, `judge_agreement.py`, `make_fresh_split.py`, `fresh_analysis.py`, `robustness_checks.py`, `estimate_budget.py` | each script's docstring has its command line |
+| PR eval workflow | Runs 15 fixed cases on a pull request and fails when business success drops more than one case below a reviewed baseline or a refusal is missed. It has run twice so far, both by manual dispatch, and not yet on a pull request | `.github/workflows/eval-pr.yml`, `scripts/ci_eval.py` | add the two secrets and `CRMROUTE_PR_EVAL=true`, as described under [Tests and CI](#tests-and-ci) |
+| CRMArena harness patch | Runs an agent served by ADK's API server against CRMArena (tried with crmroute only), with Gemini 3 on Vertex or AI Studio, a configurable judge, resumable pinned runs and fixes for five upstream bugs, which I have not reported upstream yet | `patches/crmarena-crmroute.patch` | apply to CRMArena commit `6d84f3d` (see [Setup](#setup)) |
+| Onboarding another org | Schema text, router examples and a routing table from the org's own tasks, without changing the agent's code | `scripts/add_org.py`, `fit_routing.py --org`, `ROUTING_TABLE` / `ROUTER_EXAMPLES` in `run_systems.sh` | follow the original-org commands under [Run the benchmark](#run-the-benchmark) |
 
 The project's own code is MIT. The CRMArena patch and the files built from the benchmark's data are CC BY-NC 4.0
 (research use only), and the search fork is Apache-2.0; see [License](#license).
@@ -251,14 +307,20 @@ The project's own code is MIT. The CRMArena patch and the files built from the b
   `--privacy_aware_prompt true`; 3: crmroute with every task on the big model (`CRMROUTE_MODE=no_route`);
   4: crmroute with the routing table. Same model per role, thinking level, eval mode, judge, simulated user and
   task ids for all four.
+- Same inputs. Every system gets the same task context from the benchmark (eval mode `aided`) and the same
+  customer-facing or internal flag per task. The prompts differ: ReAct uses the benchmark's own prompts,
+  crmroute its own with the hints tuned on dev.
 - Fixed, disjoint splits. `data/dev.json` and `data/test.json` (seed 20260927) are disjoint per org across both
-  modes. All tuning used dev; the test set was run once, after the agent was frozen.
+  modes. All tuning used dev; the test set was run once, after the agent was frozen. The router's examples come
+  from non-test tasks only.
 - Statistics. 95% confidence intervals by bootstrap (5,000 resamples); systems are compared on the same task
-  ids, and a win is claimed only when the paired interval excludes zero.
+  ids, and a difference is claimed only when the paired interval excludes zero.
 - Cost. List prices applied to every response's usage metadata (cached and thinking tokens included), for every
   model call, including the guard's policy classifier and Prompt Guard, not only the solver.
 - Pinned, resumable runs. Each system and stream writes a manifest with every pin plus hashes of the task list,
   routing table, harness patch, source tree and image id; a resume with any changed pin is refused.
+- Records. The raw run records stay local (`runs/`, git-ignored, about 0.8 GB); `results/` holds the summaries
+  and the commands that produce them.
 
 <details>
 <summary><b>Dev: tuning and the routing fit</b></summary>
@@ -302,7 +364,8 @@ multi-turn tasks, one per task type and org), with the same pins as the test run
   that answered every call, with its list-price cost (unknown prices stay unknown, never $0);
 - a request above 250K input tokens is not sent: the task counts as the system's failure (reward 0, as
   upstream scores exceptions). On the free tier that is the per-minute quota; on Vertex it caps runaway
-  ReAct contexts, which grow by every observation;
+  ReAct contexts, which grow by every observation. Only ReAct reached it (17 test tasks; see
+  `results/robustness_checks.md` for what it does to the comparison);
 - resumable runs with pinned configuration: each checkpoint has a `config_*.json` with every pin and a hash
   of the selected tasks; a resume with different pins is refused; checkpoints are written atomically and
   keep earlier failed attempts; `run_tasks.py` exits non-zero while any selected task lacks a completed
@@ -323,12 +386,12 @@ multi-turn tasks, one per task type and org), with the same pins as the test run
 
 | Decision | Why | Evidence |
 |---|---|---|
-| **BM25 is the default knowledge search, not hybrid + rerank** (the original plan) | Policy queries are line-item text ("CloudLink Designer: quantity 20, discount 30%"); lexical matching suits them, and the MS MARCO cross-encoder was trained on natural questions | recall@5 0.827 for BM25 vs 0.735 hybrid and 0.349 hybrid + rerank (table below) |
-| **Task type from a nearest-neighbour vote, not an LLM call** | No added latency or cost per request, and the label only picks a model; refusals never depend on it | 93.8% accuracy on the 194 test requests |
-| **Bounded tool results** | ReAct's history grows with every observation until requests exceed the context budget | 103K vs 212K tokens per business task; 0 vs 17 requests over 250K tokens |
+| **BM25 is the default knowledge search, not hybrid + rerank** (the original plan) | Policy queries are line-item text ("CloudLink Designer: quantity 20, discount 30%"); lexical matching suits them, and the MS MARCO cross-encoder was trained on natural questions | recall@5 0.827 for BM25 vs 0.735 hybrid and 0.349 hybrid + rerank on constructed dev queries (table below) |
+| **Task type from a nearest-neighbour vote, not an LLM call** | No added latency or cost per request; the label picks the model and the task hints, and is one hint to the policy classifier | 93.8% on the 194 test requests, helped by the benchmark's templated task context |
+| **Bounded tool results** | ReAct's history grows with every observation until requests exceed the context budget | 103K vs 212K tokens per business task, and 0 vs 17 tasks ended by the 250K cap; there is no ablation, so this is not this choice alone |
 | **One pinned model per role, retries on the same model** | A run that silently falls back to another model is not a measurement of either | provider fallback exists for the local demo only |
 | **Routing judged on cost, not on accuracy** | About 11 dev tasks per type cannot show per-type accuracy differences | -37% cost; success differences +1.8 and -2.6 points, not significant |
-| **Guard misses found on test fixed from the policy, measured on fresh tasks** | Fixing them against the test tasks would be tuning on test; the gap was a missing rule family, visible in the knowledge base | 3 of 42 misses on test; 96.3% -> 99.0% refusals on 408 unused requests |
+| **Guard misses found on test fixed from the policy, measured on fresh tasks** | Fixing them against the test tasks would be tuning on test; the gap was a missing rule family, visible in the knowledge base | 3 of 42 misses on test; on 188 fresh requests new to the router, 93.1% -> 97.9% refused |
 | **The policy classifier fails closed** | A safety check that allows requests when it fails protects nothing in exactly those cases | no fallback in 620 fresh tasks, so no accuracy cost |
 | **Each org brings its own router examples and routing table** | Request wording and model strengths differ per org; its own dev runs decide which types go to the small model | original CRMArena org: router 90/90, own table -24% cost with no measurable loss |
 
@@ -360,15 +423,18 @@ then `scripts/eval_retrieval.py --sosl-url http://127.0.0.1:3333/mcp`.
 <summary><b>Task-type router: accuracy on the 194 test requests</b> (<code>results/router_test.json</code>)</summary>
 
 The router takes a similarity-weighted vote over the 15 nearest of 1,760 labelled example requests. The examples
-come only from non-test tasks and are embedded with bge-small; there are no LLM calls.
+come only from non-test tasks and are embedded with bge-small; there are no LLM calls. Its input is the request
+plus the task context the benchmark supplies, such as "## Handle Time Policy ..." or "Today's date: ...", which
+is templated per task type.
 
 | input | accuracy |
 |---|---|
 | request + task context | **93.8%** (every error is a confidentiality request, which has no task context) |
 | task context only (worst case: a vague first message in multi-turn) | 84.5% |
 
-The router's label only picks a model and shapes the prompt. Refusals never depend on it: the guard decides them
-from the request text.
+The router's label picks the model and the per-task hints. In customer sessions it is also passed to the policy
+classifier as one hint among others, so refusals do depend on it in part. The test set contains no router
+example; the fresh set does (see [After the test run](#after-the-test-run)).
 
 </details>
 
@@ -391,15 +457,16 @@ above.
 <details>
 <summary><b>Earlier free-tier pilot</b> (2026-09-29, superseded)</summary>
 
-Before the Vertex project was available, the same agent ran on free tiers only (Gemini 3.1 Flash-Lite on the AI Studio key as the big model, local qwen3:8b as the small one, Groq gpt-oss-20b as policy classifier) on a 44-task dev subset (`results/dev_small_summary.md`: 63.2% vs 7.9% on business tasks). The 50-task test subset was stopped by the 500-requests/day Flash-Lite quota and is superseded by the run above. The provider smoke test from that pilot (`results/provider_smoke_2026-09-29.jsonl`) found and fixed six integration bugs across Gemini, Groq, OpenRouter and Ollama.
+Before the Vertex project was available, the same agent ran on free tiers only (Gemini 3.1 Flash-Lite on the AI Studio key as the big model, local qwen3:8b as the small one, Groq gpt-oss-20b as policy classifier) on a 44-task dev subset (`results/dev_small_summary.md`: 63.2% vs 7.9% on business tasks). The 50-task test subset was stopped by the 500-requests/day Flash-Lite quota and is superseded by the run above. The provider smoke test from that pilot (`results/provider_smoke_2026-09-29.jsonl`, three dev tasks per model) found integration problems that I then fixed: Groq rejected a JSON response format next to tools and replayed reasoning content, small models wrote tool calls as text, a 200-row SOQL result flooded the context (now capped by the 16K-character budget and the 10-call limit), and the policy classifier's reply leaked into the solver's conversation.
 
 </details>
 
 ## Tracing
 
-Every request is one trace in [Arize Phoenix](https://github.com/Arize-ai/phoenix): the workflow nodes, each
-model call and each MCP tool call, with token counts. Run `uvx --from arize-phoenix phoenix serve` and start the
-agent with `PHOENIX_COLLECTOR_ENDPOINT=http://localhost:6006` (from Docker: `http://host.docker.internal:6006`).
+With tracing on, every request is one trace in [Arize Phoenix](https://github.com/Arize-ai/phoenix): the workflow
+nodes, each model call and each MCP tool call, with token counts. Run `uvx --from arize-phoenix phoenix serve`
+and start the agent with `PHOENIX_COLLECTOR_ENDPOINT=http://localhost:6006` (from Docker:
+`http://host.docker.internal:6006`).
 
 ![Phoenix trace of dev task b2c/1943](docs/img/phoenix_trace.png)
 
@@ -414,17 +481,20 @@ the measured runs come from the run records (`scripts/analyze_results.py`), not 
 | suite | what it covers | result |
 |---|---|---|
 | `mcp-salesforce` (`npm test`) | SOQL/SOSL guards (incl. locking clauses), Id checks, cache scoping, shared in-flight reads, atomic disk writes, pagination caps, response budget, `--env` start-up | 17 passed |
-| `mcp-salesforce` live smoke (`npx tsx test/smoke.ts --env ...`) | all 5 tools on both live orgs via the official MCP client; write attempts and unknown orgs rejected | passed |
+| `mcp-salesforce` live smoke (`npx tsx test/smoke.ts --env ...`, run by hand) | all 5 tools on both live orgs via the official MCP client; write attempts and unknown orgs rejected | passed |
 | `agent` (`uv run pytest`) | guard (ownership filters, knowledge filtering on every read, identity in conversations), checker, PII scrub, Prompt Guard parsing and accounting, cost accounting, pinned retry vs fallback on real provider errors, tool-call repair, tracing export, the real ADK graph offline with a scripted model, fail-closed classifier, checker abstention, router examples from several files | 63 passed, 11 live tests skipped without their env flags |
 | `search` fork (`uv run pytest`) | upstream behaviour plus the knowledge index: mode-specific embedding, org isolation, response budget | 36 passed |
 | `tests/` (benchmark env) | harness retries, resume pins, atomic checkpoints, adapter failure handling, run manifests, complete-split analysis, routing fit pairing, judge-agreement binding, budget estimate, scoring the original org's single answers | 56 passed, 1 live test skipped |
 
-CI (`.github/workflows/ci.yml`) runs all of these on every push, and rebuilds the patched benchmark from the
-pinned upstream commit to prove the patch still applies. The PR eval (`.github/workflows/eval-pr.yml`) runs 15
-fixed dev cases on Flash-Lite and fails if the success or refusal rate drops below `evals/ci_baseline.json`
-(7/12 and 3/3) or if task ids or model/judge pins change. It needs two repository secrets (`GEMINI_API_KEY`,
-`GROQ_API_KEY`) and the variable `CRMROUTE_PR_EVAL=true`; the Salesforce logins are the benchmark's public
-demo-org credentials, read from the README at the pinned CRMArena commit.
+CI (`.github/workflows/ci.yml`) runs the offline suites (every row except the live smoke test) on every push to
+`main` and every pull request, and rebuilds the patched benchmark from the pinned upstream commit to prove the
+patch still applies. The PR eval (`.github/workflows/eval-pr.yml`) runs 15 fixed dev cases on Flash-Lite and
+fails if business success falls more than one case below `evals/ci_baseline.json` (7 of 12), if a refusal is
+missed (3 of 3), or if task ids or model/judge pins change. It runs on pull requests that touch the agent, the
+servers, the patch or the evals when the repository variable `CRMROUTE_PR_EVAL=true` is set, or by manual
+dispatch. So far it has run twice, both by manual dispatch (one failure, then a pass), and not yet on a pull
+request. It needs two repository secrets (`GEMINI_API_KEY`, `GROQ_API_KEY`); the Salesforce logins are
+the benchmark's public demo-org credentials, read from the README at the pinned CRMArena commit.
 
 ## Setup
 
@@ -502,6 +572,9 @@ SPLIT=fresh TASK_IDS=data/fresh.json OUT=runs/fresh_before IMAGE=crmroute:local 
 SPLIT=fresh TASK_IDS=data/fresh.json OUT=runs/fresh_after  IMAGE=crmroute:fixed PORT_OFFSET=20 ./scripts/run_systems.sh routed
 python scripts/fresh_analysis.py --before runs/fresh_before/routed --after runs/fresh_after/routed --task-ids data/fresh.json
 
+# the cap, false-refusal, router-overlap and spend checks over all of the above
+python scripts/robustness_checks.py --out results/robustness_checks.md
+
 # an org crmroute was not built on (the original CRMArena org): its splits, schema, router examples and index
 vendor/CRMArena/.venv/Scripts/python scripts/make_org_split.py && vendor/CRMArena/.venv/Scripts/python scripts/add_org.py --org original
 vendor/CRMArena/.venv/Scripts/python scripts/export_knowledge.py --orgs original && docker build -t crmroute:org .
@@ -519,25 +592,28 @@ the judge check, `python scripts/judge_agreement.py sheet ...` writes a blind 40
 
 ## Limitations
 
+- **No real use.** Every task is a templated benchmark question on the benchmark's own orgs, which hold
+  generated data, asked by a simulated user. Nobody has used crmroute for real work, and it runs only locally.
 - **Judge and simulated user.** Both are local qwen3:8b for every system, not the paper's GPT-4o, so the numbers are comparable across the four systems here but not with the paper's tables. The 8B simulated user sometimes misplays its role (it asks the agent for the Id it should give, or repeats a question until the turn limit), which adds noise to multi-turn results. The judge check (κ = 0.95, 39 of 40 agree) covers only 40 items, and its labels were AI-assisted, with every row reviewed by me. It rules out a badly miscalibrated judge, not occasional errors or blind spots the drafting model shares with the judge.
+- **ReAct context cap.** Requests above 250K input tokens are scored as the baseline's failure rather than sent. This ended 17 ReAct tasks on the CRMArena-Pro test set (7 with the privacy prompt) and 1 of 90 on the original CRMArena org, and no crmroute task. Counted as ReAct successes instead, crmroute's lead over plain ReAct is no longer significant; its lead over ReAct with the privacy prompt is (`results/robustness_checks.md`).
+- **Dev tuning.** The per-task hints encode the benchmark's answer-key conventions, learned on dev tasks and checked against the orgs (`results/dev_tuning.md`); the dev tuning pass took 3.8 Flash from 52.0% to 61.0% on the same 100 dev tasks. ReAct got no such tuning. The hints transfer to test because test uses the same orgs and task generators. Unchanged on the original CRMArena org, they kept crmroute ahead of ReAct but by a margin n=90 cannot confirm (+5.6 and +6.7 points).
+- **Which requests the guard screens.** The benchmark's customer-facing flag, set per task type, decides which sessions get the policy check, so the guard only has to separate confidential requests from two business task types. A deployment would have to screen every customer question, which this does not measure.
+- **Router examples and the fresh set.** The router's example file includes 220 of the 408 fresh confidential requests with their labels, and the router's type is a hint to the policy classifier. On the 188 fresh requests outside the file, the fixed agent refused 97.9%, not the overall 99.0%.
 - **Sample sizes.** With n=114 business tasks the 95% margin is about ±9 points, with n=38 multi-turn about ±16, and with 42 refusal cases about ±15. A difference is reported as a win only when its paired bootstrap interval excludes zero.
-- **Dev tuning.** The per-task hints encode the benchmark's answer-key conventions, learned on dev tasks and checked against the orgs (`results/dev_tuning.md`). They transfer to test because test uses the same orgs and task generators. Unchanged on the original CRMArena org, they kept crmroute ahead of ReAct but by a margin n=90 cannot confirm (+5.6 and +6.7 points).
-- **Routing fit.** About 11 dev tasks per type per model; the table is noisy by construction. A new org needs its own dev runs with at least 8 tasks per type per model: one Pro org's dev split is too small, and a table borrowed from another org leaned toward an accuracy loss (`results/routing_transfer.json`).
-- **Generalization.** Every org measured here (CRMArena-Pro's B2B and B2C, the original CRMArena) comes from the same benchmark family, with templated questions. Transfer to a company's own data and phrasing is untested.
-- **ReAct context cap.** Requests above 250K input tokens are scored as the baseline's failure rather than sent (the count is in the results).
+- **Routing fit.** About 11 dev tasks per type per model; the table is noisy by construction. A new org needs its own dev runs with at least 8 tasks per type per model: one Pro org's dev split is too small, and a table borrowed from the other Pro org gave mixed results (+1.9 and -4.8 points, both intervals spanning zero; `results/routing_transfer.json`).
+- **Generalization.** Every org measured here (CRMArena-Pro's B2B and B2C, the original CRMArena) comes from the same benchmark family, with templated questions and task context. Transfer to a company's own data and phrasing is untested.
 - **knowledge_qa** stays weak: answers are graded by token F1 against short reference phrases, and the agent often grounds its answer in a different article than the reference.
-- **Costs** are list-price estimates from usage metadata (cached and thinking tokens included), not an invoice. A budget alert on the Google Cloud project could not be verified from here (the Budget API is not enabled).
+- **Costs** are list-price estimates from usage metadata (cached and thinking tokens included), not an invoice; free-tier runs are counted at list price although they were not billed. A budget alert on the Google Cloud project could not be verified from here (the Budget API is not enabled).
 - **Answer keys:** some are disputed ([CRMArena issue #24](https://github.com/SalesforceAIResearch/CRMArena/issues/24)).
 - **Guard coverage:** on test, 3 of 42 confidential requests were answered (order quantity limits and a product
-  exclusion rule). The policy now covers that rule family and refuses 99.0% of 408 fresh confidential requests;
-  the 4 still answered read like customer-service and financing questions the policy allows, a trade-off kept
-  to avoid refusing real customers (`results/fresh_summary.md`).
-- **Prompt Guard under rate limits:** on Groq's free tier, 122 and 159 Prompt Guard calls in the two fresh runs
-  got `429 Too Many Requests` under parallel load, and screening continued without the injection score (that
-  one signal fails open). No benchmark task is an injection attempt, so no score depends on it; a deployment
-  needs a paid tier or a fail-closed rule for it.
+  exclusion rule). The policy now covers that rule family; the 4 fresh confidential requests still answered read
+  like customer-service and financing questions the policy allows, a trade-off kept so that ordinary
+  customer-service questions are not refused (`results/fresh_summary.md`). False refusals: 1 of 16 customer-facing business tasks on test (routed)
+  and 1 of 76 for the measured agent on fresh, none for the fixed agent; all were multi-turn.
+- **Prompt Guard** is untested here (no benchmark task is an injection attempt) and fails open: on Groq's free tier, 122 and 159 Prompt Guard calls in the two fresh runs got `429 Too Many Requests` under parallel load, and screening continued without the injection score. A deployment needs a paid tier or a fail-closed rule for it.
 - **Stakeholder interviews: not conducted.** `docs/scoping.md` is the unfilled template, and the sensitive-data map (`agent/app/guard/sensitive_fields.yaml`) is a starter built from the schema and the dev split, not from stakeholder input. Every guard result above was measured with that starter map; replacing it with an interview-based never-share list would need a new measurement.
 - **Conversations without a logged-in identity:** the harness gives multi-turn tasks no session identity, so the agent binds the first Contact Id the customer states. A deployment must take it from authentication.
+- **Raw run records** are not published: the summaries in `results/` can be checked against the scripts, but not re-derived without `runs/`.
 - **Qdrant local mode:** only one process can open an index folder at a time, so the search server and the retrieval eval need separate copies.
 
 ## License
