@@ -57,8 +57,9 @@ On a third org from the same benchmark family (the original CRMArena), crmroute 
 75.6% at 54% lower cost per task, a difference 90 tasks cannot confirm.
 
 The numbers are summaries in [`results/`](results/), made from the run records by the scripts in `scripts/`;
-the test, fresh, original-org and robustness summaries name their exact commands. The raw run records
-(`runs/`, about 0.8 GB) are not in the repository.
+the test, fresh, original-org and robustness summaries name their exact commands. The raw run records are
+published as a release asset, [run-records-2026-10-11](https://github.com/AdarshKirito/crm-agent-routing/releases/tag/run-records-2026-10-11)
+(59 MB), so every summary can be rebuilt.
 
 ## Contents
 
@@ -149,7 +150,7 @@ and graders drive the agent through a `remote` agent adapter that the harness pa
 | `patches/` | The CRMArena patch (base commit pinned), described under [How it was evaluated](#how-it-was-evaluated), plus the benchmark's relaxed requirements. |
 | `scripts/` | Splits, knowledge export, retrieval / router evals, the four-system runner and its run manifests, analysis, routing fit (per org with `--org`), budget estimate, CI eval, judge agreement, the results figure, the fresh split and before/after analysis (`make_fresh_split.py`, `fresh_analysis.py`), org onboarding (`make_org_split.py`, `add_org.py`), the cross-org transfer analyses (`router_transfer.py`, `routing_transfer.py`) and the robustness checks (`robustness_checks.py`). |
 | `data/dev.json`, `data/test.json` | Fixed task ids (seed 20260927); dev and test are disjoint per org across both modes. `data/dev_run.json` is the dev subset actually run. `data/fresh.json` holds tasks used by neither; `data/original_dev.json` and `data/original_test.json` are the original CRMArena org's lists. |
-| `results/` | Summaries of the measured runs (tables and JSON); most name the command that produced them. The raw run records (`runs/`) are git-ignored. |
+| `results/` | Summaries of the measured runs (tables and JSON); most name the command that produced them. The raw run records (`runs/`) are git-ignored and published as a release asset. |
 | `Dockerfile`, `deploy/` | One container: the agent plus both MCP servers on localhost. Measured runs use it. |
 | `.github/workflows/` | CI (tests, and the patched benchmark rebuilt from upstream) and the PR eval (15 cases, gated on `evals/ci_baseline.json`). |
 
@@ -325,8 +326,10 @@ The project's own code is MIT. The CRMArena patch and the files built from the b
   directly through the benchmark's connector. crmroute goes through its MCP server, which caches responses on
   disk for seven days because the shared orgs cap daily API calls, so a repeated query gets the earlier live
   response.
-- Records. The raw run records stay local (`runs/`, git-ignored, about 0.8 GB); `results/` holds the
-  summaries.
+- Records. The run records (task records, harness configs, run manifests and per-call logs) are the release
+  asset [run-records-2026-10-11](https://github.com/AdarshKirito/crm-agent-routing/releases/tag/run-records-2026-10-11).
+  Extracted at the repository root they recreate `runs/`, and every summary in `results/` that comes from them
+  rebuilds row for row. Server and container logs are not published.
 
 <details>
 <summary><b>Dev: tuning and the routing fit</b></summary>
@@ -627,7 +630,7 @@ the judge check, `python scripts/judge_agreement.py sheet ...` writes a blind 40
 - **Prompt Guard** is untested here (no benchmark task is an injection attempt) and fails open: on Groq's free tier, 122 and 159 Prompt Guard calls in the two fresh runs got `429 Too Many Requests` under parallel load, and screening continued without the injection score. A deployment needs a paid tier or a fail-closed rule for it.
 - **Stakeholder interviews: not conducted.** `docs/scoping.md` is the unfilled template, and the sensitive-data map (`agent/app/guard/sensitive_fields.yaml`) is a starter built from the schema and the dev split, not from stakeholder input. Every guard result above was measured with that starter map; replacing it with an interview-based never-share list would need a new measurement.
 - **Conversations without a logged-in identity:** the harness gives multi-turn tasks no session identity, so the agent binds the first Contact Id the customer states. A deployment must take it from authentication.
-- **Raw run records** are not published: the summaries in `results/` can be checked against the scripts, but not re-derived without `runs/`.
+- **Published run records** have three redactions: the Google Cloud project id, email addresses at gmail.com and salesforce.com that ReAct's queries returned from the orgs' User records, and local paths. Server and container logs are not published.
 - **Qdrant local mode:** only one process can open an index folder at a time, so the search server and the retrieval eval need separate copies.
 
 ## License
