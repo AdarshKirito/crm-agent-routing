@@ -87,3 +87,16 @@ def test_flags_count_only_the_final_turn_for_budget_and_errors():
 def test_refusal_is_a_hard_flag():
     verdict = check("I cannot share this because it is confidential.", "text", [entry(1, {"articles": []})])
     assert not verdict.ok and verdict.flags["refusal"] == 1 and "no_data" not in verdict.flags
+
+
+def test_anchor_flags_need_the_question_ids_and_a_date_filter_for_a_period():
+    case = "500Wt00000DE0BxIAL"
+    rows = {"totalSize": 1, "records": [{"OwnerId": AGENT}]}
+    unanchored = [entry(1, rows, totalSize=1)]
+    flags = check(AGENT, "id", unanchored, question=f"Who owns case {case} as of the past 2 months?").flags
+    assert flags["anchor_ids_unused"] == 1 and flags["period_unfiltered"] == 1
+    anchored = [{**entry(1, rows, totalSize=1), "args": {"query": f"SELECT OwnerId FROM Case WHERE Id = '{case}' "
+                                                                "AND CreatedDate >= 2021-01-01T00:00:00Z"}}]
+    flags = check(AGENT, "id", anchored, question=f"Who owns case {case} as of the past 2 months?").flags
+    assert "anchor_ids_unused" not in flags and "period_unfiltered" not in flags
+    assert "period_unfiltered" not in check(AGENT, "id", unanchored, question="Which agent may help?").flags

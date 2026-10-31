@@ -12,6 +12,7 @@ errors, policy blocks, a "None" with no empty result behind it, an Id seen only 
 are signals for the release rule, which decides on them.
 """
 
+import json
 import re
 from dataclasses import dataclass, field
 
@@ -120,14 +121,33 @@ def token_f1(a: str, b: str) -> float:
     return 2 * precision * recall / (precision + recall)
 
 
+PERIOD_RE = re.compile(
+    r"\b(?i:january|february|march|april|june|july|august|september|october|november|december|quarters?|q[1-4]"
+    r"|years?|months?|weeks?|days?|since|between|until)\b|\bMay\b|\b\d{4}-\d{2}-\d{2}\b")
+DATE_FILTER_RE = re.compile(r"\d{4}-\d{2}-\d{2}|\b(LAST|NEXT|THIS)_\w+|\b(LAST|NEXT)_N_\w+|\bCALENDAR_\w+|\bTODAY\b|\bYESTERDAY\b", re.I)
+
+
+def anchor_flags(question: str, receipt: list[dict], support: list[int]) -> dict[str, int]:
+    """Does the receipt use what the question constrains? Ids the question names should be queried;
+    a question about a period should have a date filter in the queries the answer rests on."""
+    queries = [json.dumps(e.get("args") or {}) for e in receipt if e.get("status") == "ok"]
+    asked = {i[:15] for i in ID_RE.findall(question or "")}
+    flags = {"anchor_ids_unused": sum(1 for i in asked if not any(i in q for q in queries))}
+    if PERIOD_RE.search(question or ""):
+        relevant = [json.dumps(e.get("args") or {}) for e in receipt if e.get("n") in support] or queries
+        flags["period_unfiltered"] = int(not any(DATE_FILTER_RE.search(q) for q in relevant))
+    return flags
+
+
 def final_turn(receipt: list[dict]) -> list[dict]:
     last = max((int(e.get("turn") or 0) for e in receipt), default=0)
     return [e for e in receipt if int(e.get("turn") or 0) == last]
 
 
-def check(answer: str, form: str, receipt: list[dict], context: str = "") -> Verdict:
+def check(answer: str, form: str, receipt: list[dict], context: str = "", question: str = "") -> Verdict:
     """Check one answer against its receipt. `context` is text the asker supplied (task context, their
-    messages): an Id given there needs no tool result to be named."""
+    messages): an Id given there needs no tool result to be named. `question` is the request itself,
+    whose Ids and period the receipt should use (anchor flags)."""
     claim = parse_claim(answer, form)
     flags: dict[str, int] = {k: 1 for k in ("unparsed", "refusal", "abstain") if claim.kind == k}
     ok_entries = [e for e in receipt if e.get("status") == "ok"]
@@ -151,4 +171,6 @@ def check(answer: str, form: str, receipt: list[dict], context: str = "") -> Ver
                 cut_only += 1
         flags["ungrounded"] = ungrounded
         flags["truncated_support"] = cut_only
+    if question and claim.kind not in ("refusal", "abstain", "unparsed"):
+        flags.update(anchor_flags(question, receipt, sorted(set(support))))
     return Verdict(claim, {k: v for k, v in flags.items() if v}, sorted(set(support)))
