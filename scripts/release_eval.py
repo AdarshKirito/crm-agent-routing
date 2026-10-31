@@ -94,6 +94,7 @@ class RunAnswer:
     correct: float
     cost: float | None
     latency: float | None
+    receipt: list = field(default_factory=list, repr=False)
 
 
 @dataclass
@@ -123,6 +124,8 @@ def load_tasks(run_dirs: list[Path], task_ids: Path, types_from: Path | None = N
         if missing:
             raise SystemExit(f"{d}: {len(missing)} tasks of the split are missing")
     router = load_system(types_from) if types_from else None
+    if router is None and not any(is_remote(runs[0][k]) for k in wanted):
+        raise SystemExit("ReAct records hold no router prediction: pass --types-from with a crmroute run of the same tasks")
     tasks = []
     for key in sorted(wanted):
         first = runs[0][key]
@@ -138,7 +141,7 @@ def load_tasks(run_dirs: list[Path], task_ids: Path, types_from: Path | None = N
             verdict = rc.check(answer_of(row) or "", form, receipt, context_of(row))
             info = row.get("agent_info") or {}
             latency = sum(t.get("latency_s") or 0 for t in info.get("turns") or []) if is_remote(row) else None
-            task.runs.append(RunAnswer(verdict, score(row, 0.5)[1], info.get("total_cost"), latency))
+            task.runs.append(RunAnswer(verdict, score(row, 0.5)[1], info.get("total_cost"), latency, receipt))
         tasks.append(task)
     return tasks
 
