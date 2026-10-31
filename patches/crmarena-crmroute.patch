@@ -81,10 +81,10 @@ index 59c7a8a..386bf29 100644
              self.messages.append({"role": "assistant", "content": message["content"].strip()})
 diff --git a/crm_sandbox/agents/remote_agent.py b/crm_sandbox/agents/remote_agent.py
 new file mode 100644
-index 0000000..db9d241
+index 0000000..43de4ed
 --- /dev/null
 +++ b/crm_sandbox/agents/remote_agent.py
-@@ -0,0 +1,178 @@
+@@ -0,0 +1,180 @@
 +"""Evaluate an agent served by `adk api_server` (or the agents-cli FastAPI app).
 +
 +The benchmark keeps its own environment, simulated user and graders. This adapter
@@ -260,6 +260,8 @@ index 0000000..db9d241
 +        self.info["route"] = state.get("crm_route")
 +        self.info["guard"] = state.get("crm_guard")
 +        self.info["check"] = state.get("crm_check")  # last answer check: ok, problems, retries
++        self.info["draft"] = state.get("crm_draft")  # the solver's last output: kind (answer/clarify/refuse) and answer
++        self.info["receipt"] = state.get("crm_receipt") or []  # every tool call: arguments, status, result as seen
 +
 +    def get_messages(self) -> List[Dict[str, str]]:
 +        return self.messages
