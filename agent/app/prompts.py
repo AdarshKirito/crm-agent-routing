@@ -6,7 +6,7 @@ from functools import lru_cache
 from google.adk.agents.readonly_context import ReadonlyContext
 
 from . import state_keys as K
-from .config import DATA_DIR, MAX_CLARIFYING_QUESTIONS
+from .config import DATA_DIR, MAX_CLARIFYING_QUESTIONS, TASK_HINTS
 from .guard.sensitive import self_ids_from_context
 from .task_specs import BANT, STAGES, spec_for
 
@@ -81,7 +81,7 @@ def solver_instruction(ctx: ReadonlyContext) -> str:
         parts.append(f"## Domain notes\n{extra}\n")
 
     if route.get("task_type") and spec.answer != "refusal":
-        hints = "\n".join(f"- {h}" for h in spec.hints)
+        hints = "\n".join(f"- {h}" for h in spec.hints) if TASK_HINTS else ""
         parts.append(
             f"## Likely task (router guess, confidence {route.get('confidence', 0):.2f})\n"
             f"The request most likely asks for {spec.goal}. If the request clearly asks for something else, follow the request.\n"
