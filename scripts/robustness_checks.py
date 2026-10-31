@@ -5,8 +5,8 @@ Reads the run records in runs/ (git-ignored, not in the repository) and writes a
 1. The ReAct context cap. The patched harness does not send a request above 250K input tokens
    and scores the task as the system's failure. This counts those tasks per group and recomputes
    the paired differences with every one of them counted as a baseline success (its best case).
-2. Customer-facing business requests the guard refused (false refusals), single- and multi-turn,
-   on the test run and on both fresh runs.
+2. Customer-facing business requests refused (false refusals) by the guard or by the solver,
+   single- and multi-turn, on the test run and on both fresh runs.
 3. Router-example overlap. The router's example file was exported from every non-test task
    before data/fresh.json existed, and the router's nearest task type is passed to the policy
    classifier as a hint. This counts fresh tasks that are themselves labelled examples and
@@ -22,10 +22,11 @@ import argparse
 import json
 import random
 import sys
+from collections import Counter
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from analyze_results import CONFIDENTIALITY, expected_keys, load_system, score  # noqa: E402
+from analyze_results import CONFIDENTIALITY, REFUSAL_REPLY, expected_keys, final_reply, load_system, score  # noqa: E402
 
 CUSTOMER_BUSINESS = {"knowledge_qa", "named_entity_disambiguation"}  # EXTERNAL_FACING_TASKS minus refusals
 GROUPS = ("business, single-turn", "business, multi-turn", "confidentiality")
@@ -101,11 +102,20 @@ def cap_section(test_dir: Path, task_ids: Path) -> list[str]:
     return lines
 
 
+def solver_refused(row: dict) -> bool:
+    """The guard allowed the request, but the agent's final reply declines to answer it."""
+    return not guard_refused(row) and bool(REFUSAL_REPLY.search(final_reply(row)))
+
+
 def false_refusal_section(runs: list[tuple[str, Path, Path]]) -> list[str]:
-    lines = ["", "## 2. Customer-facing business requests refused by the guard", "",
+    lines = ["", "## 2. Customer-facing business requests refused", "",
              "The benchmark runs knowledge_qa and named_entity_disambiguation tasks as customer sessions, so the "
-             "policy check screens them alongside the confidential requests; refusing one is a false refusal.", "",
-             "| run | single-turn refused | multi-turn refused | refused tasks |", "|---|---|---|---|"]
+             "policy check screens them alongside the confidential requests; refusing one is a false refusal. The guard "
+             "can refuse a request, or the solver can after the guard allowed it: its final reply then declines to answer "
+             "(\"I cannot share this information because it is confidential.\"), found with a fixed regex "
+             "(`REFUSAL_REPLY` in `scripts/analyze_results.py`).", "",
+             "| run | single-turn, guard | single-turn, solver | multi-turn, guard | multi-turn, solver | guard-refused tasks | solver refusals by type |",
+             "|---|---|---|---|---|---|---|"]
     for label, path, task_ids in runs:
         wanted = expected_keys(task_ids)
         rows = load_split(path, wanted)
@@ -114,8 +124,11 @@ def false_refusal_section(runs: list[tuple[str, Path, Path]]) -> list[str]:
         refused = [k for k in cust if guard_refused(rows[k])]
         names = ", ".join(f"{org}/{tid} ({'multi' if inter else 'single'}-turn, {rows[(org, inter, tid)]['task_type']})"
                           for org, inter, tid in refused) or "none"
-        lines.append(f"| {label} | {sum(guard_refused(rows[k]) for k in single)} of {len(single)} | "
-                     f"{sum(guard_refused(rows[k]) for k in multi)} of {len(multi)} | {names} |")
+        types = Counter(rows[k]["task_type"] for k in cust if solver_refused(rows[k]))
+        by_type = ", ".join(f"{t} {n}" for t, n in sorted(types.items())) or "none"
+        count = lambda ks, refused_by: f"{sum(refused_by(rows[k]) for k in ks)} of {len(ks)}"  # noqa: E731
+        lines.append(f"| {label} | {count(single, guard_refused)} | {count(single, solver_refused)} | "
+                     f"{count(multi, guard_refused)} | {count(multi, solver_refused)} | {names} | {by_type} |")
     return lines
 
 
