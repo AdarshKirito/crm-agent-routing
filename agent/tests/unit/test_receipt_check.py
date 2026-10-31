@@ -1,7 +1,8 @@
 import json
 
+from app import task_specs
 from app.guard.sensitive import SF_ID_RE
-from app.receipt_check import ID_RE, Claim, check, parse_claim, same_answer, token_f1
+from app.receipt_check import BANT, ID_RE, STAGES, Claim, check, parse_claim, same_answer, token_f1
 
 AGENT = "005Wt000003NDqDIAW"
 OTHER = "005Wt000003NDqEIAW"
@@ -12,8 +13,17 @@ def entry(n, result, status="ok", tool="soql_query", turn=1, **counts):
             "result": json.dumps(result) if not isinstance(result, str) else result, **counts}
 
 
-def test_id_pattern_matches_the_guard():
+def test_id_pattern_and_vocabularies_match_the_agent():
     assert ID_RE.pattern == SF_ID_RE.pattern
+    assert (STAGES, BANT) == (task_specs.STAGES, task_specs.BANT)
+
+
+def test_value_answers_must_name_a_value_of_the_form():
+    assert parse_claim("California", "state") == Claim("value", ("CA",))
+    assert parse_claim("CA", "state") == Claim("value", ("CA",))
+    assert parse_claim("Quote", "stage") == Claim("value", ("Quote",))
+    assert parse_claim("<thought> Let's query: SELECT CreatedDate FROM Case", "month").kind == "unparsed"
+    assert parse_claim("March or April", "month").kind == "unparsed"
 
 
 def test_claims_by_answer_form():

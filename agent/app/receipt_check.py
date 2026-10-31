@@ -20,8 +20,36 @@ ID_RE = re.compile(r"\b(?:[0-9][A-Za-z0-9]{2}|a[0-9][A-Za-z0-9]|k[aA][0-9A-Za-z]
 REFUSAL_RE = re.compile(r"\b(cannot|can't|can ?not|unable to|not able to)\s+(share|provide|disclose|help with|retrieve|access)\b", re.I)
 ABSTAIN_RE = re.compile(r"\bcould not verify an answer\b", re.I)
 NONE_WORDS = {"none", "null", "n/a", "no", "no violation", "no record", "no records"}
-VALUE_FORMS = ("state", "month", "stage", "bant")
 HARD_FLAGS = ("unparsed", "refusal", "abstain", "ungrounded", "no_data")
+MONTHS = ("January", "February", "March", "April", "May", "June", "July", "August", "September",
+          "October", "November", "December")
+US_STATES = {
+    "alabama": "AL", "alaska": "AK", "arizona": "AZ", "arkansas": "AR", "california": "CA", "colorado": "CO",
+    "connecticut": "CT", "delaware": "DE", "florida": "FL", "georgia": "GA", "hawaii": "HI", "idaho": "ID",
+    "illinois": "IL", "indiana": "IN", "iowa": "IA", "kansas": "KS", "kentucky": "KY", "louisiana": "LA",
+    "maine": "ME", "maryland": "MD", "massachusetts": "MA", "michigan": "MI", "minnesota": "MN",
+    "mississippi": "MS", "missouri": "MO", "montana": "MT", "nebraska": "NE", "nevada": "NV",
+    "new hampshire": "NH", "new jersey": "NJ", "new mexico": "NM", "new york": "NY", "north carolina": "NC",
+    "north dakota": "ND", "ohio": "OH", "oklahoma": "OK", "oregon": "OR", "pennsylvania": "PA",
+    "rhode island": "RI", "south carolina": "SC", "south dakota": "SD", "tennessee": "TN", "texas": "TX",
+    "utah": "UT", "vermont": "VT", "virginia": "VA", "washington": "WA", "west virginia": "WV",
+    "wisconsin": "WI", "wyoming": "WY", "district of columbia": "DC",
+}
+# The same values as app.task_specs.STAGES and BANT (a unit test keeps them equal).
+STAGES = ("Qualification", "Discovery", "Quote", "Negotiation", "Closed")
+BANT = ("Budget", "Authority", "Need", "Timeline")
+VALUE_FORMS = ("state", "month", "stage", "bant")
+
+
+def _values(text: str, form: str) -> tuple[str, ...]:
+    """The form's values found in an answer, or () if it does not name exactly what the form expects."""
+    if form == "state":
+        found = {c for c in re.findall(r"\b[A-Z]{2}\b", text) if c in US_STATES.values()}
+        found |= {code for name, code in US_STATES.items() if re.search(rf"\b{name}\b", text, re.I)}
+        return tuple(found) if len(found) == 1 else ()
+    vocab = {"month": MONTHS, "stage": STAGES, "bant": BANT}[form]
+    found = tuple(v for v in vocab if re.search(rf"\b{v}\b", text, re.I))
+    return found if form == "bant" or len(found) == 1 else ()
 
 
 @dataclass(frozen=True)
@@ -71,8 +99,8 @@ def parse_claim(answer: str, form: str) -> Claim:
         found = list(dict.fromkeys(ID_RE.findall(text)))
         return Claim("ids", tuple(found)) if found else Claim("unparsed")
     if form in VALUE_FORMS:
-        values = [v.strip().strip(".") for v in re.split(r",|\band\b", text) if v.strip().strip(".")]
-        return Claim("value", tuple(values))
+        values = _values(text, form)
+        return Claim("value", values) if values else Claim("unparsed")
     return Claim("text", (text,))
 
 
