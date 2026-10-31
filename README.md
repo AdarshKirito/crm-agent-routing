@@ -190,9 +190,11 @@ What the numbers say:
 - The guard refused 39 of 42 confidential requests. The benchmark's agent refused none, and its privacy prompt
   managed 25 while costing 6 points of business accuracy (not significant). The 3 misses were questions about
   order quantity limits and a product exclusion rule. Dev had no request of either kind and the written policy
-  did not list them, so I found them on test and left the test result as measured. The routed system also
+  did not list them, so I found them on test and left the test result as measured. The routed system's guard also
   refused one customer-facing business task (b2b/1987, multi-turn: the simulated user asked about a purchase
-  "by the contact with ID 003…"), which the 3.8 Flash-only system answered.
+  "by the contact with ID 003…"), which the 3.8 Flash-only system answered. Behind the guard, the solver of
+  each system declined 5 of the 16 customer-facing business tasks as confidential, 4 of them single-turn
+  knowledge_qa questions; this was not counted as a false refusal until 2026-10-31 (see Limitations).
 - On the same model, crmroute scored 13-15 points higher than ReAct on single-turn and 18-21 points higher on
   multi-turn business tasks, at about 40% lower cost per task with every task on 3.8 Flash. Two things qualify
   this. ReAct hit the harness's 250K-token request cap on 8 single-turn and 3 multi-turn business tasks, each
@@ -246,7 +248,8 @@ image ran the same tasks with the test run's pins.
 | of those, requests not in the router's example file | 188 | 93.1% | 97.9% | **+4.8** [+2.1, +8.0] |
 | confidential company knowledge refused | 136 | 89.0% | 97.1% | **+8.1** [+3.7, +13.2] |
 | order-limit and bought-together wording refused | 16 | 7/16 | 16/16 | +56.2 [+31.2, +81.2] |
-| customer business requests refused (false refusals), single- and multi-turn | 76 | 1 | 0 | |
+| customer business requests refused by the guard, single- and multi-turn | 76 | 1 | 0 | |
+| customer business requests the solver declined after the guard allowed them | 76 | 13 | 15 | |
 | business tasks, single-turn | 174 | 64.9% | 66.7% | +1.7 [-2.9, +6.3] |
 | business tasks, multi-turn | 38 | 50.0% | 55.3% | +5.3 [-5.3, +18.4] |
 
@@ -260,7 +263,7 @@ image ran the same tasks with the test run's pins.
 - The fail-closed classifier and the checker's abstention never triggered on these tasks (no missing verdict,
   no answer left with unverified Ids), so they are safeguards rather than score changes.
 - The 4 confidential requests still answered read like customer-service questions the policy allows, and they
-  were answered before the fixes too. The one false refusal (measured agent only) was a multi-turn task in
+  were answered before the fixes too. The one guard false refusal (measured agent only) was a multi-turn task in
   which the simulated user had neither an order number nor an account name for a purchase "by the team".
 
 ### Another org from the same benchmark: the original CRMArena (`results/original_test_summary.md`)
@@ -673,8 +676,14 @@ the judge check, `python scripts/judge_agreement.py sheet ...` writes a blind 40
 - **Guard coverage:** on test, 3 of 42 confidential requests were answered (order quantity limits and a product
   exclusion rule). The policy now covers that rule family; the 4 fresh confidential requests still answered read
   like customer-service and financing questions the policy allows, a trade-off kept so that ordinary
-  customer-service questions are not refused (`results/fresh_summary.md`). False refusals: 1 of 16 customer-facing business tasks on test (routed)
-  and 1 of 76 for the measured agent on fresh, none for the fixed agent; all were multi-turn.
+  customer-service questions are not refused (`results/fresh_summary.md`).
+- **False refusals:** customer-facing business requests are refused far more often than the guard's own count
+  suggests. The guard refused 1 of 16 on test (routed, multi-turn) and 1 of 76 on fresh (measured agent only), but
+  the solver also declined requests the guard had allowed, replying that the information is confidential: 5 of 16 on
+  test in each system (4 of the 6 single-turn knowledge_qa tasks) and 15 of 76 for the fixed agent on fresh (13 of
+  36 single-turn knowledge_qa). These counts were first published as guard refusals only and corrected on
+  2026-10-31 (`results/robustness_checks.md`, section 2). The records do not keep the tool calls, so why the solver
+  declined is not visible in them.
 - **Prompt Guard** is untested here (no benchmark task is an injection attempt) and fails open: on Groq's free tier, 122 and 159 Prompt Guard calls in the two fresh runs got `429 Too Many Requests` under parallel load, and screening continued without the injection score. A deployment needs a paid tier or a fail-closed rule for it.
 - **Stakeholder interviews: not conducted.** `docs/scoping.md` is the unfilled template, and the sensitive-data map (`agent/app/guard/sensitive_fields.yaml`) is a starter built from the schema and the dev split, not from stakeholder input. Every guard result above was measured with that starter map; replacing it with an interview-based never-share list would need a new measurement.
 - **Conversations without a logged-in identity:** the harness gives multi-turn tasks no session identity, so the agent binds the first Contact Id the customer states. A deployment must take it from authentication.
