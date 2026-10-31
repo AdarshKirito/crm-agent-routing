@@ -12,6 +12,7 @@ from typing import Any
 
 from google.adk.tools import BaseTool, ToolContext
 
+from .. import receipts
 from .. import state_keys as K
 from ..config import MAX_TOOL_CALLS_PER_TURN
 from .sensitive import ids_in, in_ids, load_map, self_ids_from_context
@@ -19,6 +20,8 @@ from .sensitive import ids_in, in_ids, load_map, self_ids_from_context
 MAX_EVIDENCE_CHARS = 300_000
 MAX_NOTE_CHARS = 1_200
 MAX_NOTES = 8
+BUDGET_TEXT = "Tool budget used up"
+BLOCKED_TEXT = "Blocked by the confidentiality policy"
 
 
 def _text_of(response: Any) -> str:
@@ -46,7 +49,7 @@ def before_tool(tool: BaseTool, args: dict[str, Any], tool_context: ToolContext)
     if tool.name != "set_model_response":
         if used >= MAX_TOOL_CALLS_PER_TURN:
             return {"isError": True, "content": [{"type": "text", "text": (
-                f"Tool budget used up ({MAX_TOOL_CALLS_PER_TURN} calls for this request). "
+                f"{BUDGET_TEXT} ({MAX_TOOL_CALLS_PER_TURN} calls for this request). "
                 "Give your final answer now from the data you already have.")}]}
         state[K.TOOL_CALLS_TURN] = used + 1
     if state.get(K.AUDIENCE) != "customer":
@@ -71,7 +74,7 @@ def before_tool(tool: BaseTool, args: dict[str, Any], tool_context: ToolContext)
     state[K.BLOCKED_TOOLS] = blocked
     return {
         "isError": True,
-        "content": [{"type": "text", "text": f"Blocked by the confidentiality policy: {verdict.reason} "
+        "content": [{"type": "text", "text": f"{BLOCKED_TEXT}: {verdict.reason} "
                      "If the request needs this data, refuse and say the information is confidential."}],
     }
 
@@ -141,6 +144,12 @@ def after_tool(tool: BaseTool, args: dict[str, Any], tool_context: ToolContext, 
         replaced = _filter_confidential_articles(tool_response, tool.name)
         tool_response = replaced
     text = _text_of(tool_response)
+    # after_tool also sees the calls before_tool answered itself (budget used up, blocked by policy)
+    status = "ok"
+    if _is_error(tool_response):
+        intervened = text.startswith(BLOCKED_TEXT) or replaced is not None
+        status = "budget" if text.startswith(BUDGET_TEXT) else "blocked" if intervened else "error"
+    receipts.record(state, tool.name, args, status, text)
 
     if not _is_error(tool_response):
         evidence = (state.get(K.EVIDENCE) or "") + "\n" + text
