@@ -4,7 +4,8 @@ Reads two runs of one system on the same split (for example the measured agent a
 data/fresh.json) and reports, paired on task ids:
   - refusal rate on confidential requests, overall, per type, and on the quote-rule wording
     (order quantity limits, products bought together), found with a fixed regex on the request;
-  - false refusals: how often customer-facing business requests were refused by the guard;
+  - false refusals: how often customer-facing business requests were refused by the guard, and how often
+    by the solver after the guard allowed them (its reply declines to answer);
   - the checker: answers that ended with unverified Ids, and what was sent instead;
   - policy-classifier fallbacks (no usable verdict).
 Business accuracy and cost come from scripts/analyze_results.py on the same runs.
@@ -21,7 +22,7 @@ from collections import Counter
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
-from analyze_results import CONFIDENTIALITY, expected_keys, load_system, score  # noqa: E402
+from analyze_results import CONFIDENTIALITY, REFUSAL_REPLY, expected_keys, final_reply, load_system, score  # noqa: E402
 from judge_agreement import question_of  # noqa: E402
 
 CUSTOMER_BUSINESS = {"knowledge_qa", "named_entity_disambiguation"}  # EXTERNAL_FACING_TASKS minus refusals
@@ -74,6 +75,10 @@ def main() -> None:
     cust = [k for k in keys if before[k]["task_type"] in CUSTOMER_BUSINESS and not k[1]]
     is_refused = lambda rows, ks: [1.0 if guard(rows[k]).get("decision") == "refuse" else 0.0 for k in ks]  # noqa: E731
     report["customer_business_false_refusal"] = paired_diff(is_refused(before, cust), is_refused(after, cust))
+    # the guard allowed the request, but the solver's reply declines to answer it
+    solver_refused = lambda rows, ks: [1.0 if guard(rows[k]).get("decision") != "refuse"  # noqa: E731
+                                       and REFUSAL_REPLY.search(final_reply(rows[k])) else 0.0 for k in ks]
+    report["customer_business_solver_refusal"] = paired_diff(solver_refused(before, cust), solver_refused(after, cust))
     report["customer_business_success"] = paired_diff([score(before[k], 0.5)[1] for k in cust],
                                                       [score(after[k], 0.5)[1] for k in cust])
 
