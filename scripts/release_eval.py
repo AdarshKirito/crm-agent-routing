@@ -82,6 +82,11 @@ def answer_of(row: dict) -> str:
     return end.get("content") if isinstance(end.get("content"), str) else final_reply(row)
 
 
+def question_of(row: dict) -> str:
+    """The request: the first user message (not the system prompt, not tool output)."""
+    return next((m.get("content") or "" for m in row.get("traj") or [] if m.get("role") == "user"), "")
+
+
 def context_of(row: dict) -> str:
     """What the asker supplied: their messages (and, for ReAct, the system prompt's task context)."""
     return "\n".join(m.get("content") or "" for m in row.get("traj") or [] if m.get("role") in ("user", "system")
@@ -138,7 +143,7 @@ def load_tasks(run_dirs: list[Path], task_ids: Path, types_from: Path | None = N
         for rows in runs:
             row = rows[key]
             receipt = (row["agent_info"].get("receipt") or []) if is_remote(row) else react_receipt(row)
-            verdict = rc.check(answer_of(row) or "", form, receipt, context_of(row))
+            verdict = rc.check(answer_of(row) or "", form, receipt, context_of(row), question_of(row))
             info = row.get("agent_info") or {}
             latency = sum(t.get("latency_s") or 0 for t in info.get("turns") or []) if is_remote(row) else None
             task.runs.append(RunAnswer(verdict, score(row, 0.5)[1], info.get("total_cost"), latency, receipt))
@@ -257,6 +262,33 @@ def flag_table(tasks: list[Task]) -> list[str]:
     return lines
 
 
+def percentile(values: list[float], q: float) -> float:
+    ordered = sorted(values)
+    return ordered[min(len(ordered) - 1, int(math.ceil(q * len(ordered))) - 1)] if ordered else float("nan")
+
+
+def repeat_table(tasks: list[Task]) -> list[str]:
+    """Consistency over the k runs, and what answering costs in time and money."""
+    k = len(tasks[0].runs) if tasks else 0
+    agree = Counter(len(t.majority()) for t in tasks)
+    pass_k = sum(all(r.correct for r in t.runs) for t in tasks)
+    mean_right = sum(sum(r.correct for r in t.runs) / k for t in tasks)
+    lines = ["| measure | value |", "|---|---|",
+             f"| tasks | {len(tasks)} |",
+             f"| mean success of one run | {100 * mean_right / len(tasks):.1f}% |",
+             f"| pass^{k} (every run right) | {pass_k} ({100 * pass_k / len(tasks):.1f}%) |"]
+    lines += [f"| runs giving the majority answer = {a} | {agree.get(a, 0)} tasks |" for a in range(k, 0, -1)]
+    latencies = [r.latency for t in tasks for r in t.runs if r.latency is not None]
+    if latencies:
+        parallel = [max(r.latency or 0 for r in t.runs) for t in tasks]
+        lines += [f"| latency of one run, p50 / p95 | {percentile(latencies, 0.5):.1f} s / {percentile(latencies, 0.95):.1f} s |",
+                  f"| latency with the {k} runs in parallel (slowest run), p50 / p95 | "
+                  f"{percentile(parallel, 0.5):.1f} s / {percentile(parallel, 0.95):.1f} s |"]
+    costs = [sum(r.cost or 0 for r in t.runs) for t in tasks]
+    lines.append(f"| list-price cost per task, all {k} runs | ${sum(costs) / len(costs):.4f} |")
+    return lines
+
+
 def default_rules(k: int) -> list:
     """The candidate family, strictest first."""
     rules = []
@@ -291,6 +323,7 @@ def main() -> None:
     lines += ["", f"Chosen: {chosen.__name__ if chosen else 'none (no rule certified)'}", ""]
     if chosen:
         lines += ["## Chosen rule by true task type", "", *per_type(tasks, chosen), ""]
+    lines += ["## Repeats, latency and cost", "", *repeat_table(tasks), ""]
     lines += ["## Receipt flags", "", *flag_table(tasks), ""]
     text = "\n".join(lines) + "\n"
     print(text)
