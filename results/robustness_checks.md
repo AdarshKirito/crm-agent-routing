@@ -68,5 +68,5 @@ Model calls at list price (agent, policy classifier, Prompt Guard, and any judge
 |---|---|---|---|
 | before the test | ci ($0.16), ci2 ($0.12), ci3 ($0.15), dev ($7.07), dev2 ($3.48), dev3 ($11.83), dev_react_probe ($3.31), dev_react_probe_multi ($1.70), dev_small ($0.42), devmt_check ($0.27), smoke ($0.02), smoke_pipeline ($0.02), smoke_vertex ($0.02), smoke_vertex2 ($0.64), test_small ($0.36), trace ($0.09) | 1317 | $29.66 |
 | test run | test ($42.66) | 776 | $42.66 |
-| after the test | fresh_after ($7.30), fresh_before ($7.53), original_dev ($5.00), original_dev_oom_attempt ($0.02), original_smoke ($0.38), original_smoke2 ($0.35), original_test ($12.58) | 1719 | $33.16 |
-| all | | | $105.49 |
+| after the test | ablation_hints ($7.97), fresh_after ($7.30), fresh_before ($7.53), original_dev ($5.00), original_dev_oom_attempt ($0.02), original_smoke ($0.38), original_smoke2 ($0.35), original_test ($12.58) | 1913 | $41.14 |
+| all | | | $113.46 |

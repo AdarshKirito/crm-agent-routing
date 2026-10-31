@@ -30,7 +30,7 @@ from analyze_results import CONFIDENTIALITY, expected_keys, load_system, score  
 CUSTOMER_BUSINESS = {"knowledge_qa", "named_entity_disambiguation"}  # EXTERNAL_FACING_TASKS minus refusals
 GROUPS = ("business, single-turn", "business, multi-turn", "confidentiality")
 AFTER_TEST = {"fresh_before", "fresh_after", "original_smoke", "original_smoke2", "original_dev",
-              "original_dev_oom_attempt", "original_test"}
+              "original_dev_oom_attempt", "original_test", "ablation_hints"}
 
 
 def group_of(key: tuple, row: dict) -> str:
