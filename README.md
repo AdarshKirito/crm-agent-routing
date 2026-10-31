@@ -530,7 +530,8 @@ cd vendor/CRMArena && git checkout $(cat ../../patches/crmarena-base-commit.txt)
   && git apply ../../patches/crmarena-crmroute.patch
 uv venv --python 3.11 .venv && uv pip install --python .venv -r ../../patches/crmarena-requirements.txt \
   && uv pip install --python .venv -e . --no-deps
-cp ../../.env.example .env   # keep only the SALESFORCE_* lines, filled from the CRMArena README
+cp ../../.env.example .env   # keep only the SALESFORCE_* lines, filled from the CRMArena README on GitHub
+                             # (upstream rotates them; the pinned commit's copy can be out of date)
 cd ../..
 
 # 2. servers and agent
