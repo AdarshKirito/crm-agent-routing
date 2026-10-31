@@ -12,6 +12,7 @@
 #   full           3. crmroute agent, every task on the big model (CRMROUTE_MODE=no_route)
 #   routed         4. crmroute agent with the routing table (CRMROUTE_MODE=route)
 #   agent_small    dev only: crmroute agent with every task on the small model
+#   full_nohints   ablation: system 3 without the per-task-type hints (CRMROUTE_TASK_HINTS=0)
 #
 # Everything that must stay equal across systems is set once here: models, thinking
 # level, eval mode, judge, simulated user and task ids. Each role is pinned to one
@@ -114,11 +115,12 @@ start_mcp() {  # host MCP servers (only needed when the agent runs on the host)
   fi
 }
 
-start_agent() {  # mode port
-  local mode="$1" port="$2"
+start_agent() {  # mode port [task_hints]
+  local mode="$1" port="$2" hints="${3:-1}" tag="$1"
+  [ "$hints" = 1 ] || tag="${mode}_nohints"  # own call log, so it never mixes with system 3's
   if [ "$AGENT_RUNTIME" = docker ]; then
     # the image bundles both MCP servers; Ollama is reached on the host
-    local name="crmroute-$mode-$port-$$"
+    local name="crmroute-$tag-$port-$$"
     local adc="${GOOGLE_APPLICATION_CREDENTIALS:-${APPDATA:-$HOME/.config}/gcloud/application_default_credentials.json}" vertex_args=()
     if [ "$USE_VERTEX" = 1 ]; then  # gcloud application default credentials, read-only
       [ -f "$adc" ] || { echo "Vertex credentials file missing: set GOOGLE_APPLICATION_CREDENTIALS" >&2; return 1; }
@@ -130,8 +132,8 @@ start_agent() {  # mode port
       -e OLLAMA_API_BASE=http://host.docker.internal:11434 -e CRMROUTE_MODE="$mode" \
       -e CRMROUTE_BIG_MODEL="$BIG_MODEL" -e CRMROUTE_SMALL_MODEL="$SMALL_MODEL" -e CRMROUTE_POLICY_MODEL="$POLICY_MODEL" \
       -e CRMROUTE_FALLBACK=0 -e CRMROUTE_THINKING_LEVEL="$CRMROUTE_THINKING_LEVEL" \
-      -e CRMROUTE_ROUTER_EXAMPLES="$ROUTER_EXAMPLES" \
-      -e CRMROUTE_CALL_LOG="/srv/runs/agent_calls_${mode}_${STREAM}.jsonl" \
+      -e CRMROUTE_ROUTER_EXAMPLES="$ROUTER_EXAMPLES" -e CRMROUTE_TASK_HINTS="$hints" \
+      -e CRMROUTE_CALL_LOG="/srv/runs/agent_calls_${tag}_${STREAM}.jsonl" \
       -v "$(hostpath "$OUT/logs"):/srv/runs" \
       -v "$(hostpath "$ROUTING_TABLE"):/srv/agent/app/data/routing.yaml:ro" \
       -v "$(hostpath "$ROOT/data/cache/sf-docker"):/tmp/sf-cache" \
@@ -139,10 +141,10 @@ start_agent() {  # mode port
     CONTAINERS+=("$name")
   else
     (cd "$ROOT/agent" && env CRMROUTE_MODE="$mode" CRMROUTE_BIG_MODEL="$BIG_MODEL" CRMROUTE_SMALL_MODEL="$SMALL_MODEL" \
-        CRMROUTE_POLICY_MODEL="$POLICY_MODEL" CRMROUTE_CALL_LOG="$OUT/logs/agent_calls_${mode}_${STREAM}.jsonl" \
-        CRMROUTE_ROUTING_TABLE="$ROUTING_TABLE" CRMROUTE_ROUTER_EXAMPLES="$ROUTER_EXAMPLES" \
+        CRMROUTE_POLICY_MODEL="$POLICY_MODEL" CRMROUTE_CALL_LOG="$OUT/logs/agent_calls_${tag}_${STREAM}.jsonl" \
+        CRMROUTE_ROUTING_TABLE="$ROUTING_TABLE" CRMROUTE_ROUTER_EXAMPLES="$ROUTER_EXAMPLES" CRMROUTE_TASK_HINTS="$hints" \
         "$AGENT_PY" -m uvicorn app.fast_api_app:app --host 127.0.0.1 --port "$port" \
-        > "$OUT/logs/agent_${mode}_${port}.log" 2>&1) & PIDS+=($!)
+        > "$OUT/logs/agent_${tag}_${port}.log" 2>&1) & PIDS+=($!)
   fi
   wait_http "http://127.0.0.1:$port/list-apps"
 }
@@ -189,7 +191,7 @@ fi
 for mode in $MODES; do case "$mode" in single|multi) ;; *) echo "unknown mode: $mode" >&2; exit 2 ;; esac; done
 for system in "$@"; do
   case "$system" in
-    react|react_privacy|full|routed) ;;
+    react|react_privacy|full|routed|full_nohints) ;;
     agent_small) [ "$SPLIT" = dev ] || { echo "agent_small is for dev only" >&2; exit 2; } ;;
     *) echo "unknown system: $system" >&2; exit 2 ;;
   esac
@@ -209,6 +211,9 @@ for system in "$@"; do
     agent_small)
       p=$((8003 + PORT_OFFSET)); start_mcp; start_agent all_small "$p"
       bench agent_small --agent_strategy remote --model crmroute-small --remote_url "http://127.0.0.1:$p" ;;
+    full_nohints)
+      p=$((8004 + PORT_OFFSET)); start_mcp; start_agent no_route "$p" 0
+      bench full_nohints --agent_strategy remote --model crmroute-full-nohints --remote_url "http://127.0.0.1:$p" ;;
     *) echo "unknown system: $system" >&2; exit 2 ;;
   esac
 done

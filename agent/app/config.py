@@ -60,6 +60,9 @@ CALL_LOG = os.getenv("CRMROUTE_CALL_LOG", str(REPO_ROOT / "runs" / "calls.jsonl"
 # where the routing table allows (system 4). "all_small": every task on the small
 # model, used on dev to fit the routing table.
 MODE = os.getenv("CRMROUTE_MODE", "route")
+# CRMROUTE_TASK_HINTS=0 leaves the per-task-type hints (TaskSpec.hints) out of the solver
+# prompt, for the hints ablation; the task goal, answer form and general rules stay.
+TASK_HINTS = os.getenv("CRMROUTE_TASK_HINTS", "1").lower() in ("1", "true", "yes")
 
 SALESFORCE_MCP_URL = os.getenv("CRMROUTE_SALESFORCE_MCP_URL", "http://127.0.0.1:3333/mcp")
 SEARCH_MCP_URL = os.getenv("CRMROUTE_SEARCH_MCP_URL", "http://127.0.0.1:8765/mcp")
