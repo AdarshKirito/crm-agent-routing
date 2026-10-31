@@ -63,7 +63,7 @@ On a third org from the same benchmark family (the original CRMArena), crmroute 
 The numbers are summaries in [`results/`](results/), made from the run records by the scripts in `scripts/`;
 the test, fresh, original-org, robustness and ablation summaries name their exact commands. The raw run records
 are published as release assets, [run-records-2026-10-11](https://github.com/AdarshKirito/crm-agent-routing/releases/tag/run-records-2026-10-11)
-(59 MB) and, for the hints ablation, [run-records-2026-10-30](https://github.com/AdarshKirito/crm-agent-routing/releases/tag/run-records-2026-10-30),
+(58 MB) and, for the hints ablation, [run-records-2026-10-30](https://github.com/AdarshKirito/crm-agent-routing/releases/tag/run-records-2026-10-30),
 so every summary can be rebuilt.
 
 ## Contents
