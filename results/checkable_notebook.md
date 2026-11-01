@@ -155,3 +155,57 @@ image 658df1a6bc7f, commit 1175af9): 109 of 152 right (71.7%), no API errors.
   started. It was resumed with the same pins (the harness redoes tasks that ended in an error): from a git
   worktree at its manifest commit f414d36 whose files hash to the manifest's source digest, so the
   manifest check accepted it.
+- Test run 1 stopped the same way, on the same Vertex AI error, at b2b/2130 (multi-turn), before its B2C
+  parts; resumed the same way from a worktree at its manifest commit aced050. The same error ended b2c/1108
+  (multi-turn) later in that run, also redone by resuming: 3 of about 2,400 crmroute sessions in these runs,
+  all routed, 2 of them multi-turn.
+- The host slept from about 00:47 to 10:52 on 2026-11-01 (Windows power events; a 10-hour gap in every
+  stream's call log). Test runs 2 and 3 had finished before it. On waking, each container's first Vertex AI
+  request failed with 401 UNAUTHENTICATED (the access token had expired; later requests refreshed it): 4
+  tasks ended in an error. Earlier (00:20), calibration run 2 lost its connection to its container while
+  fetching one session's state (b2c/1189). All 5 are redone by resuming. The tasks in flight at the sleep
+  were the ones that failed on waking, so no recorded latency spans it (the longest single-turn test
+  session took 201 s). A keep-awake
+  request (SetThreadExecutionState, no settings changed) held the host awake for the rest of the runs.
+- The live re-check of the test runs (`runs/checkable_test/recheck.json`) ran once all test runs had finished
+  and before the rules were committed; its output was not opened until after that commit.
+
+## Calibration and test results (2026-11-01)
+
+- Calibration (`results/checkable_calibration.md`, committed in 0016481 before any test output was
+  opened): only crmroute's three runs certified a rule, the strictest of the family. 168 of 456 answered,
+  10 wrong (6.0%), p = 0.045. The next rule, which allows tool errors the agent recovered from, had 19
+  wrong among 223 (8.5%, p = 0.27): below 10% as measured, but 223 answers cannot certify it at delta 0.10.
+  ReAct with the privacy prompt (30.1% wrong under its strictest rule), crmroute's first run alone (15.1%)
+  and the B2B-only calibration (7.2% of 83 answers, p = 0.26) certified nothing, so they withhold
+  everything on test.
+- Test (`results/checkable_answers.md`): 123 of 304 answered (40.5%), 9 wrong (7.3%, exact 95% upper
+  bound 12.4%). The four primary outcomes are met, coverage narrowly (36.8% on calibration). All 230
+  evidence entries behind released answers reproduced live.
+- The 9 wrong released answers: 6 name a real record where the answer key says None (5 invalid_config,
+  each a quote-configuration rule article, 3 of them Mandatory Bundles for Quotes, for a quote the key
+  finds valid; 1 activity_priority), 2 give the same
+  wrong stage (wrong_stage_rectification), 1 a wrong state. All three runs agreed on each, and each is
+  grounded: the receipt shows the record exists and was read, not that it answers the question. The
+  checks cannot see this kind of error.
+- Why Id-form task types released little (counted after the fact, descriptive): quote_approval because
+  the runs disagree (13 of 16 tasks), policy_violation_identification because the tool budget ran out (15
+  of 16), sales_amount_understanding and monthly_trend_analysis because of recovered tool errors (11 and
+  9 of 16).
+- Free-text and BANT task types (knowledge_qa, sales_insight_mining, lead_qualification) are never
+  released, by design. Multi-turn: neither system has a certified one-run rule, so nothing is released.
+- Each run alone, with every answer given: 72.0%, 71.7% and 71.4% right against ReAct with the privacy
+  prompt's 54.3%. Released answers were 92.7% right; the price is the 59.5% of tasks handed to a person.
+- Adaptive repeats (runs taken one at a time until the decision is settled) make the same decisions with
+  1.83 runs per task: $0.0410 per task at list price, against $0.0787 for all three runs.
+
+## The ask demo with the certified rule (2026-11-01)
+
+`scripts/ask.py` with the committed rule, against two new containers of the measured image (routed on port
+8901 for runs 1 and 2, every task on 3.8 Flash on 8902 for run 3; call logs in `runs/ask_demo`), on the two
+practice questions of the first demo:
+
+- b2b/310 (top_issue_identification): all three runs answered a03Wt00000JqvNUIAZ, the reference, with no
+  flag; released with the one SOQL query it rests on. Slowest run 12.1 s, $0.0155 for the three.
+- b2b/2 (lead_qualification): the routed runs answered None with no empty result behind it, the 3.8 Flash
+  run "Timeline"; withheld as a BANT judgment and handed off. Slowest run 27.0 s, $0.0534.
