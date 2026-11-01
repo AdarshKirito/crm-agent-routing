@@ -96,18 +96,6 @@ class Org:
         return self.cache[key]
 
 
-def support_entries(verdict, receipt: list[dict]) -> list[dict]:
-    """The entries an answer rests on."""
-    ok = [e for e in receipt if e.get("status") == "ok"]
-    claim = verdict.claim
-    if claim.kind == "ids":
-        return [e for e in ok if e["n"] in verdict.support]
-    if claim.kind == "none":
-        return [e for e in ok if e.get("totalSize") == 0 and e["tool"] in ("soql_query", "sosl_search")]
-    if claim.kind == "text":
-        return [e for e in ok if e["tool"] == "search_knowledge" or "Knowledge__kav" in json.dumps(e.get("args"))]
-    return [e for e in ok if e["tool"] in ("soql_query", "sosl_search")][-1:]  # values: the last query read
-
 
 def _literal(node):
     """A Python repr of rows (lists, dicts, OrderedDict([...]), constants), read without eval."""
@@ -192,7 +180,7 @@ def main() -> None:
     for task in RE.load_tasks(args.runs, args.task_ids, args.types_from):
         org = orgs.setdefault(task.key[0], Org(task.key[0]))
         for i, run in enumerate(task.runs):
-            entries = support_entries(run.verdict, run.receipt)
+            entries = RE.support_entries(run.verdict, run.receipt)
             for entry in entries:
                 result = recheck_entry(org, entry)
                 counts[result["status"]] += 1

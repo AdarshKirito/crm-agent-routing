@@ -205,6 +205,19 @@ def released_answer(task: Task) -> RunAnswer:
     return task.majority()[0]
 
 
+def support_entries(verdict, receipt: list[dict]) -> list[dict]:
+    """The receipt entries an answer rests on: what recheck_receipts.py re-runs and ask.py shows."""
+    ok = [e for e in receipt if e.get("status") == "ok"]
+    claim = verdict.claim
+    if claim.kind == "ids":
+        return [e for e in ok if e["n"] in verdict.support]
+    if claim.kind == "none":
+        return [e for e in ok if e.get("totalSize") == 0 and e["tool"] in ("soql_query", "sosl_search")]
+    if claim.kind == "text":
+        return [e for e in ok if e["tool"] == "search_knowledge" or "Knowledge__kav" in json.dumps(e.get("args"))]
+    return [e for e in ok if e["tool"] in ("soql_query", "sosl_search")][-1:]  # values: the last query read
+
+
 def _clusters(runs: list[RunAnswer]) -> list[list[RunAnswer]]:
     clusters: list[list[RunAnswer]] = []
     for run in runs:
