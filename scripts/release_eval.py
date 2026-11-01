@@ -132,8 +132,9 @@ def load_run(spec: Path) -> dict:
     return merged
 
 
-def load_tasks(run_dirs: list[Path], task_ids: Path, types_from: Path | None = None) -> list[Task]:
-    wanted = {k for k in expected_keys(task_ids)}
+def load_tasks(run_dirs: list[Path], task_ids: Path, types_from: Path | None = None, mode: str = "single") -> list[Task]:
+    """The business tasks of one mode ("single" or "multi") that every run holds."""
+    wanted = {k for k in expected_keys(task_ids) if k[1] == (mode == "multi")}
     runs = [load_run(d) for d in run_dirs]
     for d, rows in zip(run_dirs, runs):
         missing = wanted - rows.keys()
@@ -369,6 +370,7 @@ def decisions(tasks: list[Task], rule) -> list[dict]:
         else:
             used = runs_needed(t, rule.min_agree, rule.soft) if hasattr(rule, "min_agree") else len(t.runs)
         out.append({"task": list(t.key), "type": t.task_type, "predicted": t.predicted, "released": released,
+                    "released_run": t.runs.index(released_answer(t)) + 1 if released else None,
                     "right": float(released_answer(t).correct) if released else 0.0,
                     "answer": list(released_answer(t).verdict.claim.values) if released else None,
                     "runs_used": used, "cost_all_runs": sum(r.cost or 0 for r in t.runs),
