@@ -70,6 +70,12 @@ run's model and judge pins.
   of 408 confidential requests were refused by the solver after the guard allowed them, so the same
   instruction is a second line of defence. A refused business question counts as withheld.
 
+- ReAct with the privacy prompt, one run on the same tasks (`runs/checkable_practice/react`, receipts
+  rebuilt from its trajectories, router types from crmroute's run 1): 53.9% right. Through the same
+  procedure its strictest one-run rule released 90 of 152 answers and 29 were wrong (32.2%); with fewer
+  flags required, 110 with 39 wrong and 119 with 41 wrong. Its receipt flags separate right from wrong
+  answers far less than crmroute's agreement does, so in practice no rule of its family comes near 10%.
+
 ## Practice round 2: receipt-guided retry (did not help; off)
 
 The checker's retry was given to answers whose receipt showed the tool budget used up or a None with no
@@ -129,3 +135,23 @@ image 658df1a6bc7f, commit 1175af9): 109 of 152 right (71.7%), no API errors.
   routed runs can outvote it.
 - Decision (pre-registration part 2): two routed runs and one 3.8 Flash run, in that order for adaptive
   repeats; list price about $0.074 per task against $0.070 for three routed runs.
+
+## Calibration and test runs (launched 2026-10-31)
+
+- Baseline (ReAct with the privacy prompt): calibration 456 of 456 and test 380 of 380 tasks, no API
+  errors, as eight parallel streams launched at 933d75e (pre-registration part 1).
+- crmroute: three calibration and three test streams launched at f414d36 and aced050 (pre-registration
+  part 2; aced050 only adds `data/checkable_refusal_check.json`), image 658df1a6bc7f.
+- `scripts/checkable_report.py` (19d7afc) runs the pre-registered analysis. Since the pre-registration,
+  `scripts/release_eval.py` changed in two places only: it loads one mode at a time and records which run's
+  answer was released. The rules, the flags (`agent/app/receipt_check.py`, unchanged) and the
+  Learn-then-Test code are as pre-registered (`git diff 933d75e 19d7afc -- scripts/release_eval.py`).
+- A dry run of both stages on the practice runs (in-sample, not a result) found the strictest rule
+  withholding monthly_trend_analysis answers that all three runs got right: nearly every one of their
+  receipts holds a SOQL error the agent recovered from. The next rule of the family allows recovered errors.
+- Calibration run 1 stopped after its B2B half: on b2b/2062 Vertex AI rejected a request with 400
+  INVALID_ARGUMENT ("Function call is missing a thought_signature", on the solver's `set_model_response`
+  call), the server answered 500 and the runner exits when an org has an unfinished task, so B2C had not
+  started. It was resumed with the same pins (the harness redoes tasks that ended in an error): from a git
+  worktree at its manifest commit f414d36 whose files hash to the manifest's source digest, so the
+  manifest check accepted it.
