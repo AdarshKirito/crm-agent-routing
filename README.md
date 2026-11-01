@@ -60,11 +60,21 @@ After the test I fixed the guard's misses and measured the fixes on 620 tasks no
 On a third org from the same benchmark family (the original CRMArena), crmroute scored 82.2% against ReAct's
 75.6% at 54% lower cost per task, a difference 90 tasks cannot confirm.
 
+Last, I added **checkable answers**: crmroute gives a business answer only when code can check it against a
+receipt of the tool calls it rests on and three independent runs agree, under a release rule whose risk was
+certified on a calibration split; otherwise it withholds the answer and says why. On 304 new held-out
+single-turn tasks it answered 123 (40.5%), and 9 of those were wrong (7.3%; exact 95% upper bound 12.4%, above
+the 10% target). All 230 evidence entries behind the released answers reproduced against the live orgs. The
+same procedure certified no rule for ReAct with the privacy prompt or for a single crmroute run, so both would
+withhold everything. The other 59.5% of tasks go to a person, and the 9 wrong answers were unanimous and
+grounded, an error a receipt cannot show ([below](#checkable-answers-resultscheckable_answersmd)).
+
 The numbers are summaries in [`results/`](results/), made from the run records by the scripts in `scripts/`;
 the test, fresh, original-org, robustness and ablation summaries name their exact commands. The raw run records
 are published as release assets, [run-records-2026-10-11](https://github.com/AdarshKirito/crm-agent-routing/releases/tag/run-records-2026-10-11)
-(58 MB) and, for the hints ablation, [run-records-2026-10-30](https://github.com/AdarshKirito/crm-agent-routing/releases/tag/run-records-2026-10-30),
-so every summary can be rebuilt.
+(58 MB), for the hints ablation, [run-records-2026-10-30](https://github.com/AdarshKirito/crm-agent-routing/releases/tag/run-records-2026-10-30),
+and for checkable answers, [run-records-2026-11-01](https://github.com/AdarshKirito/crm-agent-routing/releases/tag/run-records-2026-11-01)
+(171 MB, the receipts included), so every summary can be rebuilt.
 
 ## Contents
 
@@ -229,8 +239,10 @@ triggered on test: a customer request with no usable verdict from the policy cla
 router's vote said confidential (and a classifier error crashed the request), and a checker that could not
 verify any Id answered "None", which claims that no record matches. I fixed all three and measured the fixes on
 tasks no earlier step had used, so the test set stayed untouched. There was also no evidence beyond the two
-CRMArena-Pro orgs; the original-CRMArena run below is the first step there. Last, a hints ablation reran system 3
-on the test tasks without its per-task hints, to measure what that dev tuning adds.
+CRMArena-Pro orgs; the original-CRMArena run below is the first step there. A hints ablation reran system 3
+on the test tasks without its per-task hints, to measure what that dev tuning adds. Last, checkable answers
+changed what crmroute does with an answer it cannot back up, built and measured on 912 tasks no earlier step
+had used.
 
 ### Safety fixes, measured on fresh tasks (`results/fresh_summary.md`)
 
@@ -327,6 +339,93 @@ of it.
   without, $0.0427 with; ReAct $0.0792). The run cost $7.97 at list price.
 - What stays without the hints (the tool-result bound, the checker, and the general rules and answer forms, also
   partly written from dev) was not ablated part by part.
+
+### Checkable answers (`results/checkable_answers.md`)
+
+crmroute gives a business answer only when the answer can be checked, and otherwise withholds it and says why,
+so that a person can take the request over (method and pre-registration: `docs/checkable_answers.md`). I built
+it on 152 practice tasks and fixed every choice before calibrating it on 456 more and testing it once on 304,
+all CRMArena-Pro single-turn business tasks that no earlier split used (`data/checkable_*.json`). Every trial,
+including the ones that failed, is in `results/checkable_notebook.md`.
+
+1. **A receipt for every answer.** Every tool call is recorded with its SOQL or SOSL text, its status (ok,
+   error, blocked by the confidentiality policy, budget used up), the row counts the Salesforce server reports
+   and the result as the model saw it (`agent/app/receipts.py`). The benchmark's ReAct agent keeps every query
+   and its output in its trajectory, so the same receipts are rebuilt for it.
+2. **Code checks the answer against its receipt** (`agent/app/receipt_check.py`, standard library only). An
+   answer cannot be shown from its receipt if it names an Id no tool result holds, rests on no tool result,
+   does not parse in its task's form, or declines instead of answering. Softer flags are recorded too; three
+   matter in practice: the tool budget ran out, a tool call failed, and a "None" that no empty query result
+   supports.
+3. **Independent runs must agree.** Each question goes to three runs: two of the routed system and one with
+   every task on 3.8 Flash, which in practice disagreed with some of the mistakes the routed runs shared.
+4. **Free text and judgments are never released.** Task types whose answer is free text (knowledge_qa,
+   sales_insight_mining) or a BANT judgment read from call transcripts (lead_qualification) are always
+   withheld: a receipt can show where such an answer's words came from, not that it is right.
+5. **A release rule with a certified risk.** A family of rules fixed in advance, from "all three runs agree
+   and no receipt has a flag" to looser ones. Learn-then-Test on the calibration runs (fixed-sequence testing,
+   exact binomial p-values, alpha = delta = 0.10) chose the loosest rule certified to keep the share of wrong
+   answers among released answers at or below 10%. The chosen rule was committed before any test result was
+   read and applied unchanged.
+6. **Anyone can re-run the evidence.** `scripts/recheck_receipts.py` re-runs the queries an answer rests on
+   against the benchmark's orgs through simple_salesforce, not crmroute's server, and compares the live rows
+   with the recorded ones.
+
+Held-out test, 304 single-turn business tasks, rules from `results/checkable_calibration.md`:
+
+| | answered (coverage) | wrong among answered (risk) | risk, exact 95% upper bound | right, every answer given |
+|---|---|---|---|---|
+| crmroute, three runs, certified rule | 123 (40.5%) | 9 (7.3%) | 12.4% | |
+| crmroute, each run alone | no rule certified: 0 | | | 71.4% to 72.0% |
+| ReAct + privacy prompt, one run | no rule certified: 0 | | | 54.3% |
+
+- **The four pre-registered outcomes were met**, two of them narrowly. A rule was certified, the strictest of the
+  family: all three runs agree and none of their receipts shows a used-up budget, a tool error or an unsupported
+  None. Its test risk was 7.3% against a 10% target, but the exact upper bound, 12.4%, does not exclude a risk
+  above 10%. It answered 40.5% of the tasks against a 40% target (36.8% on calibration). All 230 evidence
+  entries behind the released answers reproduced live, against a 99% target.
+- **Released answers were right 92.7% of the time**, against about 72% for one run that answers everything. The
+  price is coverage: 59.5% of the tasks go to a person, every free-text and BANT task among them. The benchmark's
+  score, which counts a withheld answer as a failure, falls to 37.5%.
+- **The 9 wrong released answers were all unanimous and grounded.** Six name a real record where the answer
+  key says there is none: five of them cite a quote-configuration rule article for a quote the key finds valid.
+  A receipt shows that a record exists and was read, not that it answers the question.
+- **Agreement is what certifies.** With one run, the same flags left 15.1% of crmroute's released calibration
+  answers wrong and 30.1% of ReAct's, so neither certifies a rule. Calibrated on B2B tasks alone, the three runs
+  released too few answers (83) to certify one for B2C.
+- **Coverage is limited by sample size more than by the point estimate.** The next rule, which also releases
+  answers whose agent recovered from a tool error, had 8.5% risk on calibration, but 223 answers could not
+  certify it at delta 0.10. Policy-violation tasks were withheld mostly for a used-up tool budget, quote approvals
+  because the runs disagreed.
+- **Cost and wait:** three runs cost $0.079 per task at list price. Taking runs one at a time until the decision
+  is settled gives the same decisions with 1.83 runs on average, $0.041 per task. With the three runs in
+  parallel, the median wait is 20.9 s (one run: 13.6 s).
+- **Outside the certified scope:** no one-run rule was certified for either system, so nothing was released on
+  the 76 multi-turn test tasks. Refusals did not regress: with this image, 41 of the old test split's 42
+  confidential requests were refused.
+
+`scripts/ask.py` does the same for one question against running servers, with the certified rule
+(`results/checkable_rules.json`):
+
+```
+$ python scripts/ask.py --url http://127.0.0.1:8901,http://127.0.0.1:8901,http://127.0.0.1:8902 --org b2b \
+    --context "- Today's date: 2024-10-30" "What was the most frequent problem encountered with the SecureFlow \
+    Suite in the third quarter of 2020? The associated product Id is 01tWt000006hV58IAE. Return only the issue Id ..."
+task type (router): top_issue_identification  |  answer form: id  |  rule: agree>=3, no budget/none_without_empty/errors, ...
+  run 1: 'a03Wt00000JqvNUIAZ'  flags: none  (5.6 s, $0.0026)
+  run 2: 'a03Wt00000JqvNUIAZ'  flags: none  (6.1 s, $0.0024)
+  run 3: 'a03Wt00000JqvNUIAZ'  flags: none  (12.1 s, $0.0105)
+
+ANSWER: a03Wt00000JqvNUIAZ
+Evidence (re-run with scripts/recheck_receipts.py, or paste the queries into any SOQL client):
+  [1] soql_query: {"query": "SELECT IssueId__c, COUNT(Id) FROM Case WHERE OrderItemId__r.Product2Id = '01tWt000006hV58IAE'
+      AND CreatedDate >= 2020-07-01T00:00:00Z AND CreatedDate <= 2020-09-30T23:59:59Z GROUP BY IssueId__c
+      ORDER BY COUNT(Id) DESC LIMIT 1"}  -> 1 rows
+```
+
+A lead-qualification question asked the same way is withheld ("answers of form 'bant' cannot be checked against
+record fields. Hand this request to a person."). The practice, calibration, test and refusal runs cost $145.77
+at list price (`results/robustness_checks.md`, section 4); the live re-check makes no model calls.
 
 ## Reusable parts
 
@@ -546,7 +645,7 @@ the measured runs come from the run records (`scripts/analyze_results.py`), not 
 |---|---|---|
 | `mcp-salesforce` (`npm test`) | SOQL/SOSL guards (incl. locking clauses), Id checks, cache scoping, shared in-flight reads, atomic disk writes, pagination caps, response budget, `--env` start-up | 17 passed |
 | `mcp-salesforce` live smoke (`npx tsx test/smoke.ts --env ...`, run by hand) | all 5 tools on both live orgs via the official MCP client; write attempts and unknown orgs rejected | passed |
-| `agent` (`uv run pytest`) | guard (ownership filters, knowledge filtering on every read, identity in conversations), checker, PII scrub, Prompt Guard parsing and accounting, cost accounting, pinned retry vs fallback on real provider errors, tool-call repair, tracing export, the real ADK graph offline with a scripted model, fail-closed classifier, checker abstention, router examples from several files, the task-hints switch | 65 passed, 11 live tests skipped without their env flags |
+| `agent` (`uv run pytest`) | guard (ownership filters, knowledge filtering on every read, identity in conversations), checker, PII scrub, Prompt Guard parsing and accounting, cost accounting, pinned retry vs fallback on real provider errors, tool-call repair, tracing export, the real ADK graph offline with a scripted model, fail-closed classifier, checker abstention, router examples from several files, the task-hints switch, tool-call receipts (budget and blocked calls included), receipt checks, the receipt-guided retry | 84 passed, 11 live tests skipped without their env flags |
 | `search` fork (`uv run pytest`) | upstream behaviour plus the knowledge index: mode-specific embedding, org isolation, response budget | 36 passed |
 | `tests/` (benchmark env) | harness retries, resume pins, atomic checkpoints, adapter failure handling, run manifests, complete-split analysis, routing fit pairing, judge-agreement binding, budget estimate, scoring the original org's single answers, released runs that reuse task ids | 57 passed, 1 live test skipped |
 
@@ -652,6 +751,27 @@ python scripts/fit_routing.py --org original --big runs/original_dev/full --smal
   --dev-split data/original_dev.json --test-split data/original_test.json --out agent/app/data/routing_original.yaml
 SPLIT=test TASK_IDS=data/original_test.json OUT=runs/original_test IMAGE=crmroute:org ORGS=original MODES=single \
   ROUTING_TABLE=agent/app/data/routing_original.yaml ./scripts/run_systems.sh react full routed
+
+# checkable answers (docs/checkable_answers.md): splits, then per split two routed runs and one 3.8 Flash run
+vendor/CRMArena/.venv/Scripts/python scripts/make_checkable_splits.py --out-dir data --seed 20261031
+vendor/CRMArena/.venv/Scripts/python scripts/make_checkable_splits.py --extend-calibration 4 --seed 20261101
+export IMAGE=crmroute:checkable   # commit the splits before any run
+for s in calibration test; do
+  m=single; [ $s = test ] && m="single multi"   # the multi-turn test tasks: routed run 1 only
+  SPLIT=checkable_$s TASK_IDS=data/checkable_$s.json OUT=runs/checkable_$s/r1 MODES="$m" PORT_OFFSET=100 ./scripts/run_systems.sh routed
+  SPLIT=checkable_$s TASK_IDS=data/checkable_$s.json OUT=runs/checkable_$s/r2 MODES=single PORT_OFFSET=110 ./scripts/run_systems.sh routed
+  SPLIT=checkable_$s TASK_IDS=data/checkable_$s.json OUT=runs/checkable_$s/f1 MODES=single PORT_OFFSET=120 ./scripts/run_systems.sh full
+  # the baseline, ReAct with the privacy prompt, once: four streams (they can run side by side), read as one run
+  python scripts/split_halves.py data/checkable_$s.json runs/checkable_splits/$s
+  for h in 1 2; do for org in b2b b2c; do
+    SPLIT=checkable_$s TASK_IDS=runs/checkable_splits/${s}_h$h.json OUT=runs/checkable_$s/react_h$h ORGS=$org MODES="$m" \
+      ./scripts/run_systems.sh react_privacy
+  done; done
+done
+python scripts/checkable_report.py --stage calibration   # certify the rules; commit them before reading any test result
+vendor/CRMArena/.venv/Scripts/python scripts/recheck_receipts.py --runs runs/checkable_test/r1/routed \
+  runs/checkable_test/r2/routed runs/checkable_test/f1/full --task-ids data/checkable_test.json --out runs/checkable_test/recheck.json
+python scripts/checkable_report.py --stage test          # results/checkable_answers.md
 ```
 
 `scripts/estimate_budget.py` projects a run's list-price cost from measured checkpoints before it starts. For
@@ -682,12 +802,23 @@ the judge check, `python scripts/judge_agreement.py sheet ...` writes a blind 40
   the solver also declined requests the guard had allowed, replying that the information is confidential: 5 of 16 on
   test in each system (4 of the 6 single-turn knowledge_qa tasks) and 15 of 76 for the fixed agent on fresh (13 of
   36 single-turn knowledge_qa). These counts were first published as guard refusals only and corrected on
-  2026-10-31 (`results/robustness_checks.md`, section 2). The records do not keep the tool calls, so why the solver
-  declined is not visible in them.
+  2026-10-31 (`results/robustness_checks.md`, section 2). The test and fresh records do not keep the tool calls, so
+  why the solver declined is not visible in them (the checkable-answers runs keep them as receipts).
+- **Checkable answers** are certified for one distribution: single-turn templated tasks on these two orgs, with
+  this image, these models and this judge. The guarantee is about the calibration split (risk at most 10% with
+  90% confidence) and carries to new tasks only as far as they are exchangeable with it; on test the exact 95%
+  upper bound was 12.4%. Coverage met its 40% target by 0.5 points. A receipt check sees whether the cited records
+  exist and were read, not whether they answer the question, and all 9 wrong released answers passed it with
+  three runs agreeing. "Right" is the benchmark's grading against its answer key (qwen3:8b as judge), not a person's
+  check. Free-text, BANT and multi-turn
+  answers are never released, and three runs cost about three times one run (1.83 runs with adaptive repeats).
+  Eight tasks ended in an error (three Vertex AI "missing thought_signature" rejections, four expired credentials
+  after the host slept, one dropped connection) and were redone by resuming with identical pins, seven resumes in
+  all (`results/checkable_notebook.md`).
 - **Prompt Guard** is untested here (no benchmark task is an injection attempt) and fails open: on Groq's free tier, 122 and 159 Prompt Guard calls in the two fresh runs got `429 Too Many Requests` under parallel load, and screening continued without the injection score. A deployment needs a paid tier or a fail-closed rule for it.
 - **Stakeholder interviews: not conducted.** `docs/scoping.md` is the unfilled template, and the sensitive-data map (`agent/app/guard/sensitive_fields.yaml`) is a starter built from the schema and the dev split, not from stakeholder input. Every guard result above was measured with that starter map; replacing it with an interview-based never-share list would need a new measurement.
 - **Conversations without a logged-in identity:** the harness gives multi-turn tasks no session identity, so the agent binds the first Contact Id the customer states. A deployment must take it from authentication.
-- **Published run records** have three redactions: the Google Cloud project id, email addresses at gmail.com and salesforce.com that ReAct's queries returned from the orgs' User records, and local paths. The hints ablation's records, published separately, needed only the first and last (they hold no email addresses). Server and container logs are not published.
+- **Published run records** have three redactions: the Google Cloud project id, email addresses at gmail.com and salesforce.com that ReAct's queries returned from the orgs' User records, and local paths. The hints ablation's records, published separately, needed only the first and last (they hold no email addresses). The checkable-answers records, also published separately, have the same three redactions; their receipts hold the tool results as the agent saw them. Server and container logs are not published.
 - **Qdrant local mode:** only one process can open an index folder at a time, so the search server and the retrieval eval need separate copies.
 
 ## License
