@@ -373,6 +373,51 @@ def default_rules(k: int, withheld_forms: frozenset = frozenset()) -> list:
     return rules
 
 
+# ---- round 2: a competence map learned on earlier runs --------------------------------------------
+
+
+def competence_map(dev_tasks: list[Task], rule, threshold: float) -> frozenset:
+    """Predicted task types whose answers `rule` released in earlier runs (never the calibration or test
+    runs it is certified and scored on) were wrong more than `threshold` of the time."""
+    released, wrong = Counter(), Counter()
+    for t in dev_tasks:
+        if rule(t):
+            released[t.predicted] += 1
+            wrong[t.predicted] += not released_answer(t).correct
+    return frozenset(k for k in released if wrong[k] / released[k] > threshold)
+
+
+SOFT_LEVELS = (("budget", "none_without_empty", "errors"), ("budget", "none_without_empty"), ())
+
+
+def round2_rules(k: int, dev_tasks: list[Task], withheld_forms: frozenset = UNCHECKABLE_FORMS) -> list:
+    """The round-2 chain in its pre-registered order (docs/checkable_answers.md): all k runs agree; with
+    the types wrong more than 15% of the time in the earlier runs withheld, then those wrong more than
+    20%; at each threshold the agreeing runs show no used-up budget, unsupported None or tool error, then
+    only the first two, then no flag is required."""
+    rules = []
+    for threshold in (0.15, 0.20):
+        for soft in SOFT_LEVELS:
+            bad = competence_map(dev_tasks, make_rule(k, soft, frozenset(), withheld_forms), threshold)
+            rule = make_rule(k, soft, bad, withheld_forms)
+            rule.__name__ = (f"agree>={k}" + (f", no {'/'.join(soft)}" if soft else "")
+                             + f", withhold {len(bad)} types wrong >{round(threshold * 100)}% before"
+                             + f", withhold {'/'.join(sorted(withheld_forms))} answers")
+            rule.map_threshold, rule.map_types = threshold, sorted(t or "None" for t in bad)
+            rules.append(rule)
+    return rules
+
+
+def calibrate_widest(tasks: list[Task], rules: list, alpha: float, delta: float) -> tuple[object | None, list[dict]]:
+    """Fixed-sequence Learn-then-Test over `rules` in order; of the rules certified before the first
+    failure (all of them hold their risk bound together), the one that answers the most calibration tasks."""
+    _, rows = calibrate(tasks, rules, alpha, delta)
+    certified = [(rule, row) for rule, row in zip(rules, rows) if row["certified"]]
+    if not certified:
+        return None, rows
+    return max(certified, key=lambda c: c[1]["released"])[0], rows
+
+
 def decisions(tasks: list[Task], rule) -> list[dict]:
     """One row per task: whether the rule released an answer, whether it was right, and its cost."""
     out = []
