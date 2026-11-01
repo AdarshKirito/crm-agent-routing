@@ -107,3 +107,25 @@ reported either way. The baseline's protocol is complete with it, so its calibra
 after this commit, as eight parallel streams (each split in two halves by `scripts/split_halves.py`, one
 stream per half and org). crmroute's run composition is fixed after practice round 3, before any crmroute
 calibration or test run.
+
+## Practice round 3: one run on 3.8 Flash for every task (cross-model agreement)
+
+crmroute with every task on 3.8 Flash (system 3) once on the practice tasks (`runs/checkable_practice/f1`,
+image 658df1a6bc7f, commit 1175af9): 109 of 152 right (71.7%), no API errors.
+
+- Of the 76 answers the three routed runs agreed on cleanly (all three, no budget or unsupported-None
+  flag), the 3.8 Flash run disagreed with 2 of the 5 wrong ones (b2b/233 activity_priority, b2c/871
+  sales_amount_understanding) and with 2 of the 71 right ones.
+- Two routed runs plus the 3.8 Flash run, over the three ways of pairing (in-sample):
+
+  | runs | all 3 agree, no budget / unsupported None / tool errors | all 3 agree, no budget / unsupported None |
+  |---|---|---|
+  | routed, routed, routed | 62 released, 3 wrong (4.8%) | 76 released, 5 wrong (6.6%) |
+  | r1, r2, 3.8 Flash | 61, 2 (3.3%) | 75, 4 (5.3%) |
+  | r1, r3, 3.8 Flash | 65, 3 (4.6%) | 77, 4 (5.2%) |
+  | r2, r3, 3.8 Flash | 59, 2 (3.4%) | 73, 3 (4.1%) |
+
+  At the two-of-three rules it does not help (9.9-10.0% against 7.6% for the strictest of them), since two
+  routed runs can outvote it.
+- Decision (pre-registration part 2): two routed runs and one 3.8 Flash run, in that order for adaptive
+  repeats; list price about $0.074 per task against $0.070 for three routed runs.

@@ -53,9 +53,13 @@ Fixed before any calibration or test run, from the practice runs only (`results/
 **System.** crmroute, image `crmroute:checkable` 658df1a6bc7f (its agent code is that of commit
 0121418, unchanged since), with the test run's pins (Gemini 3.8 Flash and 3.1 Flash-Lite on Vertex AI,
 thinking low, aided mode, a local qwen3:8b judge and simulated user) and the receipt-guided retry off. Each task is answered by three independent
-runs. Whether they are three runs of the routed system, or two routed runs and one with every task on 3.8
-Flash, is settled by practice round 3 and committed to this section before any crmroute calibration or
-test run. The baseline is the benchmark's ReAct agent with its privacy prompt, one run per task, on the
+runs: two of the routed system and one with every task on 3.8 Flash (system 3), taken in that order when
+repeats are added one at a time. Part 2 of this pre-registration, committed after practice round 3 and
+before any crmroute calibration or test run. In practice, of the 76 answers three routed runs agreed on
+cleanly, the 3.8 Flash run disagreed with 2 of the 5 wrong ones and 2 of the 71 right ones; over the three
+ways of pairing it with two routed runs, the risk of the rules that need all three runs to agree fell from
+6.6% to 4.1-5.3% at about the same coverage and list-price cost (`results/checkable_notebook.md`, round 3).
+A modest, in-sample difference: the calibration and test runs measure it again. The baseline is the benchmark's ReAct agent with its privacy prompt, one run per task, on the
 same models, judge and simulated user, its receipts rebuilt from its trajectories; its protocol below is
 fixed by this commit.
 
