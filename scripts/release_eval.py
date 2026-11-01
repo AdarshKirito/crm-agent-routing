@@ -121,14 +121,25 @@ class Task:
         return max(clusters, key=len)  # ties keep the first run's answer
 
 
+def load_run(spec: Path) -> dict:
+    """The records of one run; "dir_a,dir_b" reads a run made as parallel streams (scripts/split_halves.py)."""
+    merged: dict = {}
+    for part in str(spec).split(","):
+        rows = load_system(Path(part))
+        if merged.keys() & rows.keys():
+            raise SystemExit(f"{spec}: a task appears in more than one of its directories")
+        merged.update(rows)
+    return merged
+
+
 def load_tasks(run_dirs: list[Path], task_ids: Path, types_from: Path | None = None) -> list[Task]:
     wanted = {k for k in expected_keys(task_ids)}
-    runs = [load_system(d) for d in run_dirs]
+    runs = [load_run(d) for d in run_dirs]
     for d, rows in zip(run_dirs, runs):
         missing = wanted - rows.keys()
         if missing:
             raise SystemExit(f"{d}: {len(missing)} tasks of the split are missing")
-    router = load_system(types_from) if types_from else None
+    router = load_run(types_from) if types_from else None
     if router is None and not any(is_remote(runs[0][k]) for k in wanted):
         raise SystemExit("ReAct records hold no router prediction: pass --types-from with a crmroute run of the same tasks")
     tasks = []
@@ -154,7 +165,6 @@ def load_tasks(run_dirs: list[Path], task_ids: Path, types_from: Path | None = N
 # ---- release rules ------------------------------------------------------------------------------
 # A rule sees only the runs' verdicts, their agreement and the predicted task type.
 
-SOFT = ("budget", "none_without_empty", "truncated_support")
 
 
 def clean(run: RunAnswer, soft: tuple[str, ...]) -> bool:
@@ -337,11 +347,14 @@ def repeat_table(tasks: list[Task]) -> list[str]:
 
 
 def default_rules(k: int, withheld_forms: frozenset = frozenset()) -> list:
-    """The candidate family, strictest first."""
+    """The candidate family in its pre-registered order, strictest first (docs/checkable_answers.md): for
+    each agreement level from all k runs down to one, the agreeing runs must show no used-up budget, no
+    unsupported None and no tool error, then only the first two; rules that ignore the flags come last."""
     rules = []
     for agree in range(k, 0, -1):
-        rules.append(make_rule(agree, SOFT, withheld_forms=withheld_forms))
+        rules.append(make_rule(agree, ("budget", "none_without_empty", "errors"), withheld_forms=withheld_forms))
         rules.append(make_rule(agree, ("budget", "none_without_empty"), withheld_forms=withheld_forms))
+    for agree in range(k, 0, -1):
         rules.append(make_rule(agree, (), withheld_forms=withheld_forms))
     return rules
 
@@ -371,6 +384,8 @@ def main() -> None:
     ap.add_argument("--cal-runs", nargs="+", type=Path, help="calibration runs (default: --runs, an in-sample fit)")
     ap.add_argument("--cal-task-ids", type=Path)
     ap.add_argument("--cal-types-from", type=Path)
+    ap.add_argument("--orgs", default="b2b,b2c", help="orgs of the evaluated tasks")
+    ap.add_argument("--cal-orgs", default="b2b,b2c", help="orgs of the calibration tasks")
     ap.add_argument("--alpha", type=float, default=0.10)
     ap.add_argument("--delta", type=float, default=0.10)
     ap.add_argument("--rule", default="", help="apply this rule of the family as fixed in advance (no calibration)")
@@ -378,16 +393,17 @@ def main() -> None:
     ap.add_argument("--decisions-out", default="", help="per-task release decisions of the chosen rule (JSON)")
     ap.add_argument("--out", default="")
     args = ap.parse_args()
-    tasks = load_tasks(args.runs, args.task_ids, args.types_from)
+    tasks = [t for t in load_tasks(args.runs, args.task_ids, args.types_from) if t.key[0] in args.orgs.split(",")]
     k = len(args.runs)
     in_sample = not args.cal_runs
-    cal = tasks if in_sample else load_tasks(args.cal_runs, args.cal_task_ids, args.cal_types_from)
+    cal = tasks if in_sample else [t for t in load_tasks(args.cal_runs, args.cal_task_ids, args.cal_types_from)
+                                   if t.key[0] in args.cal_orgs.split(",")]
     if len(cal[0].runs) != k:
         raise SystemExit("calibration and evaluation must use the same number of runs per task")
     lines = [f"# Release evaluation: {', '.join(p.as_posix() for p in args.runs)}", "",
              f"{len(tasks)} business tasks, {k} run(s) each; alpha {args.alpha}, delta {args.delta}; rule chosen "
              + ("in-sample on these runs (practice only)" if in_sample else
-                f"on {', '.join(p.as_posix() for p in args.cal_runs)}") + ".", ""]
+                f"on {', '.join(p.as_posix() for p in args.cal_runs)} ({args.cal_orgs})") + f"; evaluated on {args.orgs}.", ""]
     lines += ["## Each run alone, every answer released", "", *TABLE]
     for i in range(k):
         single = [Task(t.key, t.task_type, t.predicted, [t.runs[i]]) for t in tasks]
