@@ -161,15 +161,25 @@ def clean(run: RunAnswer, soft: tuple[str, ...]) -> bool:
     return run.verdict.ok and not any(run.verdict.flags.get(f) for f in soft)
 
 
-def make_rule(min_agree: int, soft: tuple[str, ...], withheld_types: frozenset = frozenset()):
+# Answer forms a receipt can check against record fields: Ids, and values read from fields (a state, a month,
+# a stage). Free text (graded by word overlap with a paraphrase) and BANT factors (a judgment over call
+# transcripts) can only be shown to come from retrieved text, not checked.
+UNCHECKABLE_FORMS = frozenset({"text", "bant"})
+
+
+def make_rule(min_agree: int, soft: tuple[str, ...], withheld_types: frozenset = frozenset(),
+              withheld_forms: frozenset = frozenset()):
     def rule(task: Task) -> bool:
-        if task.predicted in withheld_types:
+        if task.predicted in withheld_types or specs.spec_for(task.predicted).answer in withheld_forms:
             return False
         group = task.majority()
         return sum(clean(r, soft) for r in group) >= min_agree
     rule.__name__ = (f"agree>={min_agree}" + (f", no {'/'.join(soft)}" if soft else "")
-                     + (f", withhold {len(withheld_types)} types" if withheld_types else ""))
-    rule.min_agree, rule.soft, rule.withheld_types = min_agree, soft, withheld_types
+                     + (f", withhold {len(withheld_types)} types" if withheld_types else "")
+                     + (f", withhold {'/'.join(sorted(withheld_forms))} answers" if withheld_forms else ""))
+    rule.min_agree, rule.soft = min_agree, soft
+    rule.withheld_types = frozenset(t for t in specs.SPECS if t in withheld_types
+                                    or specs.SPECS[t].answer in withheld_forms)
     return rule
 
 
@@ -177,7 +187,7 @@ def withhold_all(task: Task) -> bool:
     return False
 
 
-withhold_all.min_agree, withhold_all.soft = 10 ** 6, ()
+withhold_all.min_agree, withhold_all.soft, withhold_all.withheld_types = 10 ** 6, (), frozenset(specs.SPECS) | {None}
 
 
 def released_answer(task: Task) -> RunAnswer:
@@ -326,13 +336,13 @@ def repeat_table(tasks: list[Task]) -> list[str]:
     return lines
 
 
-def default_rules(k: int) -> list:
+def default_rules(k: int, withheld_forms: frozenset = frozenset()) -> list:
     """The candidate family, strictest first."""
     rules = []
     for agree in range(k, 0, -1):
-        rules.append(make_rule(agree, SOFT))
-        rules.append(make_rule(agree, ("budget", "none_without_empty")))
-        rules.append(make_rule(agree, ()))
+        rules.append(make_rule(agree, SOFT, withheld_forms=withheld_forms))
+        rules.append(make_rule(agree, ("budget", "none_without_empty"), withheld_forms=withheld_forms))
+        rules.append(make_rule(agree, (), withheld_forms=withheld_forms))
     return rules
 
 
@@ -364,6 +374,7 @@ def main() -> None:
     ap.add_argument("--alpha", type=float, default=0.10)
     ap.add_argument("--delta", type=float, default=0.10)
     ap.add_argument("--rule", default="", help="apply this rule of the family as fixed in advance (no calibration)")
+    ap.add_argument("--withhold-forms", default="", help="answer forms never released, e.g. text,bant")
     ap.add_argument("--decisions-out", default="", help="per-task release decisions of the chosen rule (JSON)")
     ap.add_argument("--out", default="")
     args = ap.parse_args()
@@ -381,7 +392,7 @@ def main() -> None:
     for i in range(k):
         single = [Task(t.key, t.task_type, t.predicted, [t.runs[i]]) for t in tasks]
         lines.append(fmt(evaluate(single, make_rule(0, ()), args.delta)).replace("agree>=0", f"run {i + 1}, no rule"))
-    family = default_rules(k)
+    family = default_rules(k, frozenset(f for f in args.withhold_forms.split(",") if f))
     if args.rule:
         chosen = next((r for r in family if r.__name__ == args.rule), None)
         if chosen is None:
