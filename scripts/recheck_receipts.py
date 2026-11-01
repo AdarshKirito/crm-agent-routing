@@ -6,8 +6,10 @@ never printed). For every answer in the given runs it re-runs the receipt entrie
 on: the SOQL/SOSL results that contain the answer's Ids, the empty results behind a "None", and the
 knowledge articles a text answer was read from. Live rows are shaped the way the MCP server shapes
 them (attributes dropped, child results as lists, text cut at 4,000 characters, empty fields
-ignored) and compared with the recorded rows as a multiset; a cut-off recorded result must be
-contained in the live one. Identical queries are run once per org.
+ignored, numbers compared by value) and compared with the recorded rows as a multiset; a recorded result that
+was cut to fit a response, or thinned by the confidentiality filter, must be contained in the live one. The
+re-check uses the MCP server's API version (62.0), so both see the same fields, and ignores the two fields
+Salesforce updates on every view (LastViewedDate, LastReferencedDate). Identical queries are run once per org.
 
   vendor/CRMArena/.venv/Scripts/python scripts/recheck_receipts.py --runs runs/checkable_practice/r1/routed \
       --task-ids data/checkable_practice.json --out runs/checkable_practice/recheck.json
@@ -29,8 +31,11 @@ import release_eval as RE  # noqa: E402  (loads agent/app/receipt_check.py by pa
 
 ROOT = Path(__file__).resolve().parents[1]
 MAX_TEXT = 4000  # SF_MAX_TEXT_CHARS of the MCP server
+API_VERSION = "62.0"  # the MCP server's default (mcp-salesforce/src/config.ts): the same fields exist
 CUT = re.compile(r"\.\.\. \[truncated \d+ chars\]$")
 KNOWLEDGE_FIELDS = ("Id", "Title", "Summary", "FAQ_Answer__c")
+# Salesforce updates these whenever anyone views the record (this re-check included): never compared.
+VOLATILE = {"LastViewedDate", "LastReferencedDate"}
 
 
 def shape(value, keep_type: bool = False):
@@ -43,12 +48,14 @@ def shape(value, keep_type: bool = False):
         if keep_type and isinstance(attrs, dict) and attrs.get("type"):
             out["_type"] = attrs["type"]
         for k, v in value.items():
-            if k == "attributes" or v is None:
+            if k == "attributes" or k in VOLATILE or v is None:
                 continue
             out[k] = shape(v["records"] if isinstance(v, dict) and "records" in v else v)
         return out
     if isinstance(value, str):
         return CUT.sub("", value)[:MAX_TEXT]
+    if isinstance(value, float) and value.is_integer():
+        return int(value)  # the MCP server's JSON writes 25, simple_salesforce returns 25.0
     return value
 
 
@@ -60,8 +67,19 @@ class Org:
     def __init__(self, org: str):
         up = org.upper()
         self.sf = Salesforce(username=os.environ[f"SALESFORCE_{up}_USERNAME"], password=os.environ[f"SALESFORCE_{up}_PASSWORD"],
-                             security_token=os.environ[f"SALESFORCE_{up}_SECURITY_TOKEN"])
+                             security_token=os.environ[f"SALESFORCE_{up}_SECURITY_TOKEN"],
+                             version=os.getenv("SALESFORCE_API_VERSION", API_VERSION))
         self.cache: dict = {}
+
+    def get(self, obj: str, record_id: str):
+        """One record by Id through the REST API, shaped like the MCP server's get_record."""
+        key = ("get", obj, record_id)
+        if key not in self.cache:
+            try:
+                self.cache[key] = (shape(dict(getattr(self.sf, obj).get(record_id))), None)
+            except Exception as error:  # noqa: BLE001 - a failed re-run is reported, not raised
+                self.cache[key] = ({}, f"{type(error).__name__}: {str(error)[:200]}")
+        return self.cache[key]
 
     def run(self, tool: str, query: str):
         key = (tool, query)
@@ -104,17 +122,12 @@ def _literal(node):
     raise ValueError(f"not a row literal: {type(node).__name__}")
 
 
-def live_ids(org: Org, entry: dict) -> set[str]:
-    """Ids in the live rows of an entry that was re-run (empty if it was not)."""
-    tool, args = entry["tool"], entry.get("args") or {}
-    if tool not in ("soql_query", "sosl_search"):
-        return set()
-    _, live, _ = org.run(tool, str(args.get("query", "")))
-    return {i[:15] for i in RE.rc.ID_RE.findall(json.dumps(live))}
+def _ids(rows) -> list[str]:
+    return sorted({i[:15] for i in RE.rc.ID_RE.findall(json.dumps(rows))})
 
 
 def recheck_entry(org: Org, entry: dict) -> dict:
-    """`match`: the live result reproduces the recorded one."""
+    """`match`: the live result reproduces the recorded one. `live_ids`: the Ids in the live rows compared."""
     tool, args = entry["tool"], entry.get("args") or {}
     text = entry.get("result") or ""
     try:
@@ -133,27 +146,35 @@ def recheck_entry(org: Org, entry: dict) -> dict:
         rec_rows = shape(recorded.get("records") or [], keep_type=tool == "sosl_search")
         if tool == "sosl_search" and not any("_type" in r for r in rec_rows if isinstance(r, dict)):
             live = [{k: v for k, v in r.items() if k != "_type"} for r in live]  # ReAct's rows carry no type
-        cut = bool(recorded.get("truncated"))
+        # the recorded rows are what the model saw: cut to fit a response, or thinned by the confidentiality
+        # filter in a customer session; either way they must all be in the live result
+        cut = bool(recorded.get("truncated")) or "withheld_confidential" in recorded
         same_rows = (rows_key(rec_rows) <= rows_key(live)) if cut else (rows_key(rec_rows) == rows_key(live))
         if tool == "sosl_search" and not cut:  # SOSL's own order and limits differ between clients: compare row sets
             same_rows = rows_key(rec_rows) <= rows_key(live) and len(rec_rows) == min(len(live), len(rec_rows))
-        match = same_rows and (recorded.get("totalSize") == total or tool == "sosl_search")
-        return {"status": "match" if match else "mismatch", "recorded_total": recorded.get("totalSize"), "live_total": total}
-    if tool == "search_knowledge" or tool == "get_record":
-        articles = recorded.get("articles") if tool == "search_knowledge" else [recorded]
-        ids = [a.get("Id") for a in articles or [] if isinstance(a, dict) and a.get("Id")]
-        if not ids:
-            return {"status": "skipped", "why": "no record Ids to fetch"}
-        obj = "Knowledge__kav" if tool == "search_knowledge" else str(args.get("object_name"))
-        fields = KNOWLEDGE_FIELDS if obj.lower() == "knowledge__kav" else ("Id", *[f for f in recorded if f != "Id"])
-        query = f"SELECT {', '.join(dict.fromkeys(fields))} FROM {obj} WHERE Id IN ({', '.join(repr(i) for i in ids)})"
+        match = same_rows and (recorded.get("totalSize") == total or tool == "sosl_search" or cut)
+        return {"status": "match" if match else "mismatch", "recorded_total": recorded.get("totalSize"),
+                "live_total": total, "live_ids": _ids(live)}
+    if tool == "search_knowledge":
+        articles = [a for a in recorded.get("articles") or [] if isinstance(a, dict) and a.get("Id")]
+        if not articles:
+            return {"status": "skipped", "why": "no article Ids to fetch"}
+        query = (f"SELECT {', '.join(KNOWLEDGE_FIELDS)} FROM Knowledge__kav "
+                 f"WHERE Id IN ({', '.join(repr(a['Id']) for a in articles)})")
         _, live, error = org.run("soql_query", query)
         if error:
             return {"status": "error", "why": error}
-        live_by_id = {r.get("Id", "")[:15]: r for r in live}
-        same = all(all(live_by_id.get(a["Id"][:15], {}).get(k) == v for k, v in shape(a).items() if k in fields)
-                   for a in articles if isinstance(a, dict) and a.get("Id"))
-        return {"status": "match" if same else "mismatch", "records": len(ids)}
+        by_id = {r.get("Id", "")[:15]: r for r in live}
+        same = all(by_id.get(a["Id"][:15], {}).get(k) == v for a in articles for k, v in shape(a).items()
+                   if k in KNOWLEDGE_FIELDS)
+        return {"status": "match" if same else "mismatch", "records": len(articles), "live_ids": _ids(live)}
+    if tool == "get_record":
+        record_id, obj = str(args.get("record_id", "")), str(args.get("object_name", ""))
+        live, error = org.get(obj, record_id)
+        if error:
+            return {"status": "error", "why": error}
+        same = all(live.get(k) == v for k, v in shape(recorded).items())
+        return {"status": "match" if same else "mismatch", "live_ids": _ids(live)}
     return {"status": "skipped", "why": f"{tool} is not re-run"}
 
 
@@ -178,7 +199,7 @@ def main() -> None:
                 report.append({"task": list(task.key), "run": i + 1, "entry": entry["n"], "tool": entry["tool"], **result})
             if run.verdict.claim.kind == "ids" and entries:
                 # every Id of the answer must come back live in some entry the answer rests on
-                seen = set().union(*(live_ids(org, e) for e in entries))
+                seen = {i for r in report[-len(entries):] for i in r.get("live_ids") or []}
                 found = all(v[:15] in seen for v in run.verdict.claim.values)
                 counts["answers_with_ids_found_live" if found else "answers_with_ids_missing_live"] += 1
                 if not found:
@@ -189,7 +210,7 @@ def main() -> None:
     print(json.dumps(summary, indent=1))
     for r in report:
         if r["status"] in ("mismatch", "error", "skipped", "answer_ids_missing_live"):
-            print(r)
+            print({k: v for k, v in r.items() if k != "live_ids"})
     if args.out:
         Path(args.out).write_text(json.dumps({"summary": summary, "entries": report}, indent=1), encoding="utf-8")
 
