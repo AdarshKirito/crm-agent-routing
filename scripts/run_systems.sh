@@ -51,6 +51,8 @@ IMAGE="${IMAGE:-crmroute:local}"
 # router examples (scripts/add_org.py); the defaults are the shipped files.
 ROUTING_TABLE="${ROUTING_TABLE:-$ROOT/agent/app/data/routing.yaml}"
 ROUTER_EXAMPLES="${ROUTER_EXAMPLES:-router_examples.jsonl}"
+# extra tool calls for the checker's receipt-guided retry (0: off; docs/checkable_answers.md)
+RECEIPT_RETRY_CALLS="${RECEIPT_RETRY_CALLS:-0}"
 # Bare gemini names use Vertex AI when GOOGLE_GENAI_USE_VERTEXAI/_ENTERPRISE is true, else the AI Studio key.
 is_true() { case "${1,,}" in true|1) return 0 ;; *) return 1 ;; esac; }
 if is_true "${GOOGLE_GENAI_USE_VERTEXAI:-}" || is_true "${GOOGLE_GENAI_USE_ENTERPRISE:-}"; then USE_VERTEX=1; else USE_VERTEX=0; fi
@@ -133,6 +135,7 @@ start_agent() {  # mode port [task_hints]
       -e CRMROUTE_BIG_MODEL="$BIG_MODEL" -e CRMROUTE_SMALL_MODEL="$SMALL_MODEL" -e CRMROUTE_POLICY_MODEL="$POLICY_MODEL" \
       -e CRMROUTE_FALLBACK=0 -e CRMROUTE_THINKING_LEVEL="$CRMROUTE_THINKING_LEVEL" \
       -e CRMROUTE_ROUTER_EXAMPLES="$ROUTER_EXAMPLES" -e CRMROUTE_TASK_HINTS="$hints" \
+      -e CRMROUTE_RECEIPT_RETRY_CALLS="$RECEIPT_RETRY_CALLS" \
       -e CRMROUTE_CALL_LOG="/srv/runs/agent_calls_${tag}_${STREAM}.jsonl" \
       -v "$(hostpath "$OUT/logs"):/srv/runs" \
       -v "$(hostpath "$ROUTING_TABLE"):/srv/agent/app/data/routing.yaml:ro" \
@@ -143,7 +146,7 @@ start_agent() {  # mode port [task_hints]
     (cd "$ROOT/agent" && env CRMROUTE_MODE="$mode" CRMROUTE_BIG_MODEL="$BIG_MODEL" CRMROUTE_SMALL_MODEL="$SMALL_MODEL" \
         CRMROUTE_POLICY_MODEL="$POLICY_MODEL" CRMROUTE_CALL_LOG="$OUT/logs/agent_calls_${tag}_${STREAM}.jsonl" \
         CRMROUTE_ROUTING_TABLE="$ROUTING_TABLE" CRMROUTE_ROUTER_EXAMPLES="$ROUTER_EXAMPLES" CRMROUTE_TASK_HINTS="$hints" \
-        "$AGENT_PY" -m uvicorn app.fast_api_app:app --host 127.0.0.1 --port "$port" \
+        CRMROUTE_RECEIPT_RETRY_CALLS="$RECEIPT_RETRY_CALLS" "$AGENT_PY" -m uvicorn app.fast_api_app:app --host 127.0.0.1 --port "$port" \
         > "$OUT/logs/agent_${tag}_${port}.log" 2>&1) & PIDS+=($!)
   fi
   wait_http "http://127.0.0.1:$port/list-apps"
@@ -162,7 +165,7 @@ manifest() {  # system: record every pin so a result can be audited later
     --backend "$([ "$USE_VERTEX" = 1 ] && echo "vertex:${GOOGLE_CLOUD_PROJECT:-}" || echo ai_studio)" \
     --agent-runtime "$AGENT_RUNTIME" --image "$IMAGE" --image-id "$image_id" \
     --max-user-turns "$MAX_USER_TURNS" --max-turns "$MAX_TURNS" \
-    --routing "$ROUTING_TABLE" --router-examples "$ROUTER_EXAMPLES")"
+    --routing "$ROUTING_TABLE" --router-examples "$ROUTER_EXAMPLES" --receipt-retry-calls "$RECEIPT_RETRY_CALLS")"
   export CRMARENA_RUN_FINGERPRINT
 }
 
