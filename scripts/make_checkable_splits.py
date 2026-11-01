@@ -10,6 +10,11 @@ Single-turn and interactive tasks share ids, so ids are disjoint across modes as
 No confidentiality task is left unused, so refusals are only re-checked on earlier splits.
 
 Usage:  vendor/CRMArena/.venv/Scripts/python scripts/make_checkable_splits.py --out-dir data --seed 20261031
+        vendor/CRMArena/.venv/Scripts/python scripts/make_checkable_splits.py --extend-calibration 4 --seed 20261101
+
+--extend-calibration K adds K more single-turn tasks per org and type to data/checkable_calibration.json,
+drawn the same way and disjoint from every split above; the existing ids stay. It was used once, before
+any calibration run, to raise the calibration split from 8 to 12 tasks per org and type.
 """
 import argparse
 import json
@@ -38,13 +43,40 @@ def used_ids(paths: list[Path], examples: list[Path]) -> dict[str, set[str]]:
     return used
 
 
+def extend_calibration(args) -> None:
+    out_dir = Path(args.out_dir)
+    paths = {name: out_dir / f"checkable_{name}.json" for name in SPLITS}
+    splits = {name: json.loads(p.read_text(encoding="utf-8")) for name, p in paths.items()}
+    excluded = used_ids([Path(p) for p in args.exclude] + list(paths.values()), [Path(p) for p in args.router_examples])
+    ds = load_dataset("Salesforce/CRMArenaPro", "CRMArenaPro")
+    rng = random.Random(args.seed)
+    cal = splits["calibration"]
+    for org in ["b2b", "b2c"]:
+        single = by_type(ds[org])
+        business = [t for t in single if t not in CONFIDENTIALITY]
+        sample_id = next(iter(single[business[0]]))
+        used = {type(sample_id)(i) for i in excluded[org]}
+        before = set(map(str, cal[org]["single_turn"]))
+        extra = take(rng, single, args.extend_calibration, business, used)
+        assert not before & set(map(str, extra))
+        cal[org]["single_turn"] = sorted(cal[org]["single_turn"] + extra, key=int)
+    cal["extended"] = {"seed": args.seed, "per_type": args.extend_calibration}
+    cal["counts"] = {org: {mode: len(ids) for mode, ids in cal[org].items()} for org in ["b2b", "b2c"]}
+    paths["calibration"].write_text(json.dumps(cal, indent=1))
+    print("calibration", cal["counts"], "->", paths["calibration"])
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out-dir", default="data")
     ap.add_argument("--seed", type=int, default=20261031)
     ap.add_argument("--exclude", nargs="+", default=["data/dev.json", "data/test.json", "data/fresh.json"])
     ap.add_argument("--router-examples", nargs="+", default=["agent/app/data/router_examples.jsonl"])
+    ap.add_argument("--extend-calibration", type=int, default=0)
     args = ap.parse_args()
+    if args.extend_calibration:
+        extend_calibration(args)
+        return
 
     ds = load_dataset("Salesforce/CRMArenaPro", "CRMArenaPro")
     rng = random.Random(args.seed)
