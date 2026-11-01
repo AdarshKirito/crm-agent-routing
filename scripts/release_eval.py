@@ -169,11 +169,48 @@ def make_rule(min_agree: int, soft: tuple[str, ...], withheld_types: frozenset =
         return sum(clean(r, soft) for r in group) >= min_agree
     rule.__name__ = (f"agree>={min_agree}" + (f", no {'/'.join(soft)}" if soft else "")
                      + (f", withhold {len(withheld_types)} types" if withheld_types else ""))
+    rule.min_agree, rule.soft, rule.withheld_types = min_agree, soft, withheld_types
     return rule
+
+
+def withhold_all(task: Task) -> bool:
+    return False
+
+
+withhold_all.min_agree, withhold_all.soft = 10 ** 6, ()
 
 
 def released_answer(task: Task) -> RunAnswer:
     return task.majority()[0]
+
+
+def _clusters(runs: list[RunAnswer]) -> list[list[RunAnswer]]:
+    clusters: list[list[RunAnswer]] = []
+    for run in runs:
+        for cluster in clusters:
+            if rc.same_answer(cluster[0].verdict.claim, run.verdict.claim):
+                cluster.append(run)
+                break
+        else:
+            clusters.append([run])
+    return clusters
+
+
+def runs_needed(task: Task, min_agree: int, soft: tuple[str, ...]) -> int:
+    """Adaptive repeats: how many runs, taken one at a time, settle make_rule(min_agree, soft)'s decision.
+    It stops only when the remaining runs cannot change it, so it decides exactly as the rule does on
+    all runs, at the cost of fewer runs."""
+    k = len(task.runs)
+    for used in range(1, k + 1):
+        left = k - used
+        groups = sorted(_clusters(task.runs[:used]), key=len, reverse=True)
+        top = groups[0]
+        second = len(groups[1]) if len(groups) > 1 else 0
+        if sum(clean(r, soft) for r in top) >= min_agree and len(top) > max(second, 0) + left and len(top) > left:
+            return used  # stays the strict majority and stays eligible: released
+        if all(sum(clean(r, soft) for r in g) + left < min_agree for g in groups) and left < min_agree:
+            return used  # no answer can collect enough clean runs: withheld
+    return k
 
 
 # ---- statistics ---------------------------------------------------------------------------------
@@ -299,30 +336,75 @@ def default_rules(k: int) -> list:
     return rules
 
 
+def decisions(tasks: list[Task], rule) -> list[dict]:
+    """One row per task: whether the rule released an answer, whether it was right, and its cost."""
+    out = []
+    for t in tasks:
+        released = bool(rule(t)) if rule else False
+        if t.predicted in getattr(rule, "withheld_types", ()):
+            used = 0  # handed off before any solver run
+        else:
+            used = runs_needed(t, rule.min_agree, rule.soft) if hasattr(rule, "min_agree") else len(t.runs)
+        out.append({"task": list(t.key), "type": t.task_type, "predicted": t.predicted, "released": released,
+                    "right": float(released_answer(t).correct) if released else 0.0,
+                    "answer": list(released_answer(t).verdict.claim.values) if released else None,
+                    "runs_used": used, "cost_all_runs": sum(r.cost or 0 for r in t.runs),
+                    "cost_adaptive": sum(r.cost or 0 for r in t.runs[:used])})
+    return out
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--runs", nargs="+", type=Path, required=True, help="run directories of one system, same tasks")
     ap.add_argument("--task-ids", type=Path, required=True)
     ap.add_argument("--types-from", type=Path, help="crmroute run whose router predictions a ReAct run uses")
+    ap.add_argument("--cal-runs", nargs="+", type=Path, help="calibration runs (default: --runs, an in-sample fit)")
+    ap.add_argument("--cal-task-ids", type=Path)
+    ap.add_argument("--cal-types-from", type=Path)
     ap.add_argument("--alpha", type=float, default=0.10)
     ap.add_argument("--delta", type=float, default=0.10)
+    ap.add_argument("--rule", default="", help="apply this rule of the family as fixed in advance (no calibration)")
+    ap.add_argument("--decisions-out", default="", help="per-task release decisions of the chosen rule (JSON)")
     ap.add_argument("--out", default="")
     args = ap.parse_args()
     tasks = load_tasks(args.runs, args.task_ids, args.types_from)
     k = len(args.runs)
+    in_sample = not args.cal_runs
+    cal = tasks if in_sample else load_tasks(args.cal_runs, args.cal_task_ids, args.cal_types_from)
+    if len(cal[0].runs) != k:
+        raise SystemExit("calibration and evaluation must use the same number of runs per task")
     lines = [f"# Release evaluation: {', '.join(p.as_posix() for p in args.runs)}", "",
-             f"{len(tasks)} business tasks, {k} run(s) each; alpha {args.alpha}, delta {args.delta}.", ""]
+             f"{len(tasks)} business tasks, {k} run(s) each; alpha {args.alpha}, delta {args.delta}; rule chosen "
+             + ("in-sample on these runs (practice only)" if in_sample else
+                f"on {', '.join(p.as_posix() for p in args.cal_runs)}") + ".", ""]
     lines += ["## Each run alone, every answer released", "", *TABLE]
     for i in range(k):
         single = [Task(t.key, t.task_type, t.predicted, [t.runs[i]]) for t in tasks]
         lines.append(fmt(evaluate(single, make_rule(0, ()), args.delta)).replace("agree>=0", f"run {i + 1}, no rule"))
-    chosen, rows = calibrate(tasks, default_rules(k), args.alpha, args.delta)
-    lines += ["", "## Candidate rules, strictest first (Learn-then-Test stops at the first uncertified rule)", "",
-              TABLE[0] + " certified |", TABLE[1] + "---|"]
-    lines += [fmt(r) + f" {'yes' if r['certified'] else 'no'} (p={r['p']:.3f}) |" for r in rows]
-    lines += ["", f"Chosen: {chosen.__name__ if chosen else 'none (no rule certified)'}", ""]
-    if chosen:
-        lines += ["## Chosen rule by true task type", "", *per_type(tasks, chosen), ""]
+    family = default_rules(k)
+    if args.rule:
+        chosen = next((r for r in family if r.__name__ == args.rule), None)
+        if chosen is None:
+            raise SystemExit(f"no rule named {args.rule!r}; the family is: {[r.__name__ for r in family]}")
+        lines += ["", f"Rule fixed in advance: {chosen.__name__}", ""]
+    else:
+        chosen, rows = calibrate(cal, family, args.alpha, args.delta)
+        lines += ["", "## Candidate rules on the calibration runs, strictest first (Learn-then-Test stops at the first "
+                  "uncertified rule)", "", TABLE[0] + " certified |", TABLE[1] + "---|"]
+        lines += [fmt(r) + f" {'yes' if r['certified'] else 'no'} (p={r['p']:.3f}) |" for r in rows]
+        lines += ["", f"Chosen: {chosen.__name__ if chosen else 'none (no rule certified: everything is withheld)'}", ""]
+    rule = chosen or withhold_all
+    lines += ["## The chosen rule on the evaluated runs", "", *TABLE, fmt(evaluate(tasks, rule, args.delta)), ""]
+    made = decisions(tasks, rule)
+    used = sum(d["runs_used"] for d in made) / len(made)
+    cost_all = sum(d["cost_all_runs"] for d in made) / len(made)
+    cost_adaptive = sum(d["cost_adaptive"] for d in made) / len(made)
+    lines += [f"Adaptive repeats (same decisions, runs taken one at a time until the decision is settled): "
+              f"{used:.2f} runs per task, ${cost_adaptive:.4f} per task instead of ${cost_all:.4f}.", ""]
+    lines += ["## The chosen rule by true task type", "", *per_type(tasks, rule), ""]
+    if args.decisions_out:
+        Path(args.decisions_out).write_text(json.dumps({"rule": rule.__name__, "runs": [p.as_posix() for p in args.runs],
+                                                         "decisions": made}, indent=1), encoding="utf-8")
     lines += ["## Repeats, latency and cost", "", *repeat_table(tasks), ""]
     lines += ["## Receipt flags", "", *flag_table(tasks), ""]
     text = "\n".join(lines) + "\n"
