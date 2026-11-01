@@ -12,6 +12,7 @@ DETAILS = "crm_details"  # details gathered so far in a multi-turn task
 CLARIFICATIONS = "crm_clarifications"  # clarifying questions asked so far
 NOTES = "crm_notes"  # compact tool results carried to later turns
 EVIDENCE = "crm_evidence"  # text of every tool result (for the checker)
+RECEIPT = "crm_receipt"  # one entry per tool call: what was asked and what came back (app/receipts.py)
 SELF_IDS = "crm_self_ids"  # the logged-in customer's own record ids
 SCREEN = "crm_screen"  # request-screening signals
 GUARD = "crm_guard"  # final guard decision

@@ -1,0 +1,22 @@
+{
+ "crmroute": {
+  "rule": "agree>=3, no budget/none_without_empty/errors, withhold bant/text answers",
+  "runs_per_task": 3,
+  "calibration_tasks": 456
+ },
+ "baseline": {
+  "rule": null,
+  "runs_per_task": 1,
+  "calibration_tasks": 456
+ },
+ "crmroute_run1": {
+  "rule": null,
+  "runs_per_task": 1,
+  "calibration_tasks": 456
+ },
+ "crmroute_b2b_to_b2c": {
+  "rule": null,
+  "runs_per_task": 3,
+  "calibration_tasks": 228
+ }
+}

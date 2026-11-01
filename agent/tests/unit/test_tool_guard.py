@@ -4,7 +4,8 @@ from types import SimpleNamespace
 import pytest
 
 from app import state_keys as K
-from app.guard.tool_guard import after_tool
+from app.config import MAX_TOOL_CALLS_PER_TURN
+from app.guard.tool_guard import after_tool, before_tool
 
 
 def test_model_output_cannot_become_its_own_checker_evidence():
@@ -58,3 +59,52 @@ def test_malformed_knowledge_payload_is_blocked_without_crash():
                         {"content": [{"text": "[]"}]})
     assert result["isError"]
     assert K.EVIDENCE not in state
+
+
+def _call(name, args, state, response=None):
+    """One tool call as ADK runs it: before_tool may answer it itself; after_tool sees the result."""
+    tool, ctx = SimpleNamespace(name=name), SimpleNamespace(state=state)
+    response = before_tool(tool, args, ctx) or response
+    return after_tool(tool, args, ctx, response) or response
+
+
+def _rows(payload):
+    return {"content": [{"type": "text", "text": json.dumps(payload)}]}
+
+
+def test_receipt_keeps_query_result_and_row_counts():
+    state = {K.AUDIENCE: "employee", K.TURN: 1}
+    query = "SELECT Id FROM Case WHERE Status = 'Closed'"
+    _call("soql_query", {"query": query}, state,
+          _rows({"totalSize": 3, "returned": 2, "truncated": True, "records": [{"Id": "500A"}, {"Id": "500B"}]}))
+    [entry] = state[K.RECEIPT]
+    assert entry["n"] == 1 and entry["turn"] == 1 and entry["tool"] == "soql_query"
+    assert entry["args"] == {"query": query} and entry["status"] == "ok"
+    assert (entry["totalSize"], entry["returned"], entry["truncated"]) == (3, 2, True)
+    assert json.loads(entry["result"])["records"][1]["Id"] == "500B" and len(entry["sha256"]) == 64
+
+
+def test_receipt_marks_errors_budget_and_policy_blocks():
+    state = {K.AUDIENCE: "customer", K.TURN: 1}
+    _call("soql_query", {"query": "SELECT Nme FROM Product2"}, state,
+          {"isError": True, "content": [{"type": "text", "text": "No such column 'Nme'"}]})
+    _call("soql_query", {"query": "SELECT Id, Name FROM User"}, state)  # internal object in a customer session
+    state[K.TOOL_CALLS_TURN] = MAX_TOOL_CALLS_PER_TURN
+    _call("soql_query", {"query": "SELECT Id FROM Product2"}, state)
+    assert [e["status"] for e in state[K.RECEIPT]] == ["error", "blocked", "budget"]
+    assert [e["n"] for e in state[K.RECEIPT]] == [1, 2, 3]
+
+
+def test_receipt_records_knowledge_results_as_the_model_saw_them():
+    state = {K.AUDIENCE: "customer", K.TURN: 1}
+    _call("search_knowledge", {"query": "discount"}, state, _rows({"articles": [
+        {"Title": "Volume-Based Discounts", "Summary": "internal"}, {"Title": "Product care", "Summary": "public"}]}))
+    [entry] = state[K.RECEIPT]
+    assert entry["status"] == "ok" and entry["withheld_confidential"] == 1
+    assert "Product care" in entry["result"] and "Volume-Based Discounts" not in entry["result"]
+
+
+def test_model_output_tool_is_not_a_receipt_entry():
+    state = {K.AUDIENCE: "employee"}
+    after_tool(SimpleNamespace(name="set_model_response"), {}, SimpleNamespace(state=state), {"kind": "answer"})
+    assert K.RECEIPT not in state

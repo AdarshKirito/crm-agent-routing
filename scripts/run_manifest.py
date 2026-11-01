@@ -59,6 +59,7 @@ def main():
     # an org other than the shipped two runs with its own routing table and router examples
     parser.add_argument("--routing", default="")
     parser.add_argument("--router-examples", default="router_examples.jsonl")
+    parser.add_argument("--receipt-retry-calls", type=int, default=0)
     args = parser.parse_args()
     root = Path(args.root)
     task_ids = Path(args.task_ids)
@@ -83,6 +84,8 @@ def main():
         files = [f.strip() for f in args.router_examples.split(",") if f.strip()]
         pins["router_examples"] = args.router_examples
         pins["router_examples_sha256"] = {f: digest(root / "agent/app/data" / f) for f in files}
+    if args.receipt_retry_calls:  # likewise: only recorded when the receipt-guided retry is on
+        pins["receipt_retry_calls"] = args.receipt_retry_calls
     print(ensure_manifest(Path(args.output), pins))
 
 

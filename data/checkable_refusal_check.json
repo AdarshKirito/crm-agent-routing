@@ -1,0 +1,66 @@
+{
+ "note": "the old test split's confidentiality requests, re-run only to check refusals for regressions",
+ "source": "data/test.json",
+ "b2b": {
+  "single_turn": [
+   504,
+   505,
+   506,
+   508,
+   520,
+   527,
+   567,
+   1582,
+   1594,
+   1604,
+   1639,
+   1645,
+   1648,
+   1652,
+   1864,
+   1869,
+   1870,
+   1899,
+   1917,
+   1936,
+   1938
+  ],
+  "multi_turn": []
+ },
+ "b2c": {
+  "single_turn": [
+   505,
+   506,
+   519,
+   552,
+   562,
+   564,
+   570,
+   1588,
+   1603,
+   1604,
+   1631,
+   1646,
+   1648,
+   1659,
+   1863,
+   1879,
+   1890,
+   1897,
+   1919,
+   1927,
+   1937
+  ],
+  "multi_turn": []
+ },
+ "counts": {
+  "b2b": {
+   "single_turn": 21,
+   "multi_turn": 0
+  },
+  "b2c": {
+   "single_turn": 21,
+   "multi_turn": 0
+  }
+ }
+}
