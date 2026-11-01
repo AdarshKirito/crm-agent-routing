@@ -42,7 +42,8 @@ def react_run(base: Path, round1_split: str | None = None) -> Path:
         return base / "react" / "react_privacy"
     if round1_split:  # round 1 ran the baseline's calibration and test as two halves
         return Path(f"{base / 'react_h1' / 'react_privacy'},{base / 'react_h2' / 'react_privacy'}")
-    return base / "react" / "react_privacy"
+    # round 2: one stream per org; the B2B tasks it had not reached ran as three more streams (react_p1..p3)
+    return Path(",".join(str(d / "react_privacy") for d in [base / "react", *sorted(base.glob("react_p*"))]))
 
 
 # system -> (runs per task, runs of a round-2 split, runs of a round-1 split, needs crmroute's router types)
