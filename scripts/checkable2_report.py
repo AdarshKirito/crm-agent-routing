@@ -34,7 +34,13 @@ ROUND1_RULE = "agree>=3, no budget/none_without_empty/errors, withhold bant/text
 
 
 def crm_runs(base: Path) -> list[Path]:
-    return [base / "r1" / "routed", base / "r2" / "routed", base / "f1" / "full"]
+    """Routed runs 1 and 2 and the 3.8 Flash run; a run whose tasks were shared with a parallel stream
+    (round 2: <run>x, e.g. f1x) is read as both directories together."""
+    runs = []
+    for name, system in (("r1", "routed"), ("r2", "routed"), ("f1", "full")):
+        dirs = [base / name, *sorted(base.glob(f"{name}x"))]
+        runs.append(Path(",".join(str(d / system) for d in dirs)) if len(dirs) > 1 else base / name / system)
+    return runs
 
 
 def react_run(base: Path, round1_split: str | None = None) -> Path:
