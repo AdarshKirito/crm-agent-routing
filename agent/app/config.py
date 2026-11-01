@@ -75,6 +75,9 @@ PROMPT_GUARD_MODEL = os.getenv("CRMROUTE_PROMPT_GUARD_MODEL", "meta-llama/llama-
 PROMPT_GUARD_THRESHOLD = float(os.getenv("CRMROUTE_PROMPT_GUARD_THRESHOLD", "0.9"))
 
 MAX_CHECKER_RETRIES = int(os.getenv("CRMROUTE_MAX_CHECKER_RETRIES", "1"))
+# Receipt-guided retry: an answer whose receipt shows the tool budget ran out, or a "None" that no empty
+# query result supports, gets the checker's retry with this many extra tool calls (0 turns it off).
+RECEIPT_RETRY_CALLS = int(os.getenv("CRMROUTE_RECEIPT_RETRY_CALLS", "0"))
 # Tool calls allowed per user turn (the ReAct baseline stops at 20 turns in total).
 MAX_TOOL_CALLS_PER_TURN = int(os.getenv("CRMROUTE_MAX_TOOL_CALLS_PER_TURN", "10"))
 MAX_CLARIFYING_QUESTIONS = int(os.getenv("CRMROUTE_MAX_CLARIFYING_QUESTIONS", "3"))

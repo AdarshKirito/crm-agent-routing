@@ -8,9 +8,11 @@ from google.adk import Event
 from google.genai import types
 from pydantic import BaseModel, Field
 
+from . import receipt_check
 from . import state_keys as K
 from .checker import ABSTENTION, check_answer, has_refusal_wording
-from .config import MAX_CHECKER_RETRIES, MAX_CLARIFYING_QUESTIONS, MODE, PROMPT_GUARD_MODEL, PROMPT_GUARD_THRESHOLD, ROUTER_MIN_CONFIDENCE
+from .config import (MAX_CHECKER_RETRIES, MAX_CLARIFYING_QUESTIONS, MAX_TOOL_CALLS_PER_TURN, MODE, PROMPT_GUARD_MODEL,
+                     PROMPT_GUARD_THRESHOLD, RECEIPT_RETRY_CALLS, ROUTER_MIN_CONFIDENCE)
 from .guard import pii
 from .guard.pii import analyze_request, scrub
 from .guard.prompt_guard import injection_score
@@ -232,6 +234,16 @@ def check(ctx, node_input: Any):
                     route=f"retry_{route.get('tier', 'big')}")
         return
     kind = str(draft.get("kind") or "answer").lower()
+    feedback = receipt_feedback(kind, result.answer, spec_for(route.get("task_type")).answer, state)
+    if feedback and retries < MAX_CHECKER_RETRIES:
+        # the answer has the right form, but its receipt shows nothing decisive behind it: one more try,
+        # with a few extra tool calls to run the query that decides it
+        used = int(state.get(K.TOOL_CALLS_TURN) or 0)
+        yield Event(state={K.CHECK: {**summary, "problems": feedback, "receipt_retry": True}, K.RETRIES: retries + 1,
+                           K.FEEDBACK: " ".join(feedback),
+                           K.TOOL_CALLS_TURN: min(used, max(MAX_TOOL_CALLS_PER_TURN - RECEIPT_RETRY_CALLS, 0))},
+                    route=f"retry_{route.get('tier', 'big')}")
+        return
     if not result.ok and kind == "clarify":
         kind = "answer"  # out of questions (or single-turn): send what we have
     answer = result.answer
@@ -240,6 +252,23 @@ def check(ctx, node_input: Any):
         answer = ABSTENTION
         summary = {**summary, "answer": answer, "abstained": True}
     yield Event(state={K.CHECK: summary, K.DRAFT: {**draft, "kind": kind, "answer": answer}}, route="ok")
+
+
+def receipt_feedback(kind: str, answer: str, form: str, state) -> list[str]:
+    """Problems the receipt shows in an answer that passed the form and Id checks (empty when off)."""
+    if not RECEIPT_RETRY_CALLS or kind != "answer" or form == "refusal":
+        return []
+    turns = _user_turns(state)
+    verdict = receipt_check.check(answer, form, state.get(K.RECEIPT) or [], "\n".join(turns), turns[-1] if turns else "")
+    problems = []
+    if verdict.flags.get("none_without_empty"):
+        problems.append("You answered None, but no query you ran returned an empty result showing that nothing "
+                        "matches. Run the one query that answers the request with all of its conditions (period, "
+                        "product, owner, status) and answer None only if it returns no rows.")
+    if verdict.flags.get("budget"):
+        problems.append(f"Your tool budget ran out before the answer was verified. You have {RECEIPT_RETRY_CALLS} more "
+                        "calls: use them for the query that decides the answer, then answer.")
+    return problems
 
 
 def finalize(ctx):
