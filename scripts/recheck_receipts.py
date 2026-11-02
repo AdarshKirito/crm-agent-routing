@@ -36,6 +36,8 @@ CUT = re.compile(r"\.\.\. \[truncated \d+ chars\]$")
 KNOWLEDGE_FIELDS = ("Id", "Title", "Summary", "FAQ_Answer__c")
 # Salesforce updates these whenever anyone views the record (this re-check included): never compared.
 VOLATILE = {"LastViewedDate", "LastReferencedDate"}
+# A bare COUNT() returns its count as totalSize and no rows; query_all's totalSize counts the rows it fetched.
+COUNT_ONLY = re.compile(r"^\s*SELECT\s+COUNT\(\s*\)\s+FROM\b", re.I)
 
 
 def shape(value, keep_type: bool = False):
@@ -90,7 +92,8 @@ class Org:
                     self.cache[key] = (len(found), shape(found, keep_type=True), None)
                 else:
                     out = self.sf.query_all(query)
-                    self.cache[key] = (out["totalSize"], shape(out["records"]), None)
+                    total = self.sf.query(query)["totalSize"] if COUNT_ONLY.match(query) else out["totalSize"]
+                    self.cache[key] = (total, shape(out["records"]), None)
             except Exception as error:  # noqa: BLE001 - a failed re-run is reported, not raised
                 self.cache[key] = (None, [], f"{type(error).__name__}: {str(error)[:200]}")
         return self.cache[key]

@@ -95,3 +95,55 @@ evaluated on B2C test tasks); and, uncertified and descriptive because conversat
 distribution, the rule certified for crmroute's first run alone and the baseline's certified rule, each
 applied to one run of its system on the 76 multi-turn test tasks. Refusals of confidential requests are
 re-checked on the old test split's 42 (`data/checkable_refusal_check.json`) for regressions.
+
+## Round 2: a competence map (pre-registration)
+
+Round 1's results are in `results/checkable_answers.md`. Fixed before any round-2 run, from round-1 records
+only; no round-2 record is opened before the round-2 rules are committed.
+
+**Why.** Round 1's records (all 912 tasks: practice, calibration and test) are now development data. In them,
+most wrong answers that the looser rules release come from a few task types where every run makes the same
+mistake: sales amounts summed under another definition than the answer key's, quote-configuration rules cited
+for quotes the key finds valid, wrong opportunity stages. Agreement and receipts cannot see an error that
+every run shares; a record of how often each kind of question went wrong before can. Scored on each round-1
+split with the types chosen on the other two, withholding the predicted task types whose released answers
+were wrong more than 20% of the time raised the three-run system's coverage from 38.6% to 54.4% at about the
+same risk (6.0% and 6.2%). An LLM cross-check of the evidence was considered and left out: the answers it would
+have to rescue (two of three runs agreeing) were wrong 57% of the time in round 1.
+
+**System.** Unchanged from round 1: image `crmroute:checkable` 658df1a6bc7f, the same pins, three runs per
+task (two routed, one with every task on 3.8 Flash). Baseline: ReAct with the privacy prompt, one run, same
+models, judge and simulated user.
+
+**Splits.** `data/checkable2_calibration.json` (410 tasks) and `data/checkable2_test.json` (431): every
+CRMArena-Pro business single-turn task that no earlier split or router example used, halved at random per org
+and type (`scripts/make_checkable_splits.py --round2 --seed 20261102`). They are the benchmark's last unused
+tasks, so the type mix follows what is left (13 to 26 per org and type), not round 1's balanced design.
+
+**Release procedure** (`round2_rules` and `calibrate_widest` in `scripts/release_eval.py` at this commit). For
+a system with k runs per task, a competence map withholds the predicted task types whose answers the same
+rule released in that system's round-1 runs were wrong more than a threshold of the time; free-text and BANT
+answers are never released. The chain, in order: with the 15% map, all k runs agree and show no used-up
+budget, unsupported None or tool error; then no used-up budget or unsupported None; then no flag required;
+then the same three with the 20% map. Learn-then-Test on the round-2 calibration runs (fixed-sequence
+testing, exact binomial p-values, alpha = delta = 0.10). Of the rules certified before the first failure, which
+all hold their bound together, the one that answers the most calibration tasks is chosen, committed before
+any round-2 test result is read and applied unchanged to the round-2 test runs. The same procedure runs for
+crmroute's first run alone and for the baseline (k = 1; each map from that system's own round-1 runs; the
+baseline uses the router types of crmroute's first run).
+
+**Primary outcomes** (crmroute, three runs, the 431 round-2 test tasks):
+
+1. A rule of the chain is certified on the round-2 calibration split.
+2. Its share of wrong answers among released test answers is at most 10%.
+3. Its exact one-sided 95% upper bound on that share is at most 10% (round 1: 12.4%).
+4. It answers at least 50% of the test tasks (round 1: 40.5%).
+5. At least 99% of the evidence entries behind released test answers reproduce live.
+6. It answers more test tasks than round 1's certified rule applied to the same test runs, and more than the
+   baseline under its own round-2 rule; for each, the paired 95% bootstrap interval of the coverage
+   difference excludes zero.
+
+**Reported either way:** the chain on calibration for each system; for each chosen rule on test its coverage,
+risk, upper bound and standard score, by task type; the paired standard-score differences; repeats, latency
+and list-price cost, with and without adaptive repeats; and each run's standard benchmark score on the
+round-2 test split.

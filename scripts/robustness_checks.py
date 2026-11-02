@@ -175,7 +175,8 @@ def logged_cost(run_dir: Path) -> float:
 
 def spend_section(runs_dir: Path, test_dir: Path) -> list[str]:
     phases: dict[str, list[tuple[str, int, float]]] = {"before the test": [], "test run": [], "after the test": [],
-                                                       "checkable answers (docs/checkable_answers.md)": []}
+                                                       "checkable answers, round 1 (docs/checkable_answers.md)": [],
+                                                       "checkable answers, round 2 (docs/checkable_answers.md)": []}
     for d in sorted(p for p in runs_dir.iterdir() if p.is_dir()):
         files = sorted(d.rglob("results_*.json"))
         if not files:
@@ -189,7 +190,9 @@ def spend_section(runs_dir: Path, test_dir: Path) -> list[str]:
                     cost += sum(float(c.get("cost") or 0.0) for c in attempt.get("llm_calls") or []
                                 if c.get("role") in ("judge", "user"))
         if d.name.startswith("checkable_"):
-            phase = "checkable answers (docs/checkable_answers.md)"
+            phase = "checkable answers, round 1 (docs/checkable_answers.md)"
+        elif d.name.startswith("checkable2_"):
+            phase = "checkable answers, round 2 (docs/checkable_answers.md)"
         else:
             phase = "test run" if d == test_dir else ("after the test" if d.name in AFTER_TEST else "before the test")
         phases[phase].append((d.name, tasks, max(cost, logged_cost(d))))

@@ -69,5 +69,6 @@ Model calls at list price (agent, policy classifier, Prompt Guard, and any judge
 | before the test | ci ($0.16), ci2 ($0.12), ci3 ($0.15), dev ($7.07), dev2 ($3.48), dev3 ($11.83), dev_react_probe ($3.31), dev_react_probe_multi ($1.70), dev_small ($0.42), devmt_check ($0.27), smoke ($0.02), smoke_pipeline ($0.02), smoke_vertex ($0.02), smoke_vertex2 ($0.64), test_small ($0.36), trace ($0.09) | 1317 | $29.66 |
 | test run | test ($42.66) | 776 | $42.66 |
 | after the test | ablation_hints ($7.97), fresh_after ($7.30), fresh_before ($7.53), original_dev ($5.00), original_dev_oom_attempt ($0.02), original_smoke ($0.38), original_smoke2 ($0.35), original_test ($12.58) | 1913 | $41.14 |
-| checkable answers (docs/checkable_answers.md) | checkable_calibration ($64.57), checkable_practice ($28.85), checkable_refusal ($0.09), checkable_smoke ($0.06), checkable_test ($52.20) | 4083 | $145.77 |
-| all | | | $259.23 |
+| checkable answers, round 1 (docs/checkable_answers.md) | checkable_calibration ($64.57), checkable_practice ($28.85), checkable_refusal ($0.09), checkable_smoke ($0.06), checkable_test ($52.20) | 4083 | $145.77 |
+| checkable answers, round 2 (docs/checkable_answers.md) | checkable2_calibration ($58.75), checkable2_test ($63.16) | 3364 | $121.91 |
+| all | | | $381.14 |
