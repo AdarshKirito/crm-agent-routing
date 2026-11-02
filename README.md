@@ -69,12 +69,21 @@ same procedure certified no rule for ReAct with the privacy prompt or for a sing
 withhold everything. The other 59.5% of tasks go to a person, and the 9 wrong answers were unanimous and
 grounded, an error a receipt cannot show ([below](#checkable-answers-resultscheckable_answersmd)).
 
+A second round added a **competence map**, because errors that every run shares are invisible to agreement and
+receipts: the task types whose released answers were wrong more than 15% of the time in round 1's records are
+withheld from the start. Calibrated anew and tested once on the benchmark's last 431 unused single-turn business
+tasks, crmroute answered 194 (45.0%), and 9 of those were wrong (4.6%; exact 95% upper bound 8.0%, inside the 10%
+target this time). Round 1's rule on the same runs answered 159 (36.9%), 14 of them wrong. Coverage missed its
+pre-registered 50% target, and again no rule was certified for one run or for the baseline
+([round 2](#round-2-a-competence-map-resultscheckable2_answersmd)).
+
 The numbers are summaries in [`results/`](results/), made from the run records by the scripts in `scripts/`;
 the test, fresh, original-org, robustness and ablation summaries name their exact commands. The raw run records
 are published as release assets, [run-records-2026-10-11](https://github.com/AdarshKirito/crm-agent-routing/releases/tag/run-records-2026-10-11)
 (58 MB), for the hints ablation, [run-records-2026-10-30](https://github.com/AdarshKirito/crm-agent-routing/releases/tag/run-records-2026-10-30),
 and for checkable answers, [run-records-2026-11-01](https://github.com/AdarshKirito/crm-agent-routing/releases/tag/run-records-2026-11-01)
-(171 MB, the receipts included), so every summary can be rebuilt.
+(171 MB, the receipts included) and its second round, [run-records-2026-11-01-round2](https://github.com/AdarshKirito/crm-agent-routing/releases/tag/run-records-2026-11-01-round2)
+(149 MB), so every summary can be rebuilt.
 
 ## Contents
 
@@ -242,7 +251,8 @@ tasks no earlier step had used, so the test set stayed untouched. There was also
 CRMArena-Pro orgs; the original-CRMArena run below is the first step there. A hints ablation reran system 3
 on the test tasks without its per-task hints, to measure what that dev tuning adds. Last, checkable answers
 changed what crmroute does with an answer it cannot back up, built and measured on 912 tasks no earlier step
-had used.
+had used; a second round, a competence map learned from those 912, was measured on the benchmark's last 841
+unused tasks.
 
 ### Safety fixes, measured on fresh tasks (`results/fresh_summary.md`)
 
@@ -426,6 +436,53 @@ Evidence (re-run with scripts/recheck_receipts.py, or paste the queries into any
 A lead-qualification question asked the same way is withheld ("answers of form 'bant' cannot be checked against
 record fields. Hand this request to a person."). The practice, calibration, test and refusal runs cost $145.77
 at list price (`results/robustness_checks.md`, section 4); the live re-check makes no model calls.
+
+#### Round 2: a competence map (`results/checkable2_answers.md`)
+
+Round 1's records (912 tasks, three runs each) became development data once its test was done. Most wrong
+answers that the looser rules released came from a few task types where every run made the same mistake, such
+as sales amounts summed under another definition than the answer key's. Round 2 adds one step, fixed before any
+round-2 run (pre-registration: `docs/checkable_answers.md`, "Round 2"): withhold the task types, as the router
+predicts them, whose released answers were wrong more than a threshold of the time in the same system's round-1
+records. A chain of six rules (a 15% and then a 20% map, three flag levels each, all three runs agreeing) was
+calibrated on 410 tasks, and the widest certified rule was applied once to 431 test tasks: together, every
+CRMArena-Pro single-turn business task that no earlier split or router example used (`data/checkable2_*.json`).
+Same image, models and pins as round 1; every trial is in `results/checkable_notebook.md`.
+
+Held-out test, 431 single-turn business tasks, rules from `results/checkable2_calibration.md`:
+
+| | answered (coverage) | wrong among answered (risk) | risk, exact 95% upper bound | right, every answer given |
+|---|---|---|---|---|
+| crmroute, three runs, round 2's certified rule | 194 (45.0%) | 9 (4.6%) | 8.0% | |
+| crmroute, three runs, round 1's certified rule | 159 (36.9%) | 14 (8.8%) | 13.4% | |
+| crmroute, each run alone | no rule certified: 0 | | | 71.5% to 73.3% |
+| ReAct + privacy prompt, one run | no rule certified: 0 | | | 52.9% |
+
+- **Five of the six pre-registered outcomes were met; coverage was not.** The certified rule: all three runs
+  agree, no flag required, and five types withheld, the five above 15% in round 1 (quote_approval,
+  policy_violation_identification, sales_amount_understanding, invalid_config, wrong_stage_rectification). Its
+  risk, 4.6%, and upper bound, 8.0%, are within the 10% target that round 1's bound missed. It answered 8.1
+  points more of the tasks than round 1's rule on the same runs [+3.5, +12.8], and 45.0 more than the
+  baseline, which certified nothing [+40.4, +49.7]. It answered 45.0% of the tasks against a 50% target (48.0% on
+  calibration).
+- **Released answers were right 95.4% of the time** (185 of 194), against 72.5% on average for one run that
+  answers everything. The benchmark's score, which counts a withheld answer as a failure, is 42.9%; each run alone scored
+  18.6 to 20.4 points above the baseline (every interval above zero).
+- **Where the rest went:** 183 tasks were withheld by type (120 by the map, 63 free-text or BANT; the router's
+  type was right on all 431) and 54 because the runs disagreed (their majority answer was right 29 times). Under
+  this rule at most 57.5% of these tasks can be answered.
+- **The map catches errors that repeat, not new ones.** The 9 wrong answers were unanimous: four activity_priority
+  lists that hold every Id of the key plus one to three more, two regions, two agents for transfer counts and one
+  routed case. activity_priority was wrong in 3 of 35 releases in round 1 (8.6%), below the line, and in 4 of 14
+  here.
+- **Evidence:** 419 of the 420 entries behind released answers reproduced live. The other is a `SELECT COUNT()`
+  that the re-check script compared wrongly: simple_salesforce's `query_all` reports how many rows it fetched,
+  none for a bare count, instead of the count. With the server's count it reproduces, as do the other three bare
+  counts behind released answers; the script now compares the count (round 1's released evidence had none).
+- **Cost and wait:** three runs cost $0.080 per task at list price, $0.045 with runs taken one at a time until
+  the decision is settled (1.63 runs on average). With the three runs in parallel the median wait was 33.5 s
+  (one run: 18.8 s); this round's latency includes a ten-minute Vertex AI slowdown and model calls that took
+  several minutes. Round 2's runs cost $121.91 at list price (`results/robustness_checks.md`, section 4).
 
 ## Reusable parts
 
@@ -772,6 +829,24 @@ python scripts/checkable_report.py --stage calibration   # certify the rules; co
 vendor/CRMArena/.venv/Scripts/python scripts/recheck_receipts.py --runs runs/checkable_test/r1/routed \
   runs/checkable_test/r2/routed runs/checkable_test/f1/full --task-ids data/checkable_test.json --out runs/checkable_test/recheck.json
 python scripts/checkable_report.py --stage test          # results/checkable_answers.md
+
+# round 2 (docs/checkable_answers.md, "Round 2"): every remaining single-turn business task, the same image and runs
+vendor/CRMArena/.venv/Scripts/python scripts/make_checkable_splits.py --round2 --seed 20261102
+for s in calibration test; do
+  SPLIT=checkable2_$s TASK_IDS=data/checkable2_$s.json OUT=runs/checkable2_$s/r1 MODES=single PORT_OFFSET=200 ./scripts/run_systems.sh routed
+  SPLIT=checkable2_$s TASK_IDS=data/checkable2_$s.json OUT=runs/checkable2_$s/r2 MODES=single PORT_OFFSET=210 ./scripts/run_systems.sh routed
+  SPLIT=checkable2_$s TASK_IDS=data/checkable2_$s.json OUT=runs/checkable2_$s/f1 MODES=single PORT_OFFSET=220 ./scripts/run_systems.sh full
+  for org in b2b b2c; do
+    SPLIT=checkable2_$s TASK_IDS=data/checkable2_$s.json OUT=runs/checkable2_$s/react ORGS=$org MODES=single ./scripts/run_systems.sh react_privacy
+  done
+done
+# slow streams were shared out mid-run: their unfinished tasks (runs/checkable2_splits/*.json) ran with the same
+# pins into react_p1..p6 and f1x, and the report reads each run's directories together (results/checkable_notebook.md)
+python scripts/checkable2_report.py --stage calibration   # commit results/checkable2_rules.json before any test result
+vendor/CRMArena/.venv/Scripts/python scripts/recheck_receipts.py --runs runs/checkable2_test/r1/routed \
+  runs/checkable2_test/r2/routed runs/checkable2_test/f1/full,runs/checkable2_test/f1x/full \
+  --task-ids data/checkable2_test.json --out runs/checkable2_test/recheck.json
+python scripts/checkable2_report.py --stage test          # results/checkable2_answers.md
 ```
 
 `scripts/estimate_budget.py` projects a run's list-price cost from measured checkpoints before it starts. For
@@ -807,18 +882,21 @@ the judge check, `python scripts/judge_agreement.py sheet ...` writes a blind 40
 - **Checkable answers** are certified for one distribution: single-turn templated tasks on these two orgs, with
   this image, these models and this judge. The guarantee is about the calibration split (risk at most 10% with
   90% confidence) and carries to new tasks only as far as they are exchangeable with it; on test the exact 95%
-  upper bound was 12.4%. Coverage met its 40% target by 0.5 points. A receipt check sees whether the cited records
-  exist and were read, not whether they answer the question, and all 9 wrong released answers passed it with
-  three runs agreeing. "Right" is the benchmark's grading against its answer key (qwen3:8b as judge), not a person's
-  check. Free-text, BANT and multi-turn
-  answers are never released, and three runs cost about three times one run (1.83 runs with adaptive repeats).
-  Eight tasks ended in an error (three Vertex AI "missing thought_signature" rejections, four expired credentials
-  after the host slept, one dropped connection) and were redone by resuming with identical pins, seven resumes in
-  all (`results/checkable_notebook.md`).
+  upper bound was 12.4% in round 1 and 8.0% in round 2. Coverage met round 1's 40% target by 0.5 points and
+  missed round 2's 50% target by 5 points. A receipt check sees whether the cited records exist and were read,
+  not whether they answer the question, and the 9 wrong released answers of each round all passed it with three
+  runs agreeing. Round 2's competence map is learned from round 1's runs on the same benchmark: it withholds task
+  types that went wrong before and cannot see a type whose errors are new. "Right" is the benchmark's grading
+  against its answer key (qwen3:8b as judge), not a person's check. Free-text, BANT and multi-turn answers are
+  never released, and three runs cost about three times one run (1.83 and 1.63 runs with adaptive repeats).
+  Eight tasks ended in an error in round 1 (three Vertex AI "missing thought_signature" rejections, four expired
+  credentials after the host slept, one dropped connection) and eleven in round 2 (dropped connections, the
+  harness's 15-minute limit, one MAX_TOKENS ending; one task timed out three times on slow model calls before it
+  finished); all were redone by resuming with identical pins (`results/checkable_notebook.md`).
 - **Prompt Guard** is untested here (no benchmark task is an injection attempt) and fails open: on Groq's free tier, 122 and 159 Prompt Guard calls in the two fresh runs got `429 Too Many Requests` under parallel load, and screening continued without the injection score. A deployment needs a paid tier or a fail-closed rule for it.
 - **Stakeholder interviews: not conducted.** `docs/scoping.md` is the unfilled template, and the sensitive-data map (`agent/app/guard/sensitive_fields.yaml`) is a starter built from the schema and the dev split, not from stakeholder input. Every guard result above was measured with that starter map; replacing it with an interview-based never-share list would need a new measurement.
 - **Conversations without a logged-in identity:** the harness gives multi-turn tasks no session identity, so the agent binds the first Contact Id the customer states. A deployment must take it from authentication.
-- **Published run records** have three redactions: the Google Cloud project id, email addresses at gmail.com and salesforce.com that ReAct's queries returned from the orgs' User records, and local paths. The hints ablation's records, published separately, needed only the first and last (they hold no email addresses). The checkable-answers records, also published separately, have the same three redactions; their receipts hold the tool results as the agent saw them. Server and container logs are not published.
+- **Published run records** have three redactions: the Google Cloud project id, email addresses at gmail.com and salesforce.com that ReAct's queries returned from the orgs' User records, and local paths. The hints ablation's records, published separately, needed only the first and last (they hold no email addresses). The checkable-answers records of both rounds, also published separately, have the same three redactions (round 2's local paths include those of the worktree some of its streams ran from); their receipts hold the tool results as the agent saw them. Server and container logs are not published.
 - **Qdrant local mode:** only one process can open an index folder at a time, so the search server and the retrieval eval need separate copies.
 
 ## License
