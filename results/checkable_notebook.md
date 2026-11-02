@@ -281,3 +281,48 @@ Round 1's records (912 tasks, three runs each) became development data once its 
 - crmroute's first run alone and the baseline certified nothing: their strictest rules had 9 wrong of 119
   (7.6%, p = 0.24) and 6 wrong of 77 (7.8%, p = 0.34), too few answers to show a risk below 10%.
 - Calibration coverage, 48.0%, is below the 50% that outcome 4 asks of the test split.
+
+## Round 2: test (2026-11-01, `results/checkable2_answers.md`, 2316751)
+
+- Errors redone on the test runs by resuming each with its run's configuration: b2c/608 (dropped connection) and
+  b2c/883 in routed run 1, b2c/1406 (timed out) in the 3.8 Flash run's part A. b2c/883 hit the harness's 900 s
+  limit three times and finished on the fourth attempt (11 model calls, about 500 s). On every attempt its first
+  3.8 Flash call took 2 to 8 minutes and some later ones as long, also in the 3.8 Flash run (which finished it in
+  about 835 s), while the run's median first call took 2 s; the limit is fixed in the pinned harness patch, so a
+  resume with every pin unchanged was the only redo. Round 2 redid 11 tasks in all (3 calibration, 8 test; 13
+  failed attempts, kept in the records).
+- Every test run complete (21:37): 431 of 431 tasks each, no duplicate across a run's directories, no errored
+  record; the baseline's 250K-token cap ended 20 of its tasks (scored as its failures).
+- `scripts/checkable2_report.py` took the 3.8 Flash run's standard score from `f1` alone, which would have missed
+  the 132 B2C tasks in `f1x`; fixed before the test stage was run (4bbd030) and checked on the calibration split.
+- Live re-check (6 min 50 s, 2,037 live queries, no model calls): 2,511 of 2,513 entries matched. Behind released
+  answers, 419 of 420 reproduced. The other, b2b/171's `SELECT COUNT()` (a released, right answer), recorded a count
+  of 1 and re-checked as 0. That was the re-check script's mistake: it runs every SOQL query through
+  simple_salesforce's `query_all`, whose totalSize counts the rows it fetched, and a bare COUNT() returns none. Run
+  with `query()`, the count is 1, as recorded (the case exists, created 2024-05-02). Released answers rest on four
+  bare COUNT() queries in round 2: b2b/171 and three recorded 0 (b2c/2075 twice, b2c/2101), which the script could
+  not have found different; all four reproduce with the server's count. Round 1's 230 released entries had none.
+  Fixed in bdec661, after the test results were committed; the committed results keep the pre-registered
+  script's 419 of 420.
+- Results (crmroute, three runs, the rule chosen on calibration): 194 of 431 answered (45.0%), 9 wrong (4.6%,
+  exact 95% upper bound 8.0%). Outcomes 1, 2, 3, 5 and 6 met; 4 (coverage at least 50%) missed. Round 1's rule on
+  the same runs: 159 answered (36.9%), 14 wrong (8.8%, bound 13.4%); coverage difference +8.1 points [+3.5,
+  +12.8]. On calibration the chosen rule had answered 48.0%, 6.6% of them wrong.
+- Where coverage went: 183 tasks withheld by type (120 by the map's five types, 63 free-text or BANT; the router's
+  type was right on all 431), 54 because the runs disagreed (47 with two runs agreeing, 7 with none; the majority
+  answer was right 29 times), none for a failed check among unanimous runs. At most 248 tasks (57.5%) can be
+  released under this rule.
+- The 9 wrong released answers, all unanimous: four activity_priority lists that hold every Id of the key plus one
+  to three more (b2b/254, b2c/208, 220, 282), two best_region_identification (b2b/1110 TX where the key says MO,
+  b2c/1159 IL where it says None), two transfer_count (b2b/1195 another agent, b2c/1275 none where the key names
+  one) and one case_routing (b2b/1500, another agent). activity_priority was wrong in 3 of 35 round-1 releases
+  under this rule (8.6%), below the 15% line, and in 4 of 14 here: the map withholds what went wrong before, not
+  new errors.
+- crmroute's first run alone and the baseline certified nothing on calibration, so they release nothing. Standard
+  score of each run: crmroute 71.5%, 73.3% and 72.9%, ReAct + privacy 52.9% (+18.6 to +20.4 points, every interval
+  above zero).
+- Cost and wait: $0.0804 per task for three runs, $0.0445 with adaptive repeats (1.63 runs). One run p50 18.8 s,
+  three in parallel 33.5 s (p95 299 s); this round's latency includes the 15:38 to 15:48 slowdown and the slow
+  calls above. Round 2's model calls cost $121.91 at list price (843a96e), of the $200 cap.
+- Rebuilt from the records to be published (round 1's published archive plus round 2's redacted copy): the four
+  round-2 results files, and round 1's four with this branch's scripts, match byte for byte.
