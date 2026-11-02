@@ -1,0 +1,30 @@
+{
+ "crmroute": {
+  "rule": "agree>=3, withhold 5 types wrong >15% before, withhold bant/text answers",
+  "runs_per_task": 3,
+  "min_agree": 3,
+  "soft": [],
+  "map_threshold": 0.15,
+  "withheld_types": [
+   "invalid_config",
+   "policy_violation_identification",
+   "quote_approval",
+   "sales_amount_understanding",
+   "wrong_stage_rectification"
+  ],
+  "calibration_tasks": 410,
+  "round1_tasks": 912
+ },
+ "crmroute_run1": {
+  "rule": null,
+  "runs_per_task": 1,
+  "calibration_tasks": 410,
+  "round1_tasks": 912
+ },
+ "baseline": {
+  "rule": null,
+  "runs_per_task": 1,
+  "calibration_tasks": 410,
+  "round1_tasks": 912
+ }
+}
