@@ -209,3 +209,75 @@ practice questions of the first demo:
   flag; released with the one SOQL query it rests on. Slowest run 12.1 s, $0.0155 for the three.
 - b2b/2 (lead_qualification): the routed runs answered None with no empty result behind it, the 3.8 Flash
   run "Timeline"; withheld as a BANT judgment and handed off. Slowest run 27.0 s, $0.0534.
+
+## Round 2: a competence map (2026-11-01)
+
+Round 1's records (912 tasks, three runs each) became development data once its test was done.
+
+- Where the looser rules' wrong answers came from (two of three runs agreeing, recovered tool errors allowed:
+  64 wrong of 565 released): sales_amount_understanding 15 of 42 (every run summed order lines by order
+  date, where the key evidently uses another definition), invalid_config 10 of 46 (a quote-configuration
+  rule article cited for a quote the key finds valid), wrong_stage_rectification 8 of 39, activity_priority
+  7 of 37. Every run shares these mistakes, so neither agreement nor receipts can see them.
+- A competence map: withhold the predicted task types whose released answers were wrong more than a
+  threshold of the time before. Scored on each round-1 split with the types chosen on the other two, at
+  20% it took the three-run system from 38.6% coverage and 6.0% wrong (round 1's rule) to 54.4% and 6.2%;
+  crmroute's first run alone reached 35.3% at 5.3% (15% map) and ReAct with the privacy prompt 20.7% at
+  5.3%.
+- An LLM cross-check of each answer against its evidence was considered and left out: the answers it would
+  have to rescue beyond all three runs agreeing were wrong 57% of the time (24 of 42).
+- Only 841 business single-turn tasks were still unused once every earlier split and router example is
+  excluded (414 B2B, 427 B2C; 13 to 26 per org and type); an earlier estimate of 1,585 per org did not hold.
+  All of them went into round 2: 410 calibration, 431 test (`data/checkable2_*.json`, aeff067).
+- Pre-registration (3a76368, before any round-2 run): the chain of six rules (15% then 20% map, three flag
+  levels, all runs agreeing), the widest certified rule chosen, six primary outcomes including an upper bound
+  at most 10% and coverage at least 50%. Same image and pins as round 1; the baseline runs again.
+- Launched 2026-11-01 15:35 from 3a76368: three crmroute runs and the baseline on both splits, ten streams;
+  Vertex AI now billed to the user's second billing account (01BA45-0BFE37-3DE10E, free-trial credit, a
+  $200 cap for this round set by the user).
+- `scripts/checkable2_report.py`, committed after the launch and before any round-2 record was read, was
+  dry-run on round-1 data (in-sample, a code check only).
+- From about 15:38 to 15:48, every Vertex AI call to 3.8 Flash in every stream took 30 to 210 s instead of
+  about 2 s (no errors, no rate-limit waits; one crmroute task took 653 s). It recovered by itself. Round-2
+  latency figures include that window. The baseline's 250K-token cap ended some ReAct tasks as before
+  (scored as its failures, as in every earlier run).
+- Round 2's manifests pin the harness patch as 499226b9, round 1's as e3a9aaae: switching branches rewrote
+  the patch file's line endings in the working tree. Its content is unchanged (both hash to e3a9aaae with
+  carriage returns removed; `git diff f414d36 -- patches/` is empty).
+- At about 16:37 the baseline's two B2B streams (about 0.3 tasks a minute, so about ten more hours) were stopped
+  after 30 and 29 tasks and their unfinished tasks split three ways (`runs/checkable2_splits/*_b2b_p*.json`),
+  run as six streams from a worktree at 3a76368 with the same pins (`react_p1..p3`). The report reads the
+  baseline's run as `react` plus `react_p1..p3`; no task is in two of them. Slow model calls set the pace:
+  most take a few seconds, a few take 2 to 6 minutes, and those few hold about half of each stream's time.
+  The 3.8 Flash calibration run timed out on b2b/417 and test run 1 lost its connection on b2b/588, so both
+  stop after B2B and are resumed.
+- At about 17:20 the baseline's two B2C streams (about 0.65 tasks a minute) were split the same way after
+  68 and 81 tasks: their unfinished tasks run as `react_p4..p6` from the same worktree and pins.
+- At about 17:26 the 3.8 Flash runs' B2C work was shared out the same way: both runs stop after B2B
+  (b2b/417 timed out, b2b/916 ended on MAX_TOKENS), so 3/5 of their B2C tasks started at once in a parallel
+  stream (`f1x`) from the same worktree and pins; the other 2/5 run in `f1` after the B2B redo. The report
+  reads each such run as both directories together.
+- The first redo of b2b/417 was refused by the harness, as it should be: it was launched as a B2B-only
+  stream, whose configuration fingerprint differs from the run's, and the harness ties each results file to
+  its run's fingerprint ("Checkpoint configuration changed"; no task ran; it left a
+  `manifest_full_b2b-single.json`). The redo then ran with the run's original configuration (both orgs):
+  it redoes the B2B task, and its B2C step cannot start, because B2C part A's stream already holds that
+  results file under its own fingerprint. So no task can run twice.
+- More errors redone by resuming with each run's own configuration: dropped connections on b2c/1857
+  (calibration 3.8 Flash part B) and b2c/824 (calibration routed run 2), a timeout on b2c/874 (test 3.8
+  Flash part B); the 3.8 Flash test run's B2B half ended with three (b2b/916 MAX_TOKENS, b2b/1473 and
+  b2b/2027 timed out after model calls of 2 to 6 minutes), all redone after its B2C part A had claimed the
+  B2C file.
+- Every calibration run complete (19:42): 410 of 410 tasks each, no duplicate across a run's directories,
+  no errored record.
+
+## Round 2: calibration (2026-11-01, `results/checkable2_calibration.md`, e7f8342)
+
+- crmroute, three runs: the first five rules of the chain were certified; the sixth (20% map, no flag
+  required: 216 of 410 answered, 16 wrong, 7.4%, p = 0.12) was not. The widest certified rule, chosen: all
+  three runs agree, the 15% map (invalid_config, policy_violation_identification, quote_approval,
+  sales_amount_understanding, wrong_stage_rectification withheld), no flag required: 197 of 410 answered
+  (48.0%), 13 wrong (6.6%), p = 0.065.
+- crmroute's first run alone and the baseline certified nothing: their strictest rules had 9 wrong of 119
+  (7.6%, p = 0.24) and 6 wrong of 77 (7.8%, p = 0.34), too few answers to show a risk below 10%.
+- Calibration coverage, 48.0%, is below the 50% that outcome 4 asks of the test split.
