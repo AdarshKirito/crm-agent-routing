@@ -2,8 +2,8 @@
 
   python scripts/checkable2_report.py --stage calibration   # certify; commit results/checkable2_rules.json first
   vendor/CRMArena/.venv/Scripts/python scripts/recheck_receipts.py --runs runs/checkable2_test/r1/routed \
-      runs/checkable2_test/r2/routed runs/checkable2_test/f1/full --task-ids data/checkable2_test.json \
-      --out runs/checkable2_test/recheck.json
+      runs/checkable2_test/r2/routed runs/checkable2_test/f1/full,runs/checkable2_test/f1x/full \
+      --task-ids data/checkable2_test.json --out runs/checkable2_test/recheck.json
   python scripts/checkable2_report.py --stage test          # apply the committed rules unchanged
 
 Each system's competence map is learned on its own round-1 runs only (practice, calibration and test of
@@ -198,8 +198,8 @@ def stage_test(recheck: Path) -> None:
 
 def standard_scores() -> list[str]:
     base, ids = ROUND2["test"]
-    runs = {"crmroute routed run 1": base / "r1" / "routed", "crmroute routed run 2": base / "r2" / "routed",
-            "crmroute 3.8 Flash run": base / "f1" / "full", "ReAct + privacy": react_run(base)}
+    names = ("crmroute routed run 1", "crmroute routed run 2", "crmroute 3.8 Flash run")
+    runs = {**dict(zip(names, crm_runs(base))), "ReAct + privacy": react_run(base)}
     rows = {name: RE.load_run(path) for name, path in runs.items()}
     keys = sorted(k for k in RE.expected_keys(ids) if not k[1] and rows["ReAct + privacy"][k]["task_type"] not in RE.CONFIDENTIALITY)
     ok = {name: [RE.score(r[k], 0.5)[1] for k in keys] for name, r in rows.items()}
