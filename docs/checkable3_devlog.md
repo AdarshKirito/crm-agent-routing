@@ -134,3 +134,41 @@ below with its date and reason, and with the values under both definitions.
   - **Not added to catalog v0.** Development surfaced one more candidate slot, kept out so the checks use
     catalog v0 as committed. b2b/1201's key suggests that "lowest transfer count" counts only agents with at
     least one transfer. It is a candidate for the original org's used-key tests (step 6).
+- 2026-11-03, the checks, computed once (`results/checkable3_gonogo.md`):
+  - **Runs.** Code caa02dd and deb90d3. The Pro pass ran 14:17-14:30 with 7,615 distinct live queries, 84
+    of them first fetched while testing the code on six tasks. The original-org pass ran 14:16-14:17 with
+    158 queries.
+
+  | Check | Value | Result |
+  |---|---|---|
+  | C1 Rewrite coverage | 1,648 of 1,671 (98.6%) | pass |
+  | C2 Strict derivation | 1,399 of 1,671 (83.7%); 495 of the passes over one group | fail |
+  | C3 Chance control | 163 of 1,461 (11.2%) | fail |
+  | C4 Catch | 18 of 18 (100%) | pass |
+  | C5 Cost | 137 of 453 (30.2%) | fail |
+  | C6 Added information | 6 | pass |
+  | C7 Rescue | key among the readings' answers in 78 of 86 disagreeing tasks; among the runs' answers in 75 of 86 | reported |
+  | C8 Portability | 36 of 51 (70.6%) | fail |
+  | C9 Readiness | logins, API allowance, knowledge index, split script | pass |
+
+  - **C9 details.** CRMArena rotated the original org's login on 2026-11-03 (its README, 521c126). The
+    local `vendor/CRMArena/.env` was updated from it, and the org's instance is the one earlier runs used.
+    The Pro orgs allow 441,450 API requests a day. The original org's limits resource is disabled; its
+    response header shows 441,430 a day. The round-2 image 658df1a6bc7f holds `knowledge_original`, and
+    `make_checkable_splits.py --round3` writes the split (5054d71).
+  - **Restricted check.** C2 failed overall, so the gate was limited to best_region_identification,
+    case_routing and top_issue_identification. There C4 is 9 of 9, C5 is 49 of 248 (19.8%) and C6 is 2.
+  - **Decision: NO-GO.** C5 fails, both overall and restricted. By the rule above, round 3 runs as a
+    replication on the original org. The derivation gate becomes a pre-registered arm, round 2's frozen rule
+    is applied unchanged as a transfer check, and the blinded audit follows. The convention gate becomes a
+    secondary analysis.
+  - **What the numbers show.**
+    - The gate held back every unanimous wrong answer, and also 137 right ones.
+    - Of those 137, 76 fail the own level (39 in monthly_trend_analysis). The other 61 change under a reading
+      the keys never use, most often ClosedDate as the date field, calendar months or quarter-aligned
+      seasons.
+    - The exclusion rule removed no reading, because each one had at least one supporting run by
+      coincidence. Pinning picked out the benchmark's conventions in both rounds: rolling windows,
+      meteorological seasons, December of Y and CreatedDate.
+    - C8's 15 incomplete checks are all ReAct's two-step product filter: order items first, then cases by a
+      literal list of their Ids. The derivation does not yet treat such a query as limited to the product.
