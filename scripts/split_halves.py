@@ -15,8 +15,9 @@ from pathlib import Path
 def main() -> None:
     source, prefix = Path(sys.argv[1]), Path(sys.argv[2])
     split = json.loads(source.read_text(encoding="utf-8"))
+    orgs = [org for org in ("b2b", "b2c", "original") if org in split]
     halves = [{"source": source.as_posix(), "half": h + 1} for h in range(2)]
-    for org in ("b2b", "b2c"):
+    for org in orgs:
         for half in halves:
             half[org] = {}
         for mode, ids in split[org].items():
@@ -25,7 +26,7 @@ def main() -> None:
             halves[0][org][mode], halves[1][org][mode] = ordered[:cut], ordered[cut:]
     prefix.parent.mkdir(parents=True, exist_ok=True)
     for half in halves:
-        half["counts"] = {org: {mode: len(v) for mode, v in half[org].items()} for org in ("b2b", "b2c")}
+        half["counts"] = {org: {mode: len(v) for mode, v in half[org].items()} for org in orgs}
         path = prefix.parent / f"{prefix.name}_h{half['half']}.json"
         path.write_text(json.dumps(half, indent=1), encoding="utf-8")
         print(path, half["counts"])
