@@ -206,3 +206,25 @@ below with its date and reason, and with the values under both definitions.
       NO-GO path above.
     - Either way, round 3's frozen pins are learned from all 510 used tasks' keys (step 6), and no fresh
       task is read.
+- 2026-11-03, while D1 runs and before any of its records is read: how D1 fixes the chain's inputs
+  (`scripts/dev/freeze_inputs.py` writes them to `results/checkable3_frozen.json`).
+  - **Flag level.** The strictest of round 2's three soft-flag levels (budget, unsupported None and tool
+    errors; budget and unsupported None; none) that withholds at most 10% of the run-1 answers the level
+    with no soft flag releases. Free text and BANT are withheld throughout.
+  - **Competence maps.** These are the predicted types whose D1 run-1 answers are wrong more than 15%
+    (map 15) or more than 20% (map 20) of the time. The answers counted are those released by the one-run
+    rule at that flag level. If G2 passes, the gated types' answers also go through the pinned gate, with
+    G2's cross-fitted pins.
+  - **Pins.** Learned from all of D1's checkable answers (`scripts/learn_conventions.py`) and frozen in
+    `data/conventions_original.yaml`.
+  - **The chain if G2 passes:**
+    - three runs with the pinned gate, under map 15 and then map 20;
+    - then runs 1 and 2 with the gate, then run 1 alone with the gate, each under map 15 and then map 20.
+      Fewer runs apply only to gated types; every other type needs all three.
+    - last, every run agrees with no gate, under map 15 and then map 20.
+
+    This order follows `results/checkable3_chain_order.md`: on the Pro records the gated rules' risk is
+    9.7-9.9%, against 11.0% without a gate, and the most conservative rule comes first.
+  - **The chain if G2 fails:** round 2's chain for this org, with every run agreeing, round 2's three flag
+    levels and maps 15 and 20, in round 2's order. The own-level gate becomes a separate arm (S2) with the
+    same structure as the gated chain above.
