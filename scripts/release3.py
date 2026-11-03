@@ -61,8 +61,11 @@ def make_rule(runs_used: int, gate_kind: str, gate: Gate | None, soft: tuple[str
             return CG.task_gate([gate.level(task, i, gate_kind) for i in range(len(considered))]) == "pass"
         return True
 
-    rule.__name__ = (f"runs 1-{runs_used} agree" if runs_used > 1 else "run 1") + (
-        f" on gated types, gate {gate_kind}" if gate_kind != "none" else "") + (
+    if gate_kind == "none":
+        name = "all runs agree"
+    else:
+        name = (f"runs 1-{runs_used} agree" if runs_used > 1 else "run 1") + f" on gated types, gate {gate_kind}"
+    rule.__name__ = name + (
         f", no {'/'.join(soft)}" if soft else "") + (
         f", withhold {len(withheld_types)} types" if withheld_types else "") + (
         f", withhold {'/'.join(sorted(withheld_forms))} answers" if withheld_forms else "")

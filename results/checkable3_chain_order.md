@@ -8,7 +8,7 @@ data only: it orders the chain before calibration, it is not a result.
 |---|---|---|---|---|
 | runs 1-3 agree on gated types, gate pinned, withhold bant/text answers | 1134 of 1753 (64.7%) | 112 (9.9%) | 11.5% | 3.00 |
 | runs 1-3 agree on gated types, gate own, withhold bant/text answers | 1093 of 1753 (62.4%) | 118 (10.8%) | 12.5% | 3.00 |
-| runs 1-3 agree, withhold bant/text answers | 1180 of 1753 (67.3%) | 130 (11.0%) | 12.6% | 3.00 |
+| all runs agree, withhold bant/text answers | 1180 of 1753 (67.3%) | 130 (11.0%) | 12.6% | 3.00 |
 | runs 1-2 agree on gated types, gate pinned, withhold bant/text answers | 1154 of 1753 (65.8%) | 112 (9.7%) | 11.3% | 2.68 |
 | runs 1-2 agree on gated types, gate own, withhold bant/text answers | 1132 of 1753 (64.6%) | 125 (11.0%) | 12.7% | 2.68 |
 | run 1 on gated types, gate pinned, withhold bant/text answers | 1182 of 1753 (67.4%) | 117 (9.9%) | 11.4% | 2.36 |
