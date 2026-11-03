@@ -309,9 +309,36 @@ def d1_records():
         yield "d1", task, RE.question_of(row), P.contexts()["original"][task.key[2]], row.get("gt_answer"), None
 
 
+def round3_records(split: str, system: str):
+    """Round 3's runs on its calibration or test half: crmroute's three runs (routed 1 and 2, the 3.8 Flash
+    run), or plain ReAct's one run typed by crmroute's routed run 1."""
+    sys.path.insert(0, str(ROOT / "scripts" / "dev"))
+    import checkable2_report as C2
+    import pro_records as P
+
+    base, ids = ROOT / "runs" / f"checkable3_{split}", ROOT / "data" / f"checkable3_{split}.json"
+    if system == "crmroute":
+        runs, types = C2.crm_runs(base), None
+    else:
+        parts = [base / "react", *sorted(base.glob("react_p*"))]
+        runs, types = [Path(",".join(str(d / "react") for d in parts))], base / "r1" / "routed"
+    first = RE.load_run(runs[0])
+    for task in RE.load_tasks(runs, ids, types):
+        row = first[task.key]
+        claims = [r.verdict.claim for r in task.runs]
+        unanimous = len(claims) > 1 and all(c.kind in ("ids", "none", "value") for c in claims) and all(
+            RE.rc.same_answer(claims[0], c) for c in claims[1:])
+        yield f"checkable3_{split}", task, RE.question_of(row), P.contexts()["original"][task.key[2]], row.get("gt_answer"), unanimous
+
+
+RECORDS = {"pro": pro_records, "original_react": original_react_records, "d1": d1_records,
+           **{f"checkable3_{split}{suffix}": (lambda s=split, m=system: round3_records(s, m))
+              for split in ("calibration", "test") for suffix, system in (("", "crmroute"), ("_react", "react"))}}
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--records", choices=["pro", "original_react", "d1"], required=True)
+    ap.add_argument("--records", choices=sorted(RECORDS), required=True)
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--tasks", default="", help="only these org/id pairs, comma-separated (development)")
     ap.add_argument("--env", type=Path, default=ROOT / "vendor" / "CRMArena" / ".env")
@@ -320,7 +347,7 @@ def main() -> None:
     CV.catalog()
     wanted = {tuple(x.split("/")) for x in args.tasks.split(",") if x}
     lives: dict[str, Live] = {}
-    records = {"pro": pro_records, "original_react": original_react_records, "d1": d1_records}[args.records]()
+    records = RECORDS[args.records]()
     args.out.parent.mkdir(parents=True, exist_ok=True)
     n = 0
     with args.out.open("w", encoding="utf-8") as out:
