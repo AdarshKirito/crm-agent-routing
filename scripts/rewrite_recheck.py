@@ -296,9 +296,22 @@ def original_react_records():
         yield "original_test", task, RE.question_of(row), P.contexts()["original"][task.key[2]], row.get("gt_answer"), None
 
 
+def d1_records():
+    """Round 3's development run D1: one routed run on the original org's 510 used tasks, as two streams."""
+    sys.path.insert(0, str(ROOT / "scripts" / "dev"))
+    import pro_records as P
+
+    base = ROOT / "runs" / "checkable3_dev"
+    run = Path(f"{base / 'd1_h1' / 'routed'},{base / 'd1_h2' / 'routed'}")
+    first = RE.load_run(run)
+    for task in RE.load_tasks([run], ROOT / "data" / "checkable3_dev.json"):
+        row = first[task.key]
+        yield "d1", task, RE.question_of(row), P.contexts()["original"][task.key[2]], row.get("gt_answer"), None
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--records", choices=["pro", "original_react"], required=True)
+    ap.add_argument("--records", choices=["pro", "original_react", "d1"], required=True)
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--tasks", default="", help="only these org/id pairs, comma-separated (development)")
     ap.add_argument("--env", type=Path, default=ROOT / "vendor" / "CRMArena" / ".env")
@@ -307,7 +320,7 @@ def main() -> None:
     CV.catalog()
     wanted = {tuple(x.split("/")) for x in args.tasks.split(",") if x}
     lives: dict[str, Live] = {}
-    records = pro_records() if args.records == "pro" else original_react_records()
+    records = {"pro": pro_records, "original_react": original_react_records, "d1": d1_records}[args.records]()
     args.out.parent.mkdir(parents=True, exist_ok=True)
     n = 0
     with args.out.open("w", encoding="utf-8") as out:
