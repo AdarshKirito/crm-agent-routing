@@ -118,3 +118,19 @@ below with its date and reason, and with the values under both definitions.
 
 - 2026-11-03: definitions, catalog slots, thresholds and the decision rule committed. Nothing has been
   computed with versioned code yet.
+- 2026-11-03, before any check is computed. The code makes these definitions concrete:
+  - **Deciding query.** A query whose live re-run fails, or whose derivation ties where the context settles
+    ties (case routing), cannot be the deciding query. If no query reproduces the answer, the deciding query
+    is the last one that derives one.
+  - **Handle time.** Handle time leaves out the transferred cases that the run's own CaseHistory__c queries
+    show, re-run live.
+  - **Date field.** Types without a date-field slot put cases in a period by CreatedDate, and transfers by
+    the CaseHistory__c row's CreatedDate.
+  - **Fixed periods.** A question naming a month or a quarter triggers no window slot. Its single reading is
+    that period's window, so the check still re-runs the deciding query on exactly that window. A question
+    with no period has no readings.
+  - **Ties.** Case routing's tie rule (product expertise, then workload) is not computed, so a tie there
+    leaves the run unchecked.
+  - **Not added to catalog v0.** Development surfaced one more candidate slot, kept out so the checks use
+    catalog v0 as committed. b2b/1201's key suggests that "lowest transfer count" counts only agents with at
+    least one transfer. It is a candidate for the original org's used-key tests (step 6).
