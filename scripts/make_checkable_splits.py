@@ -22,6 +22,8 @@ Round 2 (docs/checkable_answers.md) uses every business single-turn task still u
 Round 3 (docs/checkable3_devlog.md) uses the original CRMArena org's single-turn tasks that neither its dev
 and test splits nor its router examples used, halved per task type, with the seed of the pre-registration:
         vendor/CRMArena/.venv/Scripts/python scripts/make_checkable_splits.py --round3 --seed <seed>
+Its development run uses the other 510, the ones those lists hold (data/checkable3_dev.json):
+        vendor/CRMArena/.venv/Scripts/python scripts/make_checkable_splits.py --round3-dev
 """
 import argparse
 import json
@@ -140,6 +142,21 @@ def round3(args) -> None:
     print("round-3 splits are disjoint from each other, from the org's dev and test splits and from its router examples")
 
 
+def round3_dev(args) -> None:
+    """The original org's used single-turn tasks (its dev and test splits and router examples), for round 3's
+    development run; every one already has a known key, so nothing here touches the fresh halves."""
+    used = used_ids([Path(p) for p in ORIGINAL_USED], [Path(p) for p in ORIGINAL_EXAMPLES], ("original",))["original"]
+    known = {i for ids in by_type(load_dataset("Salesforce/CRMArena", "CRMArena")["test"]).values() for i in ids}
+    ids = sorted(i for i in known if str(i) in used)  # as the dataset stores them, like every other split file
+    assert len(ids) == len(used), "a used id is not a task of the original org"
+    split = {"org": "original", "sources": ORIGINAL_USED + ORIGINAL_EXAMPLES,
+             "original": {"single_turn": ids, "multi_turn": []},
+             "counts": {"original": {"single_turn": len(used), "multi_turn": 0}}}
+    path = Path(args.out_dir) / "checkable3_dev.json"
+    path.write_text(json.dumps(split, indent=1))
+    print("development", split["counts"], "->", path)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out-dir", default="data")
@@ -149,12 +166,16 @@ def main():
     ap.add_argument("--extend-calibration", type=int, default=0)
     ap.add_argument("--round2", action="store_true", help="split every remaining task (data/checkable2_*.json)")
     ap.add_argument("--round3", action="store_true", help="split the original org's unused tasks (data/checkable3_*.json)")
+    ap.add_argument("--round3-dev", action="store_true", help="the original org's used tasks (data/checkable3_dev.json)")
     args = ap.parse_args()
     if args.round2:
         round2(args)
         return
     if args.round3:
         round3(args)
+        return
+    if args.round3_dev:
+        round3_dev(args)
         return
     if args.extend_calibration:
         extend_calibration(args)
