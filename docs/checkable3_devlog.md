@@ -172,3 +172,37 @@ below with its date and reason, and with the values under both definitions.
       meteorological seasons, December of Y and CreatedDate.
     - C8's 15 incomplete checks are all ReAct's two-step product filter: order items first, then cases by a
       literal list of their Ids. The derivation does not yet treat such a query as limited to the product.
+- 2026-11-03, after the decision: an engine change, and a second check fixed before its data exist.
+  - **The order-item change (ff5a07c).** A query that lists order items now counts as limited to the
+    product, using the order items the run's own OrderItem queries return, re-run live. Both passes were
+    re-run with it (`results/checkable3_gonogo_v2.md`). C1 1,654 of 1,671 (99.0%), C2 1,407 (84.2%), C3 163
+    of 1,461 (11.2%), C4 18 of 18, C5 136 of 453 (30.0%), C6 6, C8 47 of 51 (92.2%). The decision stays
+    NO-GO.
+  - **Exploratory, post hoc.** `scripts/dev/pinned_gate.py` asks only the readings the other round's keys
+    pin, with the executed readings deciding wherever the question has a period. On the same in-sample Pro
+    records it holds back all 18 unanimous wrong answers and 28 of 453 right ones (6.2%; 30, 6.6%, before
+    the order-item change), against 136 for the allowed level (`results/checkable3_pinned_v2.md`). It was
+    chosen after seeing these records, so it is a hypothesis, not a result.
+  - **G2, a development check on the original org.** It tests that gate on another org before anything is
+    frozen.
+    - Data: the development run D1, one routed run of round 2's unchanged image (658df1a6bc7f) on the
+      original org's 510 used tasks (`data/checkable3_dev.json`, c293843). It is re-checked live with
+      `scripts/rewrite_recheck.py` at ff5a07c.
+    - Gate: pinned readings only, the executed readings deciding wherever the question has a period and the
+      own level elsewhere (`pinned_level` with the own level not required).
+    - Pins: cross-fitted between tasks with odd and even ids. Each half is judged by pins learned from the
+      other half's keys, by the Pro rule: runs of at least three tasks support the reading, and none
+      contradicts it.
+    - Population: D1's checkable run answers in the six types, by predicted type.
+
+    | Check | Measure | GO if |
+    |---|---|---|
+    | G2a Coverage | the pinned check completes | at least 85% |
+    | G2b Catch | wrong answers held back | at least 40% |
+    | G2c Cost | right answers held back | at most 8% |
+
+    - Decision: if G2a to G2c all pass, round 3 pre-registers this gate as its mechanism arm (P3), beside
+      round 2's frozen rule as a transfer check and the replication. If any fails, round 3 stays on the
+      NO-GO path above.
+    - Either way, round 3's frozen pins are learned from all 510 used tasks' keys (step 6), and no fresh
+      task is read.
