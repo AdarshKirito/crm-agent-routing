@@ -192,6 +192,20 @@ def case_history(live: Live, queries: list[dict]) -> dict:
     return D.history_from(list(events.values()), HISTORY)
 
 
+def product_items(live: Live, queries: list[dict], spec) -> frozenset | None:
+    """The question's product's order items, from the run's OrderItem queries that name it, re-run live."""
+    if spec.product is None:
+        return None
+    ids = set()
+    for e in queries:
+        q = D.parse_query(query_of(e))
+        if q is None or q.obj != "orderitem" or spec.product not in query_of(e) or not q.column("Id"):
+            continue
+        rows, error = live.rows(drop_limit(query_of(e)))
+        ids |= {D._id15(r.get(q.column("Id"))) for r in ([] if error else rows)} - {None}
+    return frozenset(ids) or None
+
+
 def answers_of(d, spec) -> dict | None:
     """The answer under each tie reading ({"*": answer} without a tie); None if a tie the context settles."""
     if d.status != "tie":
@@ -207,7 +221,8 @@ def jsonable(answers: dict | None):
 
 def check_run(live: Live, spec, task_type: str, receipt: list[dict], claim_key: tuple, period, today) -> dict:
     queries = [e for e in receipt if e.get("status") == "ok" and e.get("tool") == "soql_query"]
-    applicable = [e for e in queries if D.derive(spec, query_of(e), []) is not None]
+    items = product_items(live, queries, spec) if task_type in ("monthly_trend_analysis", "top_issue_identification") else None
+    applicable = [e for e in queries if D.derive(spec, query_of(e), [], items=items) is not None]
     out = {"applicable": len(applicable), "derived": [], "deciding": None, "own": "unchecked", "own_answers": None,
            "groups": None, "readings": []}
     if not applicable:
@@ -217,7 +232,7 @@ def check_run(live: Live, spec, task_type: str, receipt: list[dict], claim_key: 
     deciding = None
     for e in applicable:
         rows, error = live.rows(drop_limit(query_of(e)))
-        d = None if error else D.derive(spec, query_of(e), rows, history)
+        d = None if error else D.derive(spec, query_of(e), rows, history, items)
         answers = None if d is None else answers_of(d, spec)
         out["derived"].append({"n": e["n"], "error": error, "answers": jsonable(answers),
                                "groups": len(d.scores) if d else None})
@@ -242,7 +257,7 @@ def check_run(live: Live, spec, task_type: str, receipt: list[dict], claim_key: 
             item["status"] = "unrewritable"
         else:
             rows, error = live.rows(text)
-            rd = None if error else D.derive(spec, text, rows, history)
+            rd = None if error else D.derive(spec, text, rows, history, items)
             answers = None if rd is None else answers_of(rd, spec)
             item.update(status="error" if error else "unsettled" if answers is None else "ok", error=error,
                         answers=jsonable(answers), groups=len(rd.scores) if rd else None)

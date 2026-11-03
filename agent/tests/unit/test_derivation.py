@@ -139,6 +139,16 @@ def test_monthly_trend_counts_cases_per_month_of_the_product():
     assert D.derive(s, grouped, [{"expr0": 3, "expr1": 2}, {"expr0": 11, "expr1": 5}]).answer == ("value", ("november",))
 
 
+def test_cases_listed_by_the_products_order_items_count_as_the_products():
+    s = spec("monthly_trend_analysis", f"The associated product Id is {PRODUCT}.")
+    mine, other = "802Ws000001lsScIAI", "802Ws000001lwmXIAQ"
+    q = f"SELECT Id, CreatedDate, OrderItemId__c FROM Case WHERE OrderItemId__c IN ('{mine}', '{other}')"
+    rows = [{"Id": cid(1), "CreatedDate": ts(0), "OrderItemId__c": mine},
+            {"Id": cid(2), "CreatedDate": ts(40), "OrderItemId__c": other}, {"Id": cid(3), "CreatedDate": ts(41), "OrderItemId__c": other}]
+    assert D.derive(s, q, rows) is None  # without the product's order items the query is not limited to it
+    assert D.derive(s, q, rows, items=frozenset({mine[:15]})).answer == ("value", ("january",))
+
+
 def test_monthly_trend_names_one_month_when_its_best_counts_fall_in_two_years():
     s = spec("monthly_trend_analysis", f"The associated product Id is {PRODUCT}.")
     jan23, jan24, feb23 = [case(1, opened=0), case(2, opened=1)], [case(3, opened=365), case(4, opened=366)], [case(5, opened=40)]

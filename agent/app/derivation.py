@@ -286,13 +286,17 @@ def _counts(rows: list[dict], query: Query, group: str, keep=None) -> dict | Non
     return dict(out)
 
 
-def _product_rows(query: Query, spec: Spec):
+def _product_rows(query: Query, spec: Spec, items: frozenset | None = None):
     """How rows are limited to the question's product: "query" (its text names the product), a row filter
-    (rows carry a product field), or None (they are not, so the query cannot decide)."""
+    (rows carry a product field, or the order item of one of `items`, the product's order items the receipt
+    holds), or None (they are not, so the query cannot decide)."""
     if spec.product is None or spec.product in query.text:
         return "query"
     col = next((key for expr, key in query.columns if "(" not in expr and expr.lower().endswith("product2id")), None)
-    return (lambda r: (_id15(_get(r, col)) or "") == spec.product) if col else None
+    if col:
+        return lambda r: (_id15(_get(r, col)) or "") == spec.product
+    item = query.column("OrderItemId__c")
+    return (lambda r: _id15(_get(r, item)) in items) if item and items else None
 
 
 def _mean_closure(rows, query, group_col, skip=frozenset(), id_col=None) -> dict:
@@ -307,10 +311,13 @@ def _mean_closure(rows, query, group_col, skip=frozenset(), id_col=None) -> dict
     return {g: sum(v) / len(v) for g, v in durations.items()}
 
 
-def derive(spec: Spec, query_text: str, rows: list[dict], history: dict | None = None) -> Derived | None:
+def derive(spec: Spec, query_text: str, rows: list[dict], history: dict | None = None,
+           items: frozenset | None = None) -> Derived | None:
     """The type's answer from one query's rows; None if this query cannot decide it (another object, a
     missing field, no direction). `history` (history_from over the receipt's case histories) gives handle
-    time its transferred cases and its minimum-case filter the agents of each case."""
+    time its transferred cases and its minimum-case filter the agents of each case; `items` (15-character
+    Ids of the product's order items, from the receipt) lets a query that lists order items count as
+    limited to the product."""
     q = parse_query(query_text)
     if q is None or spec.direction is None:
         return None
@@ -355,7 +362,7 @@ def derive(spec: Spec, query_text: str, rows: list[dict], history: dict | None =
             candidates = set(transfers)
         return pick({a: transfers[a] for a in candidates}, spec.direction, as_id)
     if t == "monthly_trend_analysis":
-        product = _product_rows(q, spec)
+        product = _product_rows(q, spec, items)
         if q.obj != "case" or product is None:
             return None
         keep = None if product == "query" else product
@@ -380,7 +387,7 @@ def derive(spec: Spec, query_text: str, rows: list[dict], history: dict | None =
                 per[f"{when.year:04d}-{when.month:02d}"] += 1
         return pick(dict(per), "max", as_month)
     if t == "top_issue_identification":
-        product, issue = _product_rows(q, spec), q.column("IssueId__c")
+        product, issue = _product_rows(q, spec, items), q.column("IssueId__c")
         if q.obj != "case" or product is None or not issue:
             return None
         counts = _counts(rows, q, issue, None if product == "query" else product)
