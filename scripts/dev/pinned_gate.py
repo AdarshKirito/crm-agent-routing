@@ -15,30 +15,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 import gonogo as G
-
-
-def pinned_level(run: dict, pins: dict, own_required: bool) -> str:
-    """pass | fail | unchecked of one run over the pinned readings (`pins`: slot -> pinned readings)."""
-    readings = run.get("readings", [])
-    if run.get("own") == "fail" and (own_required or not readings):
-        return "fail"
-    answer = G.akey(run["answer"])
-    unknown = bool(run.get("why")) or ((own_required or not readings) and run.get("own") != "pass")
-    asked = 0
-    for reading in readings:
-        if any(slot in pins and value not in pins[slot] for slot, value in reading["choices"]):
-            continue
-        if reading.get("status") != "ok":
-            unknown = True
-            continue
-        for choices, a in G.combos(reading):
-            slot, value = choices[-1]
-            if slot in pins and value not in pins[slot]:
-                continue
-            asked += 1
-            if a != answer:
-                return "fail"
-    return "unchecked" if unknown or (readings and not asked) else "pass"
+from convention_gate import pinned_level  # noqa: E402  (gonogo puts scripts/ on the path)
 
 
 def main() -> None:

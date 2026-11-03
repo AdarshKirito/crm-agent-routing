@@ -14,7 +14,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 
 import gonogo as G
-from pinned_gate import pinned_level
+from convention_gate import pinned_level  # noqa: E402  (gonogo puts scripts/ on the path)
 
 BARS = {"G2a": (">=", 0.85), "G2b": (">=", 0.40), "G2c": ("<=", 0.08)}
 
