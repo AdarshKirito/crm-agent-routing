@@ -228,3 +228,29 @@ below with its date and reason, and with the values under both definitions.
   - **The chain if G2 fails:** round 2's chain for this org, with every run agreeing, round 2's three flag
     levels and maps 15 and 20, in round 2's order. The own-level gate becomes a separate arm (S2) with the
     same structure as the gated chain above.
+- 2026-11-03, D1 and G2.
+  - **D1 ran 16:31-18:39** as two streams: 510 tasks, 396 right (77.6%), $14.08 at list price, $0.0276 per
+    task, 11.2% under plan (`results/checkable3_d1.md`).
+    - Two policy-violation tasks, 946 and 1015, ended in a dropped connection while the harness read the
+      session state.
+    - They were redone once by resuming from a worktree at the launch commit (4454e50), with its launch-time
+      bytes rebuilt until the manifest's source digest matched. No row is errored.
+  - **The re-check.** The live re-check of D1's 342 six-type answers ran 18:42-18:44 and made 1,849 distinct
+    queries on the original org. Its check logic is unchanged since ff5a07c; later commits only added record
+    loaders.
+  - **G2, computed once (`results/checkable3_g2.md`):**
+
+    | Check | Value | Result |
+    |---|---|---|
+    | G2a Coverage | 316 of 342 (92.4%) | pass |
+    | G2b Catch | 50 of 68 wrong answers held back (73.5%) | pass |
+    | G2c Cost | 42 of 274 right answers held back (15.3%) | fail |
+
+  - **Decision: G2 fails, so round 3 stays on the NO-GO path.** The pinned gate is a secondary analysis, not
+    the mechanism arm.
+  - **The cost by type:**
+    - monthly_trend_analysis 21 of 42 (50.0%), top_issue_identification 13 of 59 (22.0%) and handle_time 4
+      of 36 (11.1%);
+    - transfer_count 2 of 39, case_routing 2 of 56 and best_region_identification 0 of 42.
+    - Where the cost is low, the catch is high: best region 14 of 15 wrong answers held back, transfer count
+      13 of 16.
