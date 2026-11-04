@@ -295,3 +295,24 @@ below with its date and reason, and with the values under both definitions.
       It answers 142 of 327 with 3 wrong (2.1%, bound 4.6%).
     - Maps 15 and 20 are the same types at each flag level, so the chain's rows 4 to 6 repeat rows 1 to 3.
     - ReAct certified its first rule only: 60 of 327, with 1 wrong.
+- 2026-11-04, the test half.
+  - **Runs.** The same four streams ran at commit 82ca12e on `data/checkable3_test.json`, from 05:05 to 09:06
+    for crmroute and to 13:47 for ReAct. Each run has 333 rows and none needed a redo.
+  - **ReAct's token cap.** The cap ended 7 ReAct tasks: 669, 688, 700, 751, 805, 852 and 881. They count as
+    ReAct's answers.
+  - **Spend.** $51.33 at list price (routed $9.37 and $9.11, 3.8 Flash $11.89, ReAct $20.96). Round 3 comes to
+    $113.57 with D1 and its smoke run.
+  - **Re-checks.**
+    - The rewrite re-check covered 221 tasks: 663 crmroute run answers with 8,282 queries, and 221 ReAct answers
+      with 8,973.
+    - `recheck_receipts.py` re-ran 1,750 evidence entries and 1,700 match. All 50 mismatches are knowledge
+      searches, in knowledge_qa and policy_violation_identification answers; the chosen rule releases neither
+      type. All 683 entries behind the released tasks match, across all three runs.
+  - **Primary outcomes (`results/checkable3_answers.md`, c77270c).**
+    - P1, P2 and P4 are met, so round 3 replicates. The chosen rule released 144 of 333 answers with 7 wrong
+      (4.9%, bound 8.9%), and 230 of 230 evidence entries reproduce.
+    - P5 is missed: coverage was 43.2%, against a target of 50%.
+  - **Hypothesis H holds on its three types.** Three of the 7 unanimous answers that the gate held back were
+    wrong, against 1 of the 68 it passed (one-sided Fisher p = 0.0020). The counts are small. On all six types:
+    8 of 33 against 1 of 122.
+  - Secondary outcomes S1 to S10 are not yet computed.
