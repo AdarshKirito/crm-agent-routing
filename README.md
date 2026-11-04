@@ -77,6 +77,17 @@ target this time). Round 1's rule on the same runs answered 159 (36.9%), 14 of t
 pre-registered 50% target, and again no rule was certified for one run or for the baseline
 ([round 2](#round-2-a-competence-map-resultscheckable2_answersmd)).
 
+A third round repeated the procedure on an org crmroute was not built on, the original CRMArena org's 660 unused
+single-turn tasks. Certified on 327 of them and applied once to the other 333, crmroute answered 144 (43.2%),
+and 7 of those were wrong (4.9%; exact 95% upper bound 8.9%), so the certificate replicated. Coverage missed 50%
+again. Round 3 also tested a **convention check**: it re-runs an answer's deciding query under each reading of its
+question's dates ("winter of 2023" has three) and holds the answer back when the reading the org uses gives
+another answer. With readings learned from 510 earlier tasks' keys, it held back 8 of 9 wrong unanimous answers in
+six task types, but also 17.1% of the right ones. On the three types pre-registered for it, it held back 3 of 4
+wrong answers at a cost of 5.6% of right ones; the counts are small. Round 2's rule, applied unchanged, answered
+57.7% here with 5.2% wrong (bound 8.7%) ([round 3](#round-3-a-replication-on-another-org-resultscheckable3_answersmd)).
+The parts that do not depend on Salesforce are packaged as [`checkable/`](checkable/).
+
 The numbers are summaries in [`results/`](results/), made from the run records by the scripts in `scripts/`;
 the test, fresh, original-org, robustness and ablation summaries name their exact commands. The raw run records
 are published as release assets, [run-records-2026-10-11](https://github.com/AdarshKirito/crm-agent-routing/releases/tag/run-records-2026-10-11)
@@ -484,13 +495,75 @@ Held-out test, 431 single-turn business tasks, rules from `results/checkable2_ca
   (one run: 18.8 s); this round's latency includes a ten-minute Vertex AI slowdown and model calls that took
   several minutes. Round 2's runs cost $121.91 at list price (`results/robustness_checks.md`, section 4).
 
+#### Round 3: a replication on another org (`results/checkable3_answers.md`)
+
+Round 3 ran round 2's agent, unchanged, on the original CRMArena org's 660 single-turn tasks that no earlier
+split, development run or router example used. They were halved at random within each type: 327 for calibration
+and 333 for test (`data/checkable3_*.json`). Everything was fixed before any fresh task ran:
+
+- the chain of 15 rules, built from a development run on the org's 510 used tasks;
+- the pinned readings, `data/conventions_original.yaml`;
+- the outcomes, stop rules and audit (pre-registration: `docs/checkable3_plan.md`).
+
+The convention check had failed its own go/no-go checks, on the CRMArena-Pro records and then on that development
+run: it held back too many right answers. So it became a secondary hypothesis on the three types where its cost was
+low. The development log, `docs/checkable3_devlog.md`, has every check, including the failures.
+
+Held-out test, 333 single-turn tasks, rules from `results/checkable3_calibration.md`:
+
+| | answered (coverage) | wrong among answered (risk) | risk, exact 95% upper bound | right, every answer given |
+|---|---|---|---|---|
+| crmroute, three runs, round 3's certified rule | 144 (43.2%) | 7 (4.9%) | 8.9% | |
+| the same rule with the convention check on its three types (not certified) | 142 (42.6%) | 5 (3.5%) | 7.3% | |
+| crmroute, three runs, round 2's certified rule applied unchanged | 192 (57.7%) | 10 (5.2%) | 8.7% | |
+| crmroute, each run alone | | | | 73.0% to 79.0% |
+| ReAct (plain prompt), its certified rule | 58 (17.4%) | 0 (0.0%) | 5.0% | 69.4% |
+
+- **The certificate replicated; coverage did not reach its target.** A rule certified on the calibration half.
+  On the test half it released 144 answers with 7 wrong, and the bound, 8.9%, is inside the 10% target. All 230
+  evidence entries behind the released answers reproduced live. It answered 43.2% of the tasks against a 50%
+  target. The rule needs all three runs to agree, and withholds handle_time, policy_violation_identification and
+  transfer_count, as well as free-text answers.
+- **The convention check catches wrong answers whose question has more than one reading, at a cost.** On
+  unanimous answers in six types it held back 8 of 9 wrong answers and 25 of 146 right ones (17.1%). Asking every
+  reading instead held back 32.2% of the right ones, and asking none held back 18.5% while catching 5 of the 9.
+  On its three pre-registered types it held back 3 of 4 wrong answers and 4 of 71 right ones (one-sided Fisher
+  p = 0.002).
+  - Example: all three runs read "winter 2020" as December 2019 to February 2020. The org's pinned reading is
+    December 2020 to February 2021, under which the key's answer follows.
+  - Its chance control was 11.8%, above the 10% bar the go/no-go checks set, so part of what it catches is luck.
+- **Round 2's rule transferred.** Certified on CRMArena-Pro, it withholds only one type that exists here. Applied
+  unchanged, it answered 57.7% of the test half with 5.2% wrong, and 59.1% of all 660 tasks with 5.9% wrong
+  (bound 8.3%). On the calibration half alone its bound was 10.2%, so on that half it would not have certified.
+  - Round 3's own chain never reached that rule. Its fixed sequence stopped one step earlier, at a stricter flag
+    level (p = 0.37).
+- **Keys no reading reproduces.** For 6 of 218 checked tasks, no run and no reading gives the key's answer: three
+  transfer counts, two handle times and one case routing.
+- **The blinded audit was not conducted.** No reader with the domain knowledge was available. Instead, the author
+  reviewed 13 answers, not blind, by recomputing them from the org's records under each reading
+  (`results/checkable3_review.md`). Those were the 7 wrong released answers and the 6 keys above.
+  - **Released answers.** Of the 7 wrong ones, 4 are wrong under every reading. For the other 3, the question has
+    two defensible readings: a "winter of 2020" asked before that winter began, twice, and "closures in November"
+    counted by creation date. Counting those 3 as right gives 4 wrong of 144 (2.8%, bound 6.2%). The certificate
+    stays stated against the key.
+  - **Keys.** Five of the six depart from their task's stated policy or follow an unstated convention. The same
+    recomputation over all the org's transfer-count and handle-time tasks finds two systematic patterns. Keys count
+    every agent who held a case where the policy says the first agent: 13 of 13 tasks where the two readings
+    differ. And "fewest transfers" ranks only agents with a transfer. Both are reported upstream as CRMArena
+    [#31](https://github.com/SalesforceAIResearch/CRMArena/issues/31).
+- **Cost:** three runs cost $0.091 per task at list price. With the three runs in parallel, the median wait was
+  39.7 s. Round 3 cost $113.57 at list price: $14.24 for development, $48.00 for calibration and $51.33 for test.
+
+Secondary outcomes are in `results/checkable3_secondary.md`.
+
 ## Reusable parts
 
-These pieces live in their own folders or scripts. They have only been run inside this project, against the
-benchmark's orgs, and none is packaged as a library:
+These pieces live in their own folders or scripts. Only `checkable/` is packaged as a library, and all of them have
+only been run inside this project, against the benchmark's orgs:
 
 | piece | what it does | where | how to start |
 |---|---|---|---|
+| checkable | Checkable answers for any agent that queries a database, without Salesforce or the benchmark. It records and re-runs the queries an answer rests on, and checks the answer under every reading of its question's dates. It learns which readings an organisation uses from answered questions, and certifies a release rule's error rate with Learn-then-Test. No dependencies; tested against crmroute's round-3 code | `checkable/` | `python checkable/examples/winter_demo.py`, then its README |
 | Read-only Salesforce MCP server | Read access to a Salesforce org over MCP: SOQL, SOSL, describe, get record and knowledge search, with SELECT/FIND-only checks, row caps, a response-size budget and a cache. Tested with ADK and the official MCP TypeScript client (`test/smoke.ts`) | `mcp-salesforce/` | `node dist/index.js --http --port 3333 --env <your .env>`, or stdio without `--http`; logins are read from the `.env` file |
 | Guard for ADK agents | A written policy applied by a small model, Presidio PII detection, a field-level sensitive map, a tool-call guard (`before_tool_callback`) and an answer scrub. The policy check fails closed; Prompt Guard fails open. Policy and field map were written for this benchmark's data | `agent/app/guard/` | edit `policy.md` and `sensitive_fields.yaml` for your data; attach `before_tool` / `after_tool` to your agent as `agent/app/agent.py` does |
 | Task router and routing fit | Picks a model per request type with a nearest-neighbour vote over labelled examples (no model call), and fits which types the small model can take from two dev runs | `agent/app/router.py`, `scripts/fit_routing.py` | a JSONL of `{"task", "text"}` examples, then `fit_routing.py --big <run> --small <run>` |
