@@ -349,3 +349,22 @@ below with its date and reason, and with the values under both definitions.
     - The table splits them into two kinds; the split was added after the list was seen. In 6, no run gives the
       key either. In 5, some run gives the key but the check does not derive it, a gap in the derivation.
   - **Not done yet: the blinded audit,** which needs a person as the reader.
+- 2026-11-04, the audit.
+  - **The blinded audit was not conducted.**
+    - The packet was built and sealed (`scripts/checkable3_audit.py`, `results/checkable3_audit_seal.md`) and
+      published as a labelling page.
+    - The owner is not a reader with the domain knowledge it needs, and no second reader was found.
+    - The one label given (an item marked "unsure") is not used.
+    - Twelve of the 25 items had their keys shown in the session that built the packet: task 1078's in a
+      message, the key flags' in a tool output.
+  - **A non-blind review takes its place, reported apart from the certificate (`results/checkable3_review.md`,
+    `scripts/dev/checkable3_review.py`).**
+    - Method: the original org's records were pulled read-only, and the 7 wrong released answers and the 6
+      flagged keys were recomputed under the readings of each question's period and policy.
+    - Released answers: 4 are wrong under every reading and 3 are ambiguous. Counting the ambiguous 3 as right
+      gives 4 wrong of 144 (bound 6.2%).
+    - Flagged keys: 1 is right. 3 count every agent who held a case where the policy says the first agent. 2
+      rank only agents with at least one transfer.
+    - The same recomputation over all the org's transfer-count and handle-time tasks: where the two filter scopes
+      differ (13 tasks), the key follows "every agent" in all 13. The transfer-only ranking reproduces 80 of 91
+      transfer-count keys (83 with the every-agent filter), against 58 (57) for ranking every agent.
