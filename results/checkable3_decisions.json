@@ -1,0 +1,5241 @@
+[
+ {
+  "task": [
+   "original",
+   false,
+   "0"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.032918130000000004
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1000"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.11881969
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1001"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.09407265000000001
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1002"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.10094891
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1009"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.10534626
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1010"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.09323936
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1016"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.09287871
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1017"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.13797188
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1018"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.07878988
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "102"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.06448382999999999
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1023"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.15269869
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1028"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.08881036
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1039"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.09702413000000001
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "104"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.04090656
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1041"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "WI"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.03337436
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1050"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "OR"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.02070064
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1055"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.06940459
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1057"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.11355219
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "106"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.02373126
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1063"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "CO"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.018189169999999998
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1065"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.05431284
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1066"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "OR"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.025862259999999998
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1067"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "AZ"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.0162373
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "107"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.02341842
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1070"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.09694732
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1074"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "WI"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.03328069
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1075"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "MA"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.07450437
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1076"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "GA"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.02356871
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1078"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 0.0,
+  "answer": [
+   "VA"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.028643860000000004
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1081"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 0.0,
+  "answer": [
+   "TN"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.01921676
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1082"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.038509909999999994
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1083"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "GA"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.04134066
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1086"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.05134108
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1087"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.15809500999999998
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "109"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.01826934
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1092"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "GA"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.05429247
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1096"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "OR"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.05441035
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1097"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.07677204
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1102"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.10452310000000001
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1104"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "GA"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.022646069999999997
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "111"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.02918391
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1123"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.10724953000000001
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1129"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "OH"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.08367235
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1131"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.06258079
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1133"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "TN"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.02608595
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1134"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "FL"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.02017358
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1137"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "OH"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.091362
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1139"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "CO"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.01951972
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1144"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "NY"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.021139909999999998
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1149"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.06740932999999999
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1156"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "OR"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.04355688
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1159"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "TX"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.014718789999999999
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1164"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.03828812
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1166"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "CA"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.02291095
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "1169"
+  ],
+  "type": "best_region_identification",
+  "predicted": "best_region_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.08391778
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "117"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.02400129
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "132"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "December"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.06957752
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "134"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.08688900999999999
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "135"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.08977748999999999
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "138"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "November"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.041469160000000005
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "139"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.08939119
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "14"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.018532649999999998
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "145"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.08760177
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "147"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "June"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.05775197
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "148"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "March"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.06549303000000001
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "153"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "September"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.06042405
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "167"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "December"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.10970025
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "169"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "August"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.11660303
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "172"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "March"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.06755022
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "179"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.05826658
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "183"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "March"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.07091807
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "184"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "December"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.08668758
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "192"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.1242177
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "193"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "January"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.09389305
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "194"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "August"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.10790435
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "197"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "March"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.08344953
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "198"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "March"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.09335628
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "20"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.02423454
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "202"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.10272842
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "206"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.07543457
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "208"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.12876773
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "209"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.09412249
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "215"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "December"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.08662210000000001
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "22"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.023843279999999998
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "221"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.0708844
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "230"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "December"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.10348895
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "235"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.11073455
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "240"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.06385339000000001
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "242"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "September"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.06086413
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "244"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": true,
+  "released_run": 1,
+  "right": 0.0,
+  "answer": [],
+  "runs_used": 3,
+  "cost_all_runs": 0.06999256
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "248"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "October"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.04349558
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "249"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "January"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.06598619
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "252"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.04172077
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "256"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "December"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.08092735
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "257"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "January"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.05971762
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "258"
+  ],
+  "type": "monthly_trend_analysis",
+  "predicted": "monthly_trend_analysis",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.07382161000000001
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "26"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.02144797
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "262"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [],
+  "runs_used": 3,
+  "cost_all_runs": 0.12952122
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "265"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "a1MWs0000012u3xMAA"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.13772015999999998
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "266"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "a1MWs0000012u7BMAQ"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.18215772
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "267"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "a1MWs0000012tvtMAA"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.054229799999999995
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "268"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "a1MWs0000012u2LMAQ"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.09694623
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "274"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [],
+  "runs_used": 3,
+  "cost_all_runs": 0.1000694
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "280"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "a1MWs0000012u2LMAQ"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.16294395
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "286"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "a1MWs0000012tz7MAA"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.0535248
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "287"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "a1MWs0000012u2LMAQ"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.11732833000000001
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "291"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "a1MWs0000012u7BMAQ"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.08064067999999999
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "294"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 0.0,
+  "answer": [],
+  "runs_used": 3,
+  "cost_all_runs": 0.16323269
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "296"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "a1MWs0000012u5ZMAQ"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.06759963
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "299"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "a1MWs0000012u7BMAQ"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.07424641
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "30"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.04038917
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "301"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "a1MWs0000012txVMAQ"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.1917955
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "307"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "a1MWs0000012u2LMAQ"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.199019
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "316"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "a1MWs0000012u2LMAQ"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.18621337
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "322"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [],
+  "runs_used": 3,
+  "cost_all_runs": 0.05768337
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "324"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "a1MWs0000012txVMAQ"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.18116672
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "325"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [],
+  "runs_used": 3,
+  "cost_all_runs": 0.12721521
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "332"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "a1MWs0000012txVMAQ"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.20307724
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "334"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [],
+  "runs_used": 3,
+  "cost_all_runs": 0.06331389
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "337"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 0.0,
+  "answer": [],
+  "runs_used": 3,
+  "cost_all_runs": 0.09518155
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "338"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "a1MWs0000012u3xMAA"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.08427405
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "34"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.02405502
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "340"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [],
+  "runs_used": 3,
+  "cost_all_runs": 0.10481637
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "342"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "a1MWs0000012u7BMAQ"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.10938675
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "35"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.021155010000000002
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "353"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [],
+  "runs_used": 3,
+  "cost_all_runs": 0.15208374
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "354"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "a1MWs0000012u5ZMAQ"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.14748451
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "356"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 0.0,
+  "answer": [
+   "a1MWs0000012u7BMAQ"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.21320938
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "359"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "a1MWs0000012u3xMAA"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.21658592
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "366"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "a1MWs0000012tz7MAA"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.09142641
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "368"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "a1MWs0000012tz7MAA"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.11626555000000001
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "376"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.22843234
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "377"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "a1MWs0000012tz7MAA"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.17313794999999998
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "379"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [],
+  "runs_used": 3,
+  "cost_all_runs": 0.09976135
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "387"
+  ],
+  "type": "top_issue_identification",
+  "predicted": "top_issue_identification",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "a1MWs0000012tvtMAA"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.05620061
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "393"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "005Ws000001xZvdIAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.03104752
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "396"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "005Ws000001xYl3IAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.02513692
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "401"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.05873472
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "404"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "005Ws000001xYl3IAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.029513249999999998
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "418"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "005Ws000001xZvdIAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.02346965
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "424"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "005Ws000001xZvdIAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.023199459999999998
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "425"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "005Ws000001xYl3IAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.02256572
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "428"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "005Ws000001xYl3IAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.02402267
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "429"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.06042796
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "43"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.020991790000000003
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "434"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "005Ws000001xZvdIAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.02077976
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "435"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "005Ws000001xYl3IAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.02006753
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "436"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "005Ws000001xYl3IAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.027115510000000002
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "44"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.02078636
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "440"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "005Ws000001xZvdIAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.028031850000000004
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "442"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "005Ws000001xZvdIAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.0288594
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "443"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "005Ws000001xZvdIAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.02310045
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "444"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.03668789
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "45"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.028187919999999998
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "450"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "005Ws000001xYl3IAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.02227478
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "454"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.06420892
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "456"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "005Ws000001xYl3IAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.02083115
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "457"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "005Ws000001xYl3IAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.02226393
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "462"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.07920769999999999
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "47"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.021150400000000003
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "471"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "005Ws000001xZvdIAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.01996558
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "474"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.06358851
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "478"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "005Ws000001xZvdIAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.02065152
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "485"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "005Ws000001xZcHIAU"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.05738573
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "491"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "005Ws000001xZvdIAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.03191806
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "492"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "005Ws000001xYl3IAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.02516905
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "493"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "005Ws000001xYl3IAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.026254350000000003
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "495"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.09056092
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "503"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "005Ws000001xYl3IAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.0315818
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "505"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.06655580999999999
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "506"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "005Ws000001xZvdIAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.02977345
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "509"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.06121493
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "51"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.02129388
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "512"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "005Ws000001xYl3IAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.02156271
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "516"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "005Ws000001xZvdIAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.01845816
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "518"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "005Ws000001xYl3IAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.02954618
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "519"
+  ],
+  "type": "case_routing",
+  "predicted": "case_routing",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "005Ws000001xYl3IAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.019750030000000002
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "524"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "01tWs000002wTWjIAM"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.040389
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "525"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [],
+  "runs_used": 3,
+  "cost_all_runs": 0.10017293000000001
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "537"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "01tWs000002wNr9IAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.07035596999999999
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "538"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [],
+  "runs_used": 3,
+  "cost_all_runs": 0.09832285
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "544"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [],
+  "runs_used": 3,
+  "cost_all_runs": 0.05810584
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "551"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [],
+  "runs_used": 3,
+  "cost_all_runs": 0.10599405
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "553"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "01tWs000002wRQ5IAM"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.04968822
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "555"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "01tWs000002wSM9IAM"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.044998369999999996
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "557"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "01tWs000002wS7dIAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.04153688
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "56"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.021498709999999997
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "562"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "01tWs000002wSArIAM"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.06116697
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "564"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "01tWs000002wRmfIAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.05011083
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "566"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 0.0,
+  "answer": [
+   "01tWs000002wQygIAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.08514645
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "570"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [],
+  "runs_used": 3,
+  "cost_all_runs": 0.12384919
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "572"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "01tWs000002wRl3IAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.05351046
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "576"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "01tWs000002wQlmIAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.049132709999999996
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "577"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "01tWs000002wRUvIAM"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.07479343
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "578"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "01tWs000002wRLFIA2"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.05709122
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "58"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.021395249999999998
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "580"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "01tWs000002wSSbIAM"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.0498584
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "581"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "01tWs000002wRujIAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.04597202
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "590"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [],
+  "runs_used": 3,
+  "cost_all_runs": 0.10169593
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "594"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "01tWs000002wSKYIA2"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.04318083
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "6"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.02108661
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "60"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.01852024
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "601"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [],
+  "runs_used": 3,
+  "cost_all_runs": 0.09606364
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "602"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [],
+  "runs_used": 3,
+  "cost_all_runs": 0.11201475999999999
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "607"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "01tWs000002wS9FIAU"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.06567177
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "608"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [],
+  "runs_used": 3,
+  "cost_all_runs": 0.06290246
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "611"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "01tWs000002wQp0IAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.042251979999999995
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "614"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "01tWs000002wRgDIAU"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.06268746
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "62"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.021564609999999998
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "624"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "01tWs000002wQsFIAU"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.04621925
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "625"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "01tWs000002wS7dIAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.07680322
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "627"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "01tWs000002wS2nIAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.045884549999999996
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "628"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [],
+  "runs_used": 3,
+  "cost_all_runs": 0.12312822
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "630"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [],
+  "runs_used": 3,
+  "cost_all_runs": 0.10771603
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "633"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "01tWs000002wSSbIAM"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.044628089999999995
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "634"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "01tWs000002wRMrIAM"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.0700326
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "639"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "01tWs000002wRUvIAM"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.04839297000000001
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "641"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "01tWs000002wRoHIAU"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.04542251
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "649"
+  ],
+  "type": "named_entity_disambiguation",
+  "predicted": "named_entity_disambiguation",
+  "released": true,
+  "released_run": 1,
+  "right": 1.0,
+  "answer": [
+   "01tWs000002wRhpIAE"
+  ],
+  "runs_used": 3,
+  "cost_all_runs": 0.03856905
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "653"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.13508224
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "654"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.22830829000000002
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "665"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.28750994
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "668"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.11126296999999999
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "669"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.29094046
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "670"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.1675407
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "676"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.18376530000000002
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "679"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.20478935999999998
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "68"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.02126377
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "682"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.25516542999999997
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "688"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.08317504
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "694"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.14932588
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "698"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.07877445
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "699"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.08745137
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "7"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.02103344
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "700"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.047216999999999995
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "701"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.27824495
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "705"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.06579267
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "706"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.17669363000000002
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "71"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.021044069999999998
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "713"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.11363382999999999
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "72"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.02408304
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "723"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.20335738000000003
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "727"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.09647294
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "73"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.02412618
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "737"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.06949351000000001
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "739"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.13661216
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "740"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.17255428
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "742"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.16506416000000002
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "748"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.18324717000000001
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "749"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.10784447999999999
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "751"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.05777138
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "753"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.15127245
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "754"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.21507401
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "757"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.09405592
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "759"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.23151775
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "76"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.021176519999999997
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "760"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.08116857999999999
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "769"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.20257027
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "773"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.04419906
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "774"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.16361156999999998
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "775"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.04744346
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "779"
+  ],
+  "type": "handle_time",
+  "predicted": "handle_time",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.30405382999999997
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "78"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.02448468
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "780"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.09549693
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "786"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.29162508
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "79"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.02332218
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "792"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.06286463
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "794"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.14142986999999999
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "804"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.18210925
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "805"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.15574669
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "806"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.09125015
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "808"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.21694028999999998
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "809"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.21792685
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "81"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.024491939999999997
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "815"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.14121349
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "818"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.28649756
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "820"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.12337326
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "821"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.18380254000000001
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "823"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.1932222
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "824"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.21529417
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "828"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.15697637
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "832"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.19414276000000003
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "842"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.14221127
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "843"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.32929246
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "848"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.16004932
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "85"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.02087674
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "850"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.23181703999999997
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "852"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.13529703
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "857"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.18807785
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "860"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.1480235
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "866"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.09010437
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "871"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.13686259
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "872"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.08170673
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "874"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.12550672000000002
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "880"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.19041914999999998
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "881"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.1721482
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "885"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.14071173999999997
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "887"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.13777503
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "895"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.20142703
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "896"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.21666035
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "90"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.02671194
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "901"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.17070042000000002
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "903"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.10616063
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "906"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.09626944000000001
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "908"
+  ],
+  "type": "transfer_count",
+  "predicted": "transfer_count",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.21307489
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "910"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.07334546
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "917"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.11136723999999999
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "921"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.12335796
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "923"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.17173710999999997
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "929"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.13257256
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "93"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.02380404
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "934"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.13830772
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "944"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.11835545
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "945"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.15004563
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "947"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.14009718
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "948"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.08744258
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "949"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.10953863
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "951"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.07847907000000001
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "954"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.14742969
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "955"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.11705271
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "964"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.09042448
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "966"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.09191205
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "968"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.11875962
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "970"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.045149110000000006
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "973"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.12570429
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "975"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.10889993
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "976"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.08031073
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "978"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.08341984
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "979"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.15719887999999999
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "986"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.10176352
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "987"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.15524698
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "99"
+  ],
+  "type": "knowledge_qa",
+  "predicted": "knowledge_qa",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 3,
+  "cost_all_runs": 0.02412213
+ },
+ {
+  "task": [
+   "original",
+   false,
+   "992"
+  ],
+  "type": "policy_violation_identification",
+  "predicted": "policy_violation_identification",
+  "released": false,
+  "released_run": null,
+  "right": 0.0,
+  "answer": null,
+  "runs_used": 0,
+  "cost_all_runs": 0.12327255000000001
+ }
+]
