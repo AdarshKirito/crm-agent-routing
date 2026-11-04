@@ -368,3 +368,5 @@ below with its date and reason, and with the values under both definitions.
     - The same recomputation over all the org's transfer-count and handle-time tasks: where the two filter scopes
       differ (13 tasks), the key follows "every agent" in all 13. The transfer-only ranking reproduces 80 of 91
       transfer-count keys (83 with the every-agent filter), against 58 (57) for ranking every agent.
+  - **Reported upstream.** The three patterns went to CRMArena as issue #31 on 2026-11-04, with a read-only
+    reproduction script. The user approved the post.

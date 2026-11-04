@@ -50,8 +50,9 @@ apart from the certificate.
 - **Keys.** Five keys depart from their task's stated policy or follow an unstated convention, and one is right.
   All five are of withheld types: the chosen rule released none of them.
 - **Patterns across the benchmark.** The same recomputation was run over every transfer-count and handle-time task
-  of the original org (91 of each with a key, all 1,170 single-turn tasks searched; computed after the test). None
-  of these patterns is reported upstream yet:
+  of the original org (91 of each with a key, all 1,170 single-turn tasks searched; computed after the test). The
+  three patterns are reported upstream as CRMArena
+  [#31](https://github.com/SalesforceAIResearch/CRMArena/issues/31):
   - **The minimum-case filter counts every agent who held a case.** The policy text says it counts the first
     agent. In 13 tasks the two readings give different answers, and the key follows "every agent" in all 13:
     3 transfer counts (808, 897, 908) and 10 handle times (650, 655, 710, 715, 721, 724, 732, 759, 774, 776).
