@@ -78,19 +78,6 @@ def rule_from(spec: dict, gate: R3.Gate):
     return rule
 
 
-def rewrites_rerun(gate: R3.Gate, tasks: list, rule) -> tuple[int, int]:
-    """Rewritten queries behind released answers of gated types that re-ran without error: (ran, all)."""
-    ran = total = 0
-    for t in tasks:
-        if not rule(t) or rule.gate_kind == "none" or t.predicted not in R3.GATED:
-            continue
-        for i in range(R3.runs_needed(t, rule)):
-            for reading in (gate.rows.get((t.key[0], str(t.key[2]), i + 1)) or {}).get("readings", []):
-                total += 1
-                ran += reading.get("status") in ("ok", "unsettled")
-    return ran, total
-
-
 def stage_calibration() -> None:
     frozen = json.loads(FROZEN.read_text(encoding="utf-8"))
     rules, lines = {}, ["# Checkable answers, round 3: the certified release rules", "",
@@ -128,7 +115,6 @@ def stage_test(recheck: Path) -> None:
     rule = rule_from(specs["crmroute"], gate)
     row = R3.evaluate(tasks, rule, 0.05)
     made = decisions(tasks, rule)
-    ran, total = rewrites_rerun(gate, tasks, rule)
     lines = ["# Checkable answers, round 3: results on the held-out test half", "",
              "```", "python scripts/checkable3_report.py --stage test", "```", "",
              f"The rule certified on the calibration half (`results/checkable3_calibration.md`), applied unchanged to the "
@@ -136,36 +122,53 @@ def stage_test(recheck: Path) -> None:
              "95% upper bound.", "",
              "| rule | answered (coverage) | wrong among answered (risk) | risk 95% upper bound | standard score |",
              "|---|---|---|---|---|", RE.fmt(row), ""]
-    # P3: unanimous answers of the gated types, held back or passed by the pinned gate
-    table = [[0, 0], [0, 0]]
-    for t in tasks:
-        if t.predicted not in R3.GATED:
-            continue
-        claims = [r.verdict.claim for r in t.runs]
-        if not (all(c.kind in CG.CHECKABLE for c in claims) and all(RE.rc.same_answer(claims[0], c) for c in claims[1:])):
-            continue
-        held = CG.task_gate([gate.level(t, i, "pinned") for i in range(3)]) != "pass"
-        table[0 if held else 1][0 if t.runs[0].correct < 1 else 1] += 1
-    (a, b), (c, d) = table
-    p3 = fisher_one_sided(a, b, c, d) if a + b and c + d else 1.0
     certified = bool(specs["crmroute"]["rule"])
     lines += ["## Pre-registered primary outcomes (crmroute, three runs)", "",
               f"1. A rule of the chain certified on the calibration half: **{'yes, ' + specs['crmroute']['rule'] if certified else 'no'}**.",
               f"2. Wrong among released test answers at most 10%, and its exact one-sided 95% upper bound at most 10%: "
               f"**{'yes' if certified and row['risk'] <= 0.10 and row['risk_ub'] <= 0.10 else 'no'}** "
               f"({row['wrong']} of {row['released']}, {100 * row['risk']:.1f}%; bound {100 * row['risk_ub']:.1f}%).",
-              f"3. Unanimous answers of the gated types that the pinned gate holds back are wrong more often than those it "
-              f"passes (one-sided Fisher exact, p < 0.05): **{'yes' if p3 < 0.05 and a / max(a + b, 1) > c / max(c + d, 1) else 'no'}** "
-              f"(held back: {a} wrong of {a + b}; passed: {c} wrong of {c + d}; p = {p3:.4f}).",
-              f"4. {CR.recheck_lines(recheck, made)[0].split('. ', 1)[1]} Rewritten queries behind released gated answers "
-              f"that re-ran without error: **{ran} of {total}**{f' ({100 * ran / total:.1f}%)' if total else ''}.",
+              f"4. {CR.recheck_lines(recheck, made)[0].split('. ', 1)[1]}",
               f"5. At least 50% of the {len(tasks)} test tasks answered: **{'yes' if row['coverage'] >= 0.50 else 'no'}** "
-              f"({100 * row['coverage']:.1f}%)."]
+              f"({100 * row['coverage']:.1f}%).",
+              "", "(P3, the gate's mechanism outcome, became a secondary analysis when G2 failed: below.)"]
+    lines += gate_lines(tasks, gate, rule, json.loads(FROZEN.read_text(encoding="utf-8")))
     lines += ["", "## crmroute's chosen rule by true task type (test)", "", *RE.per_type(tasks, rule)]
     out = ROOT / "results" / "checkable3_answers.md"
     out.write_text("\n".join(lines) + "\n", encoding="utf-8")
     (ROOT / "results" / "checkable3_decisions.json").write_text(json.dumps(made, indent=1) + "\n", encoding="utf-8")
     print("\n".join(lines))
+
+
+def unanimous(t) -> bool:
+    claims = [r.verdict.claim for r in t.runs]
+    return all(c.kind in CG.CHECKABLE for c in claims) and all(RE.rc.same_answer(claims[0], c) for c in claims[1:])
+
+
+def gate_lines(tasks: list, gate: R3.Gate, rule, frozen: dict) -> list[str]:
+    """The pre-registered secondary analysis of the pinned gate (docs/checkable3_plan.md), on its three types
+    and on all six: the one-sided Fisher test on unanimous answers; the chosen rule with the gate added; and
+    the gate with fewer runs."""
+    lines = ["", "## The pinned gate, secondary analysis (test half)", "",
+             "| types | unanimous held back: wrong of all | passed: wrong of all | one-sided Fisher p |", "|---|---|---|---|"]
+    for label, types in (("its three types", tuple(frozen["gate_types"])), ("all six", R3.GATED)):
+        table = [[0, 0], [0, 0]]
+        for t in tasks:
+            if t.predicted in types and unanimous(t):
+                held = CG.task_gate([gate.level(t, i, "pinned") for i in range(3)]) != "pass"
+                table[0 if held else 1][0 if t.runs[0].correct < 1 else 1] += 1
+        (a, b), (c, d) = table
+        p = fisher_one_sided(a, b, c, d) if a + b and c + d else 1.0
+        lines.append(f"| {label} | {a} of {a + b} | {c} of {c + d} | {p:.4f} |")
+    if rule is WITHHOLD_ALL:
+        return lines + ["", "No rule was certified, so the gate is not added to one."]
+    lines += ["", "| rule | answered (coverage) | wrong among answered (risk) | risk 95% upper bound | standard score | runs per task |",
+              "|---|---|---|---|---|---|"]
+    types = tuple(frozen["gate_types"])
+    for runs_used in (3, 2, 1):
+        gated = R3.make_rule(runs_used, "pinned", gate, rule.soft, rule.withheld_types, gated_types=types)
+        lines.append(RE.fmt(R3.evaluate(tasks, gated, 0.05)) + f" {sum(R3.runs_needed(t, gated) for t in tasks) / len(tasks):.2f} |")
+    return lines
 
 
 def decisions(tasks: list, rule) -> list[dict]:

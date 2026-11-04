@@ -43,16 +43,19 @@ class Gate:
 
 
 def make_rule(runs_used: int, gate_kind: str, gate: Gate | None, soft: tuple[str, ...] = (),
-              withheld_types: frozenset = frozenset(), withheld_forms: frozenset = RE.UNCHECKABLE_FORMS):
+              withheld_types: frozenset = frozenset(), withheld_forms: frozenset = RE.UNCHECKABLE_FORMS,
+              gated_types: tuple = GATED):
     if gate_kind not in GATES or (gate_kind != "none" and gate is None):
         raise ValueError(f"gate {gate_kind!r} needs gate results")
     if runs_used < 3 and gate_kind == "none":
         raise ValueError("fewer than three runs are allowed only with a gate")
+    if not set(gated_types) <= set(GATED):
+        raise ValueError(f"only {GATED} can be gated")
 
     def rule(task: RE.Task) -> bool:
         if task.predicted in withheld_types or RE.specs.spec_for(task.predicted).answer in withheld_forms:
             return False
-        gated = gate_kind != "none" and task.predicted in GATED
+        gated = gate_kind != "none" and task.predicted in gated_types
         considered = task.runs[:runs_used if gated else 3]
         first = considered[0].verdict.claim
         if not all(RE.rc.same_answer(first, r.verdict.claim) and RE.clean(r, soft) for r in considered):
@@ -64,12 +67,13 @@ def make_rule(runs_used: int, gate_kind: str, gate: Gate | None, soft: tuple[str
     if gate_kind == "none":
         name = "all runs agree"
     else:
-        name = (f"runs 1-{runs_used} agree" if runs_used > 1 else "run 1") + f" on gated types, gate {gate_kind}"
+        on = "gated types" if tuple(gated_types) == GATED else "/".join(gated_types)
+        name = (f"runs 1-{runs_used} agree" if runs_used > 1 else "run 1") + f" on {on}, gate {gate_kind}"
     rule.__name__ = name + (
         f", no {'/'.join(soft)}" if soft else "") + (
         f", withhold {len(withheld_types)} types" if withheld_types else "") + (
         f", withhold {'/'.join(sorted(withheld_forms))} answers" if withheld_forms else "")
-    rule.runs_used, rule.gate_kind, rule.soft = runs_used, gate_kind, soft
+    rule.runs_used, rule.gate_kind, rule.soft, rule.gated_types = runs_used, gate_kind, soft, tuple(gated_types)
     rule.withheld_types = frozenset(withheld_types)
     return rule
 
@@ -84,7 +88,7 @@ def runs_needed(task: RE.Task, rule) -> int:
     types' runs_used for a gated type, three otherwise."""
     if task.predicted in rule.withheld_types:
         return 0
-    return rule.runs_used if rule.gate_kind != "none" and task.predicted in GATED else 3
+    return rule.runs_used if rule.gate_kind != "none" and task.predicted in rule.gated_types else 3
 
 
 def evaluate(tasks: list[RE.Task], rule, delta: float) -> dict:
