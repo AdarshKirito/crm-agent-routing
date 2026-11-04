@@ -53,6 +53,20 @@ jobs:
       - run: uv sync --locked
       - run: uv run pytest -q
 
+  checkable:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: checkable
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.10"
+      - run: pip install pytest
+      - run: python -m pytest -q
+      - run: python examples/winter_demo.py
+
   scripts:
     runs-on: ubuntu-latest
     steps:
