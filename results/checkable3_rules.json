@@ -1,0 +1,33 @@
+{
+ "crmroute": {
+  "rule": "all runs agree, withhold 3 types, withhold bant/text answers",
+  "runs_used": 3,
+  "gate": "none",
+  "soft": [],
+  "withheld_types": [
+   "handle_time",
+   "policy_violation_identification",
+   "transfer_count"
+  ],
+  "runs_per_task": 3,
+  "calibration_tasks": 327
+ },
+ "baseline": {
+  "rule": "all runs agree, no budget/none_without_empty/errors, withhold 4 types, withhold bant/text answers",
+  "runs_used": 3,
+  "gate": "none",
+  "soft": [
+   "budget",
+   "none_without_empty",
+   "errors"
+  ],
+  "withheld_types": [
+   "best_region_identification",
+   "handle_time",
+   "policy_violation_identification",
+   "transfer_count"
+  ],
+  "runs_per_task": 1,
+  "calibration_tasks": 327
+ }
+}
