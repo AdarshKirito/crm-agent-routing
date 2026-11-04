@@ -254,3 +254,24 @@ below with its date and reason, and with the values under both definitions.
     - transfer_count 2 of 39, case_routing 2 of 56 and best_region_identification 0 of 42.
     - Where the cost is low, the catch is high: best region 14 of 15 wrong answers held back, transfer count
       13 of 16.
+- 2026-11-03, after reading D1 and before any fresh task runs: two changes to the freeze. They use
+  development data only.
+  - **The maps.**
+    - As defined, map 15 and map 20 are the same five types: best region, handle time, monthly trend, policy
+      violation and transfer count. Their single-run error in D1 is 25.0-63.2%.
+    - A single run's error overstates a three-run rule's. On the used Pro records, run 1 alone released 1,485
+      answers with 20.5% wrong, and three agreeing runs released 1,180 with 11.0% wrong, a ratio of 1.86.
+    - With five of nine types withheld, at most about a third of the test tasks could be answered, so P5
+      could not be met by design.
+    - So the chain keeps round 2's six rules first and then relaxes in two steps, each at round 2's three
+      flag levels. The first step uses maps at the single-run thresholds that match round 2's three-run
+      15% and 20%: 27.9% and 37.2%, that is 15% and 20% times 1.86. The second step uses no map.
+    - Learn-then-Test, not the single-run map, decides how far the chain relaxes. The order stays strictest
+      first.
+  - **The gate's secondary analysis.**
+    - It is pre-registered on the three types where D1's pinned gate held back at most 8% of right answers:
+      best_region_identification, case_routing and transfer_count. It is also reported on all six.
+    - On the test half, the measures are the one-sided Fisher test that was P3, on unanimous answers; the
+      chosen rule's coverage and risk with the gate added on those types; and the gate with runs 1 and 2,
+      or run 1 alone, on those types.
+    - Nothing here is certified; the certificate stays with the primary chain.

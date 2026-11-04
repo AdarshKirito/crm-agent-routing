@@ -21,6 +21,11 @@ import release3 as R3  # noqa: E402
 
 RE = R3.RE
 ROOT = Path(__file__).resolve().parents[2]
+# A single run's error over three agreeing runs' on the used Pro records (20.5% / 11.0%), which scales round
+# 2's three-run map thresholds to single-run data (docs/checkable3_devlog.md, the entry after reading D1).
+RATIO = 1.86
+# The types whose right answers D1's pinned gate held back at most 8% of the time: the gate's secondary analysis.
+GATE_TYPES = ("best_region_identification", "case_routing", "transfer_count")
 D1_RUN = Path(f"{ROOT / 'runs' / 'checkable3_dev' / 'd1_h1' / 'routed'},{ROOT / 'runs' / 'checkable3_dev' / 'd1_h2' / 'routed'}")
 
 
@@ -65,16 +70,19 @@ def main() -> None:
         chain = [spec(runs_used, "pinned", soft, maps[th]) for runs_used in (3, 2, 1) for th in ("0.15", "0.20")]
         chain += [spec(3, "none", soft, maps[th]) for th in ("0.15", "0.20")]
         out_maps, out_rates = maps, rates
-    else:  # round 2's chain for this org: maps per flag level, as round 2 learned them
+    else:  # round 2's chain for this org (maps per flag level, as round 2 learned them), then the scaled maps, then none
         chain, out_maps, out_rates = [], {}, {}
-        for th in ("0.15", "0.20"):
+        for label, threshold in (("0.15", 0.15), ("0.20", 0.20), (f"{0.15 * RATIO:.3f}", 0.15 * RATIO),
+                                 (f"{0.20 * RATIO:.3f}", 0.20 * RATIO), ("no map", None)):
             for level in RE.SOFT_LEVELS:
-                rates, maps = maps_at(level)
-                chain.append(spec(3, "none", level, maps[th]))
-                out_maps[f"{'/'.join(level) or 'no soft flags'} {th}"] = maps[th]
+                rates, _ = maps_at(level)
+                withheld = sorted(k for k, (w, n) in rates.items() if threshold is not None and w / n > threshold)
+                chain.append(spec(3, "none", level, withheld))
+                out_maps[f"{'/'.join(level) or 'no soft flags'} {label}"] = withheld
                 out_rates['/'.join(level) or 'no soft flags'] = rates
     frozen = {"g2": args.g2, "soft": list(soft), "released_run1_by_flag_level": {"/".join(k) or "none": v for k, v in released.items()},
-              "maps": out_maps, "map_rates_wrong_released": out_rates, "pins": "data/conventions_original.yaml", "chain": chain}
+              "maps": out_maps, "map_rates_wrong_released": out_rates, "pins": "data/conventions_original.yaml",
+              "single_to_three_run_error": RATIO, "gate_types": list(GATE_TYPES), "chain": chain}
     args.out.write_text(json.dumps(frozen, indent=1) + "\n", encoding="utf-8")
     print(json.dumps({k: v for k, v in frozen.items() if k != "chain"}, indent=1))
     for i, s in enumerate(chain, 1):

@@ -1,0 +1,369 @@
+{
+ "g2": "fail",
+ "soft": [],
+ "released_run1_by_flag_level": {
+  "budget/none_without_empty/errors": 187,
+  "budget/none_without_empty": 294,
+  "none": 454
+ },
+ "maps": {
+  "budget/none_without_empty/errors 0.15": [
+   "best_region_identification",
+   "handle_time",
+   "policy_violation_identification",
+   "transfer_count"
+  ],
+  "budget/none_without_empty 0.15": [
+   "best_region_identification",
+   "handle_time",
+   "policy_violation_identification",
+   "transfer_count"
+  ],
+  "no soft flags 0.15": [
+   "best_region_identification",
+   "handle_time",
+   "monthly_trend_analysis",
+   "policy_violation_identification",
+   "transfer_count"
+  ],
+  "budget/none_without_empty/errors 0.20": [
+   "best_region_identification",
+   "handle_time",
+   "policy_violation_identification",
+   "transfer_count"
+  ],
+  "budget/none_without_empty 0.20": [
+   "best_region_identification",
+   "handle_time",
+   "policy_violation_identification",
+   "transfer_count"
+  ],
+  "no soft flags 0.20": [
+   "best_region_identification",
+   "handle_time",
+   "monthly_trend_analysis",
+   "policy_violation_identification",
+   "transfer_count"
+  ],
+  "budget/none_without_empty/errors 0.279": [
+   "handle_time",
+   "policy_violation_identification",
+   "transfer_count"
+  ],
+  "budget/none_without_empty 0.279": [
+   "handle_time",
+   "policy_violation_identification"
+  ],
+  "no soft flags 0.279": [
+   "handle_time",
+   "policy_violation_identification",
+   "transfer_count"
+  ],
+  "budget/none_without_empty/errors 0.372": [
+   "policy_violation_identification"
+  ],
+  "budget/none_without_empty 0.372": [
+   "policy_violation_identification"
+  ],
+  "no soft flags 0.372": [
+   "policy_violation_identification"
+  ],
+  "budget/none_without_empty/errors no map": [],
+  "budget/none_without_empty no map": [],
+  "no soft flags no map": []
+ },
+ "map_rates_wrong_released": {
+  "budget/none_without_empty/errors": {
+   "policy_violation_identification": [
+    14,
+    28
+   ],
+   "best_region_identification": [
+    10,
+    39
+   ],
+   "case_routing": [
+    0,
+    31
+   ],
+   "named_entity_disambiguation": [
+    0,
+    47
+   ],
+   "handle_time": [
+    6,
+    21
+   ],
+   "transfer_count": [
+    6,
+    21
+   ]
+  },
+  "budget/none_without_empty": {
+   "policy_violation_identification": [
+    14,
+    29
+   ],
+   "best_region_identification": [
+    12,
+    54
+   ],
+   "monthly_trend_analysis": [
+    3,
+    27
+   ],
+   "top_issue_identification": [
+    1,
+    38
+   ],
+   "case_routing": [
+    0,
+    55
+   ],
+   "named_entity_disambiguation": [
+    0,
+    48
+   ],
+   "handle_time": [
+    6,
+    21
+   ],
+   "transfer_count": [
+    6,
+    22
+   ]
+  },
+  "no soft flags": {
+   "policy_violation_identification": [
+    36,
+    57
+   ],
+   "best_region_identification": [
+    14,
+    56
+   ],
+   "monthly_trend_analysis": [
+    15,
+    57
+   ],
+   "top_issue_identification": [
+    1,
+    60
+   ],
+   "case_routing": [
+    0,
+    56
+   ],
+   "named_entity_disambiguation": [
+    1,
+    56
+   ],
+   "handle_time": [
+    21,
+    57
+   ],
+   "transfer_count": [
+    16,
+    55
+   ]
+  }
+ },
+ "pins": "data/conventions_original.yaml",
+ "single_to_three_run_error": 1.86,
+ "gate_types": [
+  "best_region_identification",
+  "case_routing",
+  "transfer_count"
+ ],
+ "chain": [
+  {
+   "rule": "all runs agree, no budget/none_without_empty/errors, withhold 4 types, withhold bant/text answers",
+   "runs_used": 3,
+   "gate": "none",
+   "soft": [
+    "budget",
+    "none_without_empty",
+    "errors"
+   ],
+   "withheld_types": [
+    "best_region_identification",
+    "handle_time",
+    "policy_violation_identification",
+    "transfer_count"
+   ]
+  },
+  {
+   "rule": "all runs agree, no budget/none_without_empty, withhold 4 types, withhold bant/text answers",
+   "runs_used": 3,
+   "gate": "none",
+   "soft": [
+    "budget",
+    "none_without_empty"
+   ],
+   "withheld_types": [
+    "best_region_identification",
+    "handle_time",
+    "policy_violation_identification",
+    "transfer_count"
+   ]
+  },
+  {
+   "rule": "all runs agree, withhold 5 types, withhold bant/text answers",
+   "runs_used": 3,
+   "gate": "none",
+   "soft": [],
+   "withheld_types": [
+    "best_region_identification",
+    "handle_time",
+    "monthly_trend_analysis",
+    "policy_violation_identification",
+    "transfer_count"
+   ]
+  },
+  {
+   "rule": "all runs agree, no budget/none_without_empty/errors, withhold 4 types, withhold bant/text answers",
+   "runs_used": 3,
+   "gate": "none",
+   "soft": [
+    "budget",
+    "none_without_empty",
+    "errors"
+   ],
+   "withheld_types": [
+    "best_region_identification",
+    "handle_time",
+    "policy_violation_identification",
+    "transfer_count"
+   ]
+  },
+  {
+   "rule": "all runs agree, no budget/none_without_empty, withhold 4 types, withhold bant/text answers",
+   "runs_used": 3,
+   "gate": "none",
+   "soft": [
+    "budget",
+    "none_without_empty"
+   ],
+   "withheld_types": [
+    "best_region_identification",
+    "handle_time",
+    "policy_violation_identification",
+    "transfer_count"
+   ]
+  },
+  {
+   "rule": "all runs agree, withhold 5 types, withhold bant/text answers",
+   "runs_used": 3,
+   "gate": "none",
+   "soft": [],
+   "withheld_types": [
+    "best_region_identification",
+    "handle_time",
+    "monthly_trend_analysis",
+    "policy_violation_identification",
+    "transfer_count"
+   ]
+  },
+  {
+   "rule": "all runs agree, no budget/none_without_empty/errors, withhold 3 types, withhold bant/text answers",
+   "runs_used": 3,
+   "gate": "none",
+   "soft": [
+    "budget",
+    "none_without_empty",
+    "errors"
+   ],
+   "withheld_types": [
+    "handle_time",
+    "policy_violation_identification",
+    "transfer_count"
+   ]
+  },
+  {
+   "rule": "all runs agree, no budget/none_without_empty, withhold 2 types, withhold bant/text answers",
+   "runs_used": 3,
+   "gate": "none",
+   "soft": [
+    "budget",
+    "none_without_empty"
+   ],
+   "withheld_types": [
+    "handle_time",
+    "policy_violation_identification"
+   ]
+  },
+  {
+   "rule": "all runs agree, withhold 3 types, withhold bant/text answers",
+   "runs_used": 3,
+   "gate": "none",
+   "soft": [],
+   "withheld_types": [
+    "handle_time",
+    "policy_violation_identification",
+    "transfer_count"
+   ]
+  },
+  {
+   "rule": "all runs agree, no budget/none_without_empty/errors, withhold 1 types, withhold bant/text answers",
+   "runs_used": 3,
+   "gate": "none",
+   "soft": [
+    "budget",
+    "none_without_empty",
+    "errors"
+   ],
+   "withheld_types": [
+    "policy_violation_identification"
+   ]
+  },
+  {
+   "rule": "all runs agree, no budget/none_without_empty, withhold 1 types, withhold bant/text answers",
+   "runs_used": 3,
+   "gate": "none",
+   "soft": [
+    "budget",
+    "none_without_empty"
+   ],
+   "withheld_types": [
+    "policy_violation_identification"
+   ]
+  },
+  {
+   "rule": "all runs agree, withhold 1 types, withhold bant/text answers",
+   "runs_used": 3,
+   "gate": "none",
+   "soft": [],
+   "withheld_types": [
+    "policy_violation_identification"
+   ]
+  },
+  {
+   "rule": "all runs agree, no budget/none_without_empty/errors, withhold bant/text answers",
+   "runs_used": 3,
+   "gate": "none",
+   "soft": [
+    "budget",
+    "none_without_empty",
+    "errors"
+   ],
+   "withheld_types": []
+  },
+  {
+   "rule": "all runs agree, no budget/none_without_empty, withhold bant/text answers",
+   "runs_used": 3,
+   "gate": "none",
+   "soft": [
+    "budget",
+    "none_without_empty"
+   ],
+   "withheld_types": []
+  },
+  {
+   "rule": "all runs agree, withhold bant/text answers",
+   "runs_used": 3,
+   "gate": "none",
+   "soft": [],
+   "withheld_types": []
+  }
+ ]
+}
