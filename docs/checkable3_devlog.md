@@ -275,3 +275,23 @@ below with its date and reason, and with the values under both definitions.
       chosen rule's coverage and risk with the gate added on those types; and the gate with runs 1 and 2,
       or run 1 alone, on those types.
     - Nothing here is certified; the certificate stays with the primary chain.
+- 2026-11-03/04, the calibration half (`docs/checkable3_plan.md`).
+  - **Runs.** Four streams ran in parallel from the unchanged launcher, at commit 2269d27, on
+    `data/checkable3_calibration.json`: routed runs 1 and 2, the 3.8 Flash run and ReAct. They ran from
+    21:20 to 00:00 for crmroute and to 04:55 for ReAct. Each run has 327 rows.
+  - **One redo.** In routed run 2, task 988 ended in a dropped connection while the harness read the session
+    state, as D1's 946 and 1015 did. It was redone once by resuming from the main tree, with HEAD still at the
+    launch commit and no tracked file changed. No row is errored.
+  - **ReAct's token cap.** The pinned patch's 250K-token cap ended 11 ReAct tasks: 306, 318, 675, 681, 691,
+    718, 777, 812, 830, 855 and 892. They count as ReAct's answers, as in rounds 1 and 2, and were not redone.
+  - **Spend.** $48.00 at list price (routed $9.04 and $8.94, 3.8 Flash $11.76, ReAct $18.26), under the
+    planned $53. Projected from calibration's price per task, the test half costs $48.88. With D1, round 3
+    comes to about $111 of $169, so ReAct stays on the test half.
+  - **Re-checks.** The live rewrite re-check covered 217 tasks: 651 crmroute run answers with 4,778 distinct
+    queries, and 217 ReAct answers with 5,371.
+  - **Certification (`results/checkable3_calibration.md`, committed 0a32d0d before the test half launched).**
+    - P1 is met. crmroute's chain certified nine rules and stopped at the first map at 37.2% (p = 0.37).
+    - Chosen: all runs agree, with handle_time, policy_violation_identification and transfer_count withheld.
+      It answers 142 of 327 with 3 wrong (2.1%, bound 4.6%).
+    - Maps 15 and 20 are the same types at each flag level, so the chain's rows 4 to 6 repeat rows 1 to 3.
+    - ReAct certified its first rule only: 60 of 327, with 1 wrong.
