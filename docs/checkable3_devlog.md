@@ -316,3 +316,36 @@ below with its date and reason, and with the values under both definitions.
     wrong, against 1 of the 68 it passed (one-sided Fisher p = 0.0020). The counts are small. On all six types:
     8 of 33 against 1 of 122.
   - Secondary outcomes S1 to S10 are not yet computed.
+- 2026-11-04, the secondary outcomes (`results/checkable3_secondary.md`, `scripts/checkable3_secondary.py`). They
+  were computed once, after the primary outcomes were committed. None is certified.
+  - **S1 and S10, the chain on the test half.** The chosen rule answers 13.5 to 32.1 points more than round 2's
+    six rules, with every interval above zero. The test half's risk-coverage curve rises to 15.7% wrong at
+    67.0% coverage when no type is withheld.
+  - **S2 and S3, the gate levels.** No reading is excluded on this org, so the allowed level equals the
+    declared one. On all six types' unanimous answers:
+
+    | Level | Wrong answers held back | Right answers held back |
+    |---|---|---|
+    | Own | 5 of 9 | 18.5% |
+    | Pinned | 8 of 9 | 17.1% |
+    | Declared | 8 of 9 | 32.2% |
+
+    On the three types, the own level held back no wrong answers, and the pinned level 3 of 4 at a cost of 5.6%.
+  - **S5, the chance control,** was 11.8%, above the 10% bar the go/no-go checks used on the Pro records.
+  - **S6, ReAct.** Its certified rule answers 58 of 333 tasks with none wrong. crmroute's rule answers 25.8
+    points more [+21.3, +30.6]. On the standard score, every crmroute run beats ReAct (69.4%): routed run 1 by
+    +3.6 [-1.5, +8.7], routed run 2 by +5.7, and the 3.8 Flash run by +9.6.
+  - **S7, round 2's rule applied unchanged.** Only one of its five withheld types exists on this org, so here it
+    is chain rule 12.
+    - On the test half it answers 57.7% with 5.2% wrong (bound 8.7%).
+    - On the calibration half it answers 60.6% with 6.6% wrong (bound 10.2%).
+    - On both halves together it answers 59.1% with 5.9% wrong (bound 8.3%).
+    - Round 3's own chain never reached that rule: the fixed sequence stopped at rule 10, the strict flag level
+      of the 37.2% map (p = 0.37).
+  - **S8.** Where the runs disagree, the readings hold the key in 58 of 66 tasks; the runs' own answers hold it
+    in 53.
+  - **S9, flags.**
+    - 11 tasks have a key that no derivation and no reading reproduces, 7 of them transfer_count.
+    - The table splits them into two kinds; the split was added after the list was seen. In 6, no run gives the
+      key either. In 5, some run gives the key but the check does not derive it, a gap in the derivation.
+  - **Not done yet: the blinded audit,** which needs a person as the reader.
