@@ -1,0 +1,42 @@
+# Convention slots of round 3, catalog v0 (docs/checkable3_devlog.md): the readings a question's period
+# can have, declared before any go/no-go check is computed. scripts/conventions.py computes each reading's
+# window and refuses to run if this file and its code name different slots or readings. "Today" is the task
+# context's "Today's date"; windows are half-open, start at 00:00 UTC of their first day and end before
+# 00:00 UTC of the day after their last.
+version: 0
+slots:
+  season_months:
+    triggered_by: a season with a year ("summer of 2022", "fall 2021", "the 2021 winter")
+    readings:
+      meteorological: winter December-February, spring March-May, summer June-August, fall September-November (the benchmark's get_period)
+      quarter_aligned: winter January-March, spring April-June, summer July-September, fall October-December
+  season_year:
+    triggered_by: winter with a year, read with meteorological months
+    readings:
+      december_of_y: winter of Y is December Y to February Y+1 (the benchmark's get_period)
+      december_before_y: winter of Y is December Y-1 to February Y
+  past_quarters:
+    triggered_by: past/last/previous/recent N quarters
+    readings:
+      rolling: 3N months back from today
+      calendar: the N completed calendar quarters before the current one (SOQL LAST_N_QUARTERS)
+  past_months_years:
+    triggered_by: past/last/previous/recent N months or years (a half-year is 6 months, 1.5 years 18)
+    readings:
+      rolling: N months, or 12N for years, back from today
+      calendar: the N completed calendar months or years before the current one (SOQL LAST_N_MONTHS, LAST_N_YEARS)
+  rolling_end:
+    triggered_by: any rolling window, also past N days, weeks or fortnights, which have no calendar reading
+    readings:
+      today_counted: the window ends at the end of today
+      today_not_counted: the window ends at the start of today
+  date_field:
+    triggered_by: any period, in best_region_identification and handle_time
+    readings:
+      CreatedDate: a case is in the period by the date it was opened
+      ClosedDate: a case is in the period by the date it was closed
+  ties:
+    triggered_by: a derivation whose best score is shared, where the task context gives no tie rule
+    readings:
+      none: no unique answer, so None
+      first: the tied value that sorts first (the smallest Id or name)

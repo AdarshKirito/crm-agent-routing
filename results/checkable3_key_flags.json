@@ -1,0 +1,213 @@
+[
+ {
+  "task": "215",
+  "predicted": "monthly_trend_analysis",
+  "key": [
+   "value",
+   [
+    "december"
+   ]
+  ],
+  "answers": [
+   [
+    "december"
+   ]
+  ],
+  "unanimous": true,
+  "right": true,
+  "a_run_gives_key": true
+ },
+ {
+  "task": "495",
+  "predicted": "case_routing",
+  "key": [
+   "ids",
+   [
+    "005Ws000001xajd"
+   ]
+  ],
+  "answers": [
+   [
+    "005Ws000001xZna"
+   ],
+   [
+    "005Ws000001xaLR"
+   ]
+  ],
+  "unanimous": false,
+  "right": false,
+  "a_run_gives_key": false
+ },
+ {
+  "task": "759",
+  "predicted": "handle_time",
+  "key": [
+   "ids",
+   [
+    "005Ws000001xZCT"
+   ]
+  ],
+  "answers": [
+   [
+    "005Ws000001xamr"
+   ]
+  ],
+  "unanimous": true,
+  "right": false,
+  "a_run_gives_key": false
+ },
+ {
+  "task": "774",
+  "predicted": "handle_time",
+  "key": [
+   "ids",
+   [
+    "005Ws000001xZxF"
+   ]
+  ],
+  "answers": [
+   [],
+   [
+    "005Ws000001xYrV"
+   ]
+  ],
+  "unanimous": false,
+  "right": false,
+  "a_run_gives_key": false
+ },
+ {
+  "task": "806",
+  "predicted": "transfer_count",
+  "key": [
+   "ids",
+   [
+    "005Ws000001xZvd"
+   ]
+  ],
+  "answers": [
+   [
+    "005Ws000001xZvd"
+   ],
+   [
+    "005Ws000001xZxF"
+   ]
+  ],
+  "unanimous": false,
+  "right": false,
+  "a_run_gives_key": true
+ },
+ {
+  "task": "808",
+  "predicted": "transfer_count",
+  "key": [
+   "ids",
+   [
+    "005Ws000001xa0T"
+   ]
+  ],
+  "answers": [
+   []
+  ],
+  "unanimous": true,
+  "right": false,
+  "a_run_gives_key": false
+ },
+ {
+  "task": "842",
+  "predicted": "transfer_count",
+  "key": [
+   "ids",
+   [
+    "005Ws000001xZvd"
+   ]
+  ],
+  "answers": [
+   [],
+   [
+    "005Ws000001xYpt"
+   ],
+   [
+    "005Ws000001xadB"
+   ]
+  ],
+  "unanimous": false,
+  "right": false,
+  "a_run_gives_key": false
+ },
+ {
+  "task": "843",
+  "predicted": "transfer_count",
+  "key": [
+   "ids",
+   [
+    "005Ws000001xaV7"
+   ]
+  ],
+  "answers": [
+   [],
+   [
+    "005Ws000001xaV7"
+   ]
+  ],
+  "unanimous": false,
+  "right": false,
+  "a_run_gives_key": true
+ },
+ {
+  "task": "887",
+  "predicted": "transfer_count",
+  "key": [
+   "ids",
+   [
+    "005Ws000001xZvd"
+   ]
+  ],
+  "answers": [
+   [],
+   [
+    "005Ws000001xYpt"
+   ]
+  ],
+  "unanimous": false,
+  "right": false,
+  "a_run_gives_key": false
+ },
+ {
+  "task": "896",
+  "predicted": "transfer_count",
+  "key": [
+   "ids",
+   [
+    "005Ws000001xaV7"
+   ]
+  ],
+  "answers": [
+   [],
+   [
+    "005Ws000001xaV7"
+   ]
+  ],
+  "unanimous": false,
+  "right": true,
+  "a_run_gives_key": true
+ },
+ {
+  "task": "908",
+  "predicted": "transfer_count",
+  "key": [
+   "ids",
+   [
+    "005Ws000001xZkL"
+   ]
+  ],
+  "answers": [
+   [],
+   [
+    "005Ws000001xZkL"
+   ]
+  ],
+  "unanimous": false,
+  "right": false,
+  "a_run_gives_key": true
+ }
+]

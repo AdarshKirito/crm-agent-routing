@@ -67,9 +67,10 @@ def rows_key(rows: list) -> Counter:
 
 class Org:
     def __init__(self, org: str):
-        up = org.upper()
-        self.sf = Salesforce(username=os.environ[f"SALESFORCE_{up}_USERNAME"], password=os.environ[f"SALESFORCE_{up}_PASSWORD"],
-                             security_token=os.environ[f"SALESFORCE_{up}_SECURITY_TOKEN"],
+        # the original CRMArena org's login has the benchmark's plain names, the Pro orgs' are per org
+        prefix = "SALESFORCE" if org == "original" else f"SALESFORCE_{org.upper()}"
+        self.sf = Salesforce(username=os.environ[f"{prefix}_USERNAME"], password=os.environ[f"{prefix}_PASSWORD"],
+                             security_token=os.environ[f"{prefix}_SECURITY_TOKEN"],
                              version=os.getenv("SALESFORCE_API_VERSION", API_VERSION))
         self.cache: dict = {}
 

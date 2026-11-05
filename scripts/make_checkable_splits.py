@@ -18,6 +18,12 @@ any calibration run, to raise the calibration split from 8 to 12 tasks per org a
 
 Round 2 (docs/checkable_answers.md) uses every business single-turn task still unused, halved per org and type:
         vendor/CRMArena/.venv/Scripts/python scripts/make_checkable_splits.py --round2 --seed 20261102
+
+Round 3 (docs/checkable3_devlog.md) uses the original CRMArena org's single-turn tasks that neither its dev
+and test splits nor its router examples used, halved per task type, with the seed of the pre-registration:
+        vendor/CRMArena/.venv/Scripts/python scripts/make_checkable_splits.py --round3 --seed <seed>
+Its development run uses the other 510, the ones those lists hold (data/checkable3_dev.json):
+        vendor/CRMArena/.venv/Scripts/python scripts/make_checkable_splits.py --round3-dev
 """
 import argparse
 import json
@@ -31,12 +37,12 @@ from make_splits import CONFIDENTIALITY, by_type, take
 SPLITS = {"practice": (4, 0), "calibration": (8, 0), "test": (8, 2)}  # (single-turn, multi-turn) per type
 
 
-def used_ids(paths: list[Path], examples: list[Path]) -> dict[str, set[str]]:
-    used = {"b2b": set(), "b2c": set()}
+def used_ids(paths: list[Path], examples: list[Path], orgs=("b2b", "b2c")) -> dict[str, set[str]]:
+    used = {org: set() for org in orgs}
     for path in paths:
         split = json.loads(path.read_text(encoding="utf-8"))
         for org in used:
-            for ids in split[org].values():
+            for ids in split.get(org, {}).values():
                 used[org].update(str(i) for i in ids)
     for path in examples:
         for line in path.read_text(encoding="utf-8").splitlines():
@@ -104,6 +110,53 @@ def round2(args) -> None:
     print("round-2 splits are disjoint from each other, from every earlier split and from the router examples")
 
 
+ORIGINAL_USED = ["data/original_dev.json", "data/original_test.json"]
+ORIGINAL_EXAMPLES = ["agent/app/data/router_examples_original.jsonl"]
+
+
+def round3(args) -> None:
+    """The original org's single-turn tasks that its dev and test splits and router examples did not use,
+    halved at random per task type into checkable3_calibration.json and checkable3_test.json (an odd task
+    goes to test)."""
+    out_dir = Path(args.out_dir)
+    excluded = used_ids([Path(p) for p in ORIGINAL_USED], [Path(p) for p in ORIGINAL_EXAMPLES], ("original",))["original"]
+    single = by_type(load_dataset("Salesforce/CRMArena", "CRMArena")["test"])
+    rng = random.Random(args.seed)
+    halves = {name: {"seed": args.seed, "org": "original", "excludes": ORIGINAL_USED + ORIGINAL_EXAMPLES}
+              for name in ("calibration", "test")}
+    picked = {"calibration": [], "test": []}
+    for task_type in sorted(single):
+        pool = [i for i in single[task_type] if str(i) not in excluded]
+        rng.shuffle(pool)
+        picked["calibration"] += pool[:len(pool) // 2]
+        picked["test"] += pool[len(pool) // 2:]
+    for name, ids in picked.items():
+        halves[name]["original"] = {"single_turn": sorted(ids, key=int), "multi_turn": []}
+        halves[name]["counts"] = {"original": {"single_turn": len(ids), "multi_turn": 0}}
+        path = out_dir / f"checkable3_{name}.json"
+        path.write_text(json.dumps(halves[name], indent=1))
+        print(name, halves[name]["counts"], "->", path)
+    cal, test = ({str(i) for i in picked[n]} for n in ("calibration", "test"))
+    assert not cal & test, "round-3 halves overlap"
+    assert not (cal | test) & excluded, "a used task or router example was drawn"
+    print("round-3 splits are disjoint from each other, from the org's dev and test splits and from its router examples")
+
+
+def round3_dev(args) -> None:
+    """The original org's used single-turn tasks (its dev and test splits and router examples), for round 3's
+    development run; every one already has a known key, so nothing here touches the fresh halves."""
+    used = used_ids([Path(p) for p in ORIGINAL_USED], [Path(p) for p in ORIGINAL_EXAMPLES], ("original",))["original"]
+    known = {i for ids in by_type(load_dataset("Salesforce/CRMArena", "CRMArena")["test"]).values() for i in ids}
+    ids = sorted(i for i in known if str(i) in used)  # as the dataset stores them, like every other split file
+    assert len(ids) == len(used), "a used id is not a task of the original org"
+    split = {"org": "original", "sources": ORIGINAL_USED + ORIGINAL_EXAMPLES,
+             "original": {"single_turn": ids, "multi_turn": []},
+             "counts": {"original": {"single_turn": len(used), "multi_turn": 0}}}
+    path = Path(args.out_dir) / "checkable3_dev.json"
+    path.write_text(json.dumps(split, indent=1))
+    print("development", split["counts"], "->", path)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out-dir", default="data")
@@ -112,9 +165,17 @@ def main():
     ap.add_argument("--router-examples", nargs="+", default=["agent/app/data/router_examples.jsonl"])
     ap.add_argument("--extend-calibration", type=int, default=0)
     ap.add_argument("--round2", action="store_true", help="split every remaining task (data/checkable2_*.json)")
+    ap.add_argument("--round3", action="store_true", help="split the original org's unused tasks (data/checkable3_*.json)")
+    ap.add_argument("--round3-dev", action="store_true", help="the original org's used tasks (data/checkable3_dev.json)")
     args = ap.parse_args()
     if args.round2:
         round2(args)
+        return
+    if args.round3:
+        round3(args)
+        return
+    if args.round3_dev:
+        round3_dev(args)
         return
     if args.extend_calibration:
         extend_calibration(args)

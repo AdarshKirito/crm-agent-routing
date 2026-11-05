@@ -49,6 +49,27 @@ def one_session(base: str, org: str, audience: str, context: str, question: str)
             "latency": time.monotonic() - start}
 
 
+def reading_check(org: str, question: str, context: str, predicted: str, receipt: list, claim, conventions: Path) -> list[str]:
+    """Round 3's convention check of one answer: its deciding query rewritten for each declared reading and
+    re-run live (scripts/rewrite_recheck.py), the reading table, and the pinned gate's verdict under the org's
+    frozen conventions. Needs the benchmark environment (simple_salesforce) and the org's login."""
+    import convention_gate as CG
+    import conventions as CV
+    import explain_check as EX
+    import learn_conventions as LC
+    import rewrite_recheck as RW
+
+    RW.load_dotenv(RW.ROOT / "vendor" / "CRMArena" / ".env")
+    pins = LC.pins_of(conventions) if conventions.exists() else {}
+    spec = RW.D.spec_for(predicted, question, context)
+    period = CV.period_of(question)
+    row = {"run": 1, "answer": [claim.key()[0], list(claim.key()[1])], "period": {"text": period.text},
+           **RW.check_run(RW.Live(org), spec, predicted, receipt, claim.key(), period, CV.today_of(context))}
+    verdict = CG.pinned_level(row, pins, own_required=False)
+    lines = [f"Convention check ({conventions.name if pins else 'no frozen conventions: every reading asked'}):"]
+    return lines + EX.table(row, pins or None) + [f"pinned gate: {verdict}"]
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("question")
@@ -63,6 +84,10 @@ def main() -> None:
                                                          "or crmroute_run1 (one run)")
     ap.add_argument("--rule", default="", help="a rule of release_eval's family by name, instead of the certified one")
     ap.add_argument("--withhold-forms", default="text,bant")
+    ap.add_argument("--readings", action="store_true", help="also run round 3's convention check on run 1's answer "
+                                                            "(benchmark environment; types whose answer is computed from rows)")
+    ap.add_argument("--conventions", type=Path, default=None, help="the org's frozen conventions "
+                                                                    "(default data/conventions_<org>.yaml)")
     args = ap.parse_args()
 
     urls = [u.strip().rstrip("/") for u in args.url.split(",") if u.strip()]
@@ -116,6 +141,15 @@ def main() -> None:
             if flagged:
                 reasons.append(f"receipt flags: {', '.join(flagged)}")
         print(f"\nWITHHELD: {'; '.join(reasons) or 'the rule did not release it'}. Hand this request to a person.")
+    if args.readings:
+        import release3
+        conventions = args.conventions or Path(__file__).resolve().parents[1] / "data" / f"conventions_{args.org}.yaml"
+        if predicted not in release3.GATED:
+            print(f"\nConvention check: not run ({predicted} answers are not computed from query rows).")
+        else:
+            print()
+            print("\n".join(reading_check(args.org, args.question, args.context, predicted, sessions[0]["receipt"],
+                                          runs[0].verdict.claim, conventions)))
     print(f"\nwait (slowest run): {max(s['latency'] for s in sessions):.1f} s; "
           f"cost (all runs): ${sum(s['cost'] or 0 for s in sessions):.4f}")
 
