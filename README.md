@@ -924,6 +924,30 @@ vendor/CRMArena/.venv/Scripts/python scripts/recheck_receipts.py --runs runs/che
   runs/checkable2_test/r2/routed runs/checkable2_test/f1/full,runs/checkable2_test/f1x/full \
   --task-ids data/checkable2_test.json --out runs/checkable2_test/recheck.json
 python scripts/checkable2_report.py --stage test          # results/checkable2_answers.md
+
+# round 3 (docs/checkable3_plan.md): the original org's 660 unused single-turn tasks, round 2's image unchanged;
+# the chain and pinned readings were frozen first from development run D1 (docs/checkable3_devlog.md)
+vendor/CRMArena/.venv/Scripts/python scripts/make_checkable_splits.py --round3 --seed 20261103
+export ORGS=original MODES=single ROUTING_TABLE=agent/app/data/routing_original.yaml \
+  ROUTER_EXAMPLES=router_examples.jsonl,router_examples_original.jsonl
+run3() {  # split
+  SPLIT=checkable3_$1 TASK_IDS=data/checkable3_$1.json OUT=runs/checkable3_$1/r1 PORT_OFFSET=330 ./scripts/run_systems.sh routed
+  SPLIT=checkable3_$1 TASK_IDS=data/checkable3_$1.json OUT=runs/checkable3_$1/r2 PORT_OFFSET=340 ./scripts/run_systems.sh routed
+  SPLIT=checkable3_$1 TASK_IDS=data/checkable3_$1.json OUT=runs/checkable3_$1/f1 PORT_OFFSET=350 ./scripts/run_systems.sh full
+  SPLIT=checkable3_$1 TASK_IDS=data/checkable3_$1.json OUT=runs/checkable3_$1/react ./scripts/run_systems.sh react
+  for r in "" _react; do  # the convention check: each answer's query re-run live under every date reading
+    vendor/CRMArena/.venv/Scripts/python scripts/rewrite_recheck.py --records checkable3_$1$r --out runs/checkable3_$1/rewrites$r.jsonl
+  done
+}
+run3 calibration
+python scripts/checkable3_report.py --stage calibration   # commit results/checkable3_rules.json before the test half runs
+run3 test
+vendor/CRMArena/.venv/Scripts/python scripts/recheck_receipts.py --runs runs/checkable3_test/r1/routed \
+  runs/checkable3_test/r2/routed runs/checkable3_test/f1/full --task-ids data/checkable3_test.json --out runs/checkable3_test/recheck.json
+python scripts/checkable3_report.py --stage test          # results/checkable3_answers.md
+python scripts/checkable3_secondary.py                    # results/checkable3_secondary.md
+vendor/CRMArena/.venv/Scripts/python scripts/dev/checkable3_review.py pull   # the non-blind review, read-only
+vendor/CRMArena/.venv/Scripts/python scripts/dev/checkable3_review.py report
 ```
 
 `scripts/estimate_budget.py` projects a run's list-price cost from measured checkpoints before it starts. For
@@ -956,20 +980,26 @@ the judge check, `python scripts/judge_agreement.py sheet ...` writes a blind 40
   36 single-turn knowledge_qa). These counts were first published as guard refusals only and corrected on
   2026-10-31 (`results/robustness_checks.md`, section 2). The test and fresh records do not keep the tool calls, so
   why the solver declined is not visible in them (the checkable-answers runs keep them as receipts).
-- **Checkable answers** are certified for one distribution: single-turn templated tasks on these two orgs, with
-  this image, these models and this judge. The guarantee is about the calibration split (risk at most 10% with
-  90% confidence) and carries to new tasks only as far as they are exchangeable with it; on test the exact 95%
-  upper bound was 12.4% in round 1 and 8.0% in round 2. Coverage met round 1's 40% target by 0.5 points and
-  missed round 2's 50% target by 5 points. A receipt check sees whether the cited records exist and were read,
-  not whether they answer the question, and the 9 wrong released answers of each round all passed it with three
-  runs agreeing. Round 2's competence map is learned from round 1's runs on the same benchmark: it withholds task
+- **Checkable answers** are certified for one distribution at a time: single-turn templated tasks on the org a
+  rule was calibrated on, with this image, these models and this judge. The guarantee is about the calibration
+  split (risk at most 10% with 90% confidence) and carries to new tasks only as far as they are exchangeable with
+  it; on test the exact 95% upper bound was 12.4% in round 1, 8.0% in round 2 and 8.9% in round 3 (the original
+  org). Coverage met round 1's 40% target by 0.5 points and missed the 50% target by 5.0 points in round 2 and
+  6.8 in round 3. A receipt check sees whether the cited records exist and were read, not whether they answer
+  the question, and the 9 wrong released answers of rounds 1 and 2 and the 7 of round 3 all passed it with three
+  runs agreeing. Round 3's convention check covers dates only, failed its own go/no-go checks and is supported on
+  fresh tasks for three task types (`results/checkable3_secondary.md`). Round 2's competence map is learned from round 1's runs on the same benchmark: it withholds task
   types that went wrong before and cannot see a type whose errors are new. "Right" is the benchmark's grading
-  against its answer key (qwen3:8b as judge), not a person's check. Free-text, BANT and multi-turn answers are
+  against its answer key (qwen3:8b as judge), not a person's check; round 3's blinded audit of that key was not
+  conducted, and the author's own review found keys that follow rules their task policy does not state
+  (`results/checkable3_review.md`). Free-text, BANT and multi-turn answers are
   never released, and three runs cost about three times one run (1.83 and 1.63 runs with adaptive repeats).
   Eight tasks ended in an error in round 1 (three Vertex AI "missing thought_signature" rejections, four expired
   credentials after the host slept, one dropped connection) and eleven in round 2 (dropped connections, the
   harness's 15-minute limit, one MAX_TOKENS ending; one task timed out three times on slow model calls before it
-  finished); all were redone by resuming with identical pins (`results/checkable_notebook.md`).
+  finished); all were redone by resuming with identical pins (`results/checkable_notebook.md`). Round 3 redid
+  three tasks the same way, all dropped connections (946 and 1015 in development, 988 in calibration), and 18 of
+  ReAct's tasks ended at the harness's 250K-token cap, counted as its answers (`docs/checkable3_devlog.md`).
 - **Prompt Guard** is untested here (no benchmark task is an injection attempt) and fails open: on Groq's free tier, 122 and 159 Prompt Guard calls in the two fresh runs got `429 Too Many Requests` under parallel load, and screening continued without the injection score. A deployment needs a paid tier or a fail-closed rule for it.
 - **Stakeholder interviews: not conducted.** `docs/scoping.md` is the unfilled template, and the sensitive-data map (`agent/app/guard/sensitive_fields.yaml`) is a starter built from the schema and the dev split, not from stakeholder input. Every guard result above was measured with that starter map; replacing it with an interview-based never-share list would need a new measurement.
 - **Conversations without a logged-in identity:** the harness gives multi-turn tasks no session identity, so the agent binds the first Contact Id the customer states. A deployment must take it from authentication.
