@@ -776,12 +776,13 @@ the measured runs come from the run records (`scripts/analyze_results.py`), not 
 |---|---|---|
 | `mcp-salesforce` (`npm test`) | SOQL/SOSL guards (incl. locking clauses), Id checks, cache scoping, shared in-flight reads, atomic disk writes, pagination caps, response budget, `--env` start-up | 17 passed |
 | `mcp-salesforce` live smoke (`npx tsx test/smoke.ts --env ...`, run by hand) | all 5 tools on both live orgs via the official MCP client; write attempts and unknown orgs rejected | passed |
-| `agent` (`uv run pytest`) | guard (ownership filters, knowledge filtering on every read, identity in conversations), checker, PII scrub, Prompt Guard parsing and accounting, cost accounting, pinned retry vs fallback on real provider errors, tool-call repair, tracing export, the real ADK graph offline with a scripted model, fail-closed classifier, checker abstention, router examples from several files, the task-hints switch, tool-call receipts (budget and blocked calls included), receipt checks, the receipt-guided retry | 84 passed, 11 live tests skipped without their env flags |
+| `agent` (`uv run pytest`) | guard (ownership filters, knowledge filtering on every read, identity in conversations), checker, PII scrub, Prompt Guard parsing and accounting, cost accounting, pinned retry vs fallback on real provider errors, tool-call repair, tracing export, the real ADK graph offline with a scripted model, fail-closed classifier, checker abstention, router examples from several files, the task-hints switch, tool-call receipts (budget and blocked calls included), receipt checks, the receipt-guided retry, the round-3 derivations of six task types | 98 passed, 11 live tests skipped without their env flags |
 | `search` fork (`uv run pytest`) | upstream behaviour plus the knowledge index: mode-specific embedding, org isolation, response budget | 36 passed |
-| `tests/` (benchmark env) | harness retries, resume pins, atomic checkpoints, adapter failure handling, run manifests, complete-split analysis, routing fit pairing, judge-agreement binding, budget estimate, scoring the original org's single answers, released runs that reuse task ids | 57 passed, 1 live test skipped |
+| `tests/` (benchmark env) | harness retries, resume pins, atomic checkpoints, adapter failure handling, run manifests, complete-split analysis, routing fit pairing, judge-agreement binding, budget estimate, scoring the original org's single answers, released runs that reuse task ids, round 3's convention readings, gate, release rules, rewrite re-check and report, and `checkable` against the code it was ported from | 85 passed, 1 live test skipped |
+| `checkable` (`python -m pytest`) | date readings, receipts and their re-check, the reading check and learned conventions, release rules and the Learn-then-Test certificate | 16 passed |
 
-CI (`.github/workflows/ci.yml`) runs the offline suites (every row except the live smoke test) on every push to
-`main` and every pull request, and rebuilds the patched benchmark from the pinned upstream commit to prove the
+CI (`.github/workflows/ci.yml`) runs the offline suites (every row except the live smoke test; `checkable` on
+Python 3.10, with its demo) on every push to `main` and every pull request, and rebuilds the patched benchmark from the pinned upstream commit to prove the
 patch still applies. The PR eval (`.github/workflows/eval-pr.yml`) runs 15 fixed dev cases on Flash-Lite and
 fails if business success falls more than one case below `evals/ci_baseline.json` (7 of 12), if a refusal is
 missed (3 of 3), or if task ids or model/judge pins change. It runs on pull requests that touch the agent, the
@@ -789,7 +790,9 @@ servers, the patch or the evals when the repository variable `CRMROUTE_PR_EVAL=t
 dispatch. It ran twice by manual dispatch (one failure, then a pass), then on its first pull request,
 [#1](https://github.com/AdarshKirito/crm-agent-routing/pull/1), which it passed with 10 of 12 business cases and
 3 of 3 refusals (that PR leaves the agent's behaviour unchanged, so the gain over the baseline's 7 is not an
-improvement it made). It needs two repository secrets (`GEMINI_API_KEY`, `GROQ_API_KEY`); the Salesforce logins are the
+improvement it made). It passed again on [#2](https://github.com/AdarshKirito/crm-agent-routing/pull/2) (10 of 12,
+3 of 3) and [#4](https://github.com/AdarshKirito/crm-agent-routing/pull/4) (9 of 12, 3 of 3). On #4 it first failed
+twice without running a case: the Gemini key had expired, and then the replacement key's project had no credits. It needs two repository secrets (`GEMINI_API_KEY`, `GROQ_API_KEY`); the Salesforce logins are the
 benchmark's public demo-org credentials, read from the README on CRMArena's default branch because upstream
 rotates them (the harness code stays at the pinned commit).
 
