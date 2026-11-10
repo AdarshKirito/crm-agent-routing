@@ -93,8 +93,9 @@ the test, fresh, original-org, robustness and ablation summaries name their exac
 are published as release assets, [run-records-2026-10-11](https://github.com/AdarshKirito/crm-agent-routing/releases/tag/run-records-2026-10-11)
 (58 MB), for the hints ablation, [run-records-2026-10-30](https://github.com/AdarshKirito/crm-agent-routing/releases/tag/run-records-2026-10-30),
 and for checkable answers, [run-records-2026-11-01](https://github.com/AdarshKirito/crm-agent-routing/releases/tag/run-records-2026-11-01)
-(171 MB, the receipts included) and its second round, [run-records-2026-11-01-round2](https://github.com/AdarshKirito/crm-agent-routing/releases/tag/run-records-2026-11-01-round2)
-(149 MB), so every summary can be rebuilt.
+(171 MB, the receipts included), its second round, [run-records-2026-11-01-round2](https://github.com/AdarshKirito/crm-agent-routing/releases/tag/run-records-2026-11-01-round2)
+(149 MB), and its third, [run-records-2026-11-05-round3](https://github.com/AdarshKirito/crm-agent-routing/releases/tag/run-records-2026-11-05-round3)
+(24 MB), so every summary can be rebuilt.
 
 ## Contents
 
