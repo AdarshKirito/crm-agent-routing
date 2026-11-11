@@ -9,12 +9,12 @@
 crmroute answers business questions from a Salesforce CRM, such as "which agent closed the most cases last
 quarter?". It refuses requests for private or confidential data and sends easy questions to a cheaper model. When
 it cannot back an answer up, it hands the question to a person and says why. I built it with Google's Agent
-Development Kit (ADK), Gemini and two MCP tool servers, and tested it on Salesforce AI Research's
-[CRMArena](https://github.com/SalesforceAIResearch/CRMArena) benchmarks.
+Development Kit (ADK), Gemini and two MCP (Model Context Protocol) tool servers, and tested it on Salesforce AI
+Research's [CRMArena](https://github.com/SalesforceAIResearch/CRMArena) benchmarks.
 
 > **Status:** a finished research prototype. Nobody has used it for real work. Every result below comes from the
-> benchmark's templated questions on its own Salesforce orgs, which hold generated data, with a language model
-> playing the user and another grading the answers.
+> benchmark's templated questions on its own Salesforce orgs, which hold generated data, with a local language
+> model playing the user in conversations and grading the answers.
 
 ## Why I built it
 
@@ -33,7 +33,7 @@ So crmroute gives **checkable answers**:
 
 ```mermaid
 flowchart LR
-  Q["Business question"] --> G{"Guard: private or<br/>confidential?"}
+  Q["Business question"] --> G{"Guard, in customer<br/>sessions: private or<br/>confidential?"}
   G -- yes --> X["Refuse"]
   G -- no --> RT["Route to a<br/>model"]
   RT --> S["Answer from the CRM<br/>through read-only tools<br/>(three independent runs)"]
@@ -44,30 +44,46 @@ flowchart LR
 
 ## Results in brief
 
+<details>
+<summary>Terms used below</summary>
+
+- **ReAct:** the benchmark's own agent, run on the same main model as crmroute.
+- **Single-turn / multi-turn:** a task asked in one message, or a conversation with a simulated user.
+- **Org:** a Salesforce company database. CRMArena-Pro has two (B2B and B2C); the original CRMArena has one, with its
+  own data.
+- **Held-out test set:** tasks kept aside and run once, after all tuning was done.
+- **95% interval / upper bound:** the range the true value plausibly lies in, given the sample size. For an error
+  rate, the upper bound is the highest rate the results still allow.
+- **Pre-registered:** the plan, rules and targets were committed to git before any test question ran.
+
+</details>
+
 ### 1. Against the benchmark's own agent
 
 The held-out test set ran once, after all tuning: 194 tasks per system, with Gemini 3.8 Flash as every system's
-main model ([`results/test_summary.md`](results/test_summary.md)).
+main model ([`results/test_summary.md`](results/test_summary.md)). Here crmroute answers every question it does
+not refuse; part 2 adds the release rule.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/img/results_dark.svg">
   <img alt="Held-out test, business single-turn success, cost per task and confidential requests refused: ReAct 56.1%, $0.075, 0%; ReAct with the privacy prompt 50.0%, $0.073, 59.5%; crmroute on Gemini 3.8 Flash only 69.3%, $0.044, 92.9%; crmroute routed 71.1%, $0.028, 92.9%" src="docs/img/results_light.svg">
 </picture>
 
-| | ReAct (the benchmark's agent) | ReAct + its privacy prompt | crmroute |
+| | ReAct (the benchmark's agent) | ReAct + its privacy prompt | crmroute (routed) |
 |---|---|---|---|
 | business tasks solved, single-turn (n=114) | 56.1% | 50.0% | **71.1%** |
 | business tasks solved, multi-turn (n=38) | 28.9% | 21.1% | **47.4%** |
 | confidential requests refused (n=42) | 0% | 59.5% | **92.9%** |
-| list-price cost per task | $0.075 | $0.073 | **$0.028** |
+| list-price cost per task (all 194) | $0.075 | $0.073 | **$0.028** |
 
 How far these numbers go:
 
 - **Against ReAct with its privacy prompt**, the baseline that is also asked to protect data, every lead holds up.
-  All three 95% intervals exclude zero.
-- **Against plain ReAct, the business-task lead depends on a token cap** in the test harness. That cap stopped 8 of
-  ReAct's single-turn business tasks and none of crmroute's. Counted as ReAct successes instead, the single-turn
-  lead falls to +7.9 points [-0.9, +17.5], which is not significant.
+  All three 95% intervals exclude zero, also in the token-cap check described next.
+- **Against plain ReAct, the business-task lead depends on a token cap** in the test harness. That cap stopped 11
+  of ReAct's business tasks (8 single-turn, 3 multi-turn) and none of crmroute's. Counted as ReAct successes
+  instead, the leads fall to +7.9 points single-turn [-0.9, +17.5] and +10.5 multi-turn [-7.9, +28.9], and neither
+  is significant.
 - **crmroute's prompts were tuned on the benchmark's development tasks; ReAct's were not.** Removing the tuned hints
   cost 5.3 points single-turn, a drop the sample cannot confirm
   ([hints ablation](docs/results.md#hints-ablation-resultsablation_hintsmd)).
@@ -102,9 +118,10 @@ Also measured, with details in [`docs/results.md`](docs/results.md):
 - **Another org:** on the original CRMArena org, crmroute solved 82.2% against ReAct's 75.6% at 54% lower cost.
   With 90 tasks, the difference is not significant.
 
-Every number comes from a summary in [`results/`](results/), and each summary names the command that made it. The
-raw run records are published as [release assets](https://github.com/AdarshKirito/crm-agent-routing/releases), so
-every summary can be rebuilt.
+Every measured number comes from a summary in [`results/`](results/), and most summaries name the command that
+made them. The raw run records are published as
+[release assets](https://github.com/AdarshKirito/crm-agent-routing/releases), so the summaries made from them can
+be rebuilt without rerunning anything.
 
 ## Try it in one minute
 
@@ -118,7 +135,7 @@ python checkable/examples/winter_demo.py      # Python 3.10 or newer
 ```
 
 The demo builds a small table of support cases and asks "which state had the most cases in winter of 2023?". That
-question has three fair readings, and the agent picked one of them. Here is part of the real output:
+question has three fair readings, and a stand-in agent answers with one of them. Here is part of the real output:
 
 ```text
 question: Which state had the most cases in winter of 2023?
@@ -133,7 +150,8 @@ reading this organisation uses, and shows why "TX" is the wrong answer. Last, it
 shows the evidence stop matching once the data changes.
 
 To run the full agent against the benchmark, see [`docs/reproduce.md`](docs/reproduce.md). You need Docker, Node
-22+, [uv](https://docs.astral.sh/uv/), [Ollama](https://ollama.com), and a Gemini API key or a Vertex AI project.
+22+, [uv](https://docs.astral.sh/uv/), [Ollama](https://ollama.com), a Groq key, and a Gemini API key or a Vertex
+AI project.
 
 ## How it works
 
@@ -159,20 +177,24 @@ Checkable answers wrap this with three runs, the receipt check and the certified
 | Folder | What it is | Usable on its own? |
 |---|---|---|
 | [`agent/`](agent/) | The ADK agent: guard, router, solver, checker and receipts | The guard and router, with your own policy and examples |
-| [`mcp-salesforce/`](mcp-salesforce/) | A read-only MCP server for Salesforce (TypeScript): SOQL, SOSL, record and knowledge search | Yes |
+| [`mcp-salesforce/`](mcp-salesforce/) | A read-only MCP server for Salesforce (TypeScript): SOQL and SOSL queries, object schemas, record lookup and knowledge search | Yes |
 | [`search/`](search/) | A fork of Qdrant's MCP server with BM25 and hybrid search | Yes, and proposed upstream |
 | [`checkable/`](checkable/) | Checkable answers for any agent that queries a database | Yes, with no dependencies |
 | [`patches/`](patches/) | A patch that runs ADK agents on CRMArena, with fixes for five upstream bugs | Yes |
 | [`scripts/`](scripts/) | Runs, analysis, statistics and live re-checks | The evaluation scripts |
-| [`results/`](results/) | Every measured result, each naming the command that produced it | |
+| [`data/`](data/) | The fixed task splits of every experiment, and round 3's date-reading catalog and learned conventions | |
+| [`results/`](results/) | Every measured result; most name the command that produced them | |
+| [`tests/`](tests/), [`evals/`](evals/) | Tests for the harness and scripts; the pull-request eval's cases and the judge-check labels | |
+| [`Dockerfile`](Dockerfile), [`deploy/`](deploy/) | One container with the agent and both servers, used for crmroute's measured runs | |
 | [`docs/`](docs/) | Detailed results, method, pre-registrations and reproduction steps | |
 
 ## How I evaluated it
 
-- **Fixed splits.** I tuned only on development tasks, and the test set ran once, after the agent was frozen.
-- **Same conditions for every system:** the same model, inputs, judge and simulated user. The judge and simulated
-  user were a local qwen3:8b. The judge agreed with my labels on 39 of 40 test items (Cohen's κ = 0.95); the labels
-  were drafted with AI help and every row was reviewed by me.
+- **Fixed splits.** I tuned only on development tasks, and the test set ran once, after the agent was frozen. One
+  later ablation reran it without the tuned hints, to measure what they add.
+- **Same conditions for every system:** the same main model, inputs, judge and simulated user. The judge and
+  simulated user were a local qwen3:8b. The judge agreed with my labels on 39 of 40 test items (Cohen's κ = 0.95);
+  the labels were drafted with AI help and every row was reviewed by me.
 - **Statistics:** 95% bootstrap intervals, and a difference counts only when its paired interval excludes zero.
 - **Pre-registration:** each checkable-answers round's rules, splits and targets were committed before any test
   question ran, and every failed check is reported.
@@ -184,11 +206,12 @@ The full method is in [`docs/evaluation.md`](docs/evaluation.md), and every comm
 
 ## What did not work
 
-- **Hybrid search with reranking**, my original plan, lost to plain BM25 keyword search: recall@5 of 0.735 and
-  0.349 against BM25's 0.827.
+- **Hybrid search with reranking**, my original plan, lost to plain BM25 keyword search. On constructed
+  development queries, recall@5 was 0.349, against 0.735 for hybrid search alone and 0.827 for BM25.
 - **Round 3's convention check failed its own go/no-go tests.** It re-runs a query under each reading of a date
-  phrase. On the old records it held back 30% of right answers. On fresh questions it helped on only three task
-  types: 3 of 4 wrong answers caught there, at a cost of 5.6% of right ones, with small counts.
+  phrase. On rounds 1 and 2's records it held back 30% of right answers. A narrower version, chosen after
+  that, helped on fresh questions for only three task types: 3 of 4 wrong answers caught there, at a cost of 5.6%
+  of right ones, with small counts.
 - **Coverage stayed below half.** Rounds 2 and 3 missed their 50% coverage target, and round 1's error bound missed
   10%.
 - **The blinded audit of the answer key was not done**, because no reader with the domain knowledge was available.
@@ -203,14 +226,14 @@ More design decisions, with their evidence, are in
 
 The most important; the full list is in [`docs/limitations.md`](docs/limitations.md).
 
-- **No real use.** Every question is a templated benchmark task on generated data, asked by a simulated user.
+- **No real use.** Every question is a templated benchmark task on generated data, not a real person's.
 - **One benchmark family.** Every org here comes from CRMArena. Transfer to a company's own data and wording is
   untested.
 - **Grading** is by a local 8B model, not the paper's GPT-4o, so these numbers compare the systems here but not with
   the paper's tables.
 - **Small samples:** about ±9 points at 114 tasks and ±16 at 38.
 - **The certificate holds against the benchmark's answer key**, and only for questions like the calibration ones.
-- **Prompt-injection defense is untested**: no benchmark task is an injection attempt.
+- **Prompt-injection defence is untested**: no benchmark task is an injection attempt.
 - **Stakeholder interviews were not conducted.** The sensitive-data map is a starter built from the schema and the
   development tasks, not from stakeholder input.
 
@@ -224,6 +247,9 @@ for security fixes in November 2026. The bugs and data issues I found in other p
   (released results) and [#31](https://github.com/SalesforceAIResearch/CRMArena/issues/31) (answer-key rules).
 - **qdrant/mcp-server-qdrant:** [#202](https://github.com/qdrant/mcp-server-qdrant/issues/202) (BM25 and hybrid
   search modes).
+
+Built by [Adarsh Varanasi](https://github.com/AdarshKirito). Questions and bug reports are welcome as
+[GitHub issues](https://github.com/AdarshKirito/crm-agent-routing/issues).
 
 ## Documentation
 
@@ -239,4 +265,4 @@ for security fixes in November 2026. The bugs and data issues I found in other p
 
 ## License
 
-The project's own code is MIT (`LICENSE`); the third-party parts are listed in `NOTICE`. CRMArena and its data are CC BY-NC 4.0, for research use only; that also covers `patches/` and the files in `agent/app/data/` built from the benchmark (`schema_*.md`, `router_examples*.jsonl`). The Qdrant fork in `search/` is Apache-2.0, and files generated by agents-cli keep their Apache-2.0 headers.
+The project's own code is MIT ([`LICENSE`](LICENSE)); the third-party parts are listed in [`NOTICE`](NOTICE). CRMArena and its data are CC BY-NC 4.0, for research use only; that also covers `patches/` and the files in `agent/app/data/` built from the benchmark (`schema_*.md`, `router_examples*.jsonl`). The Qdrant fork in `search/` is Apache-2.0, and files generated by agents-cli keep their Apache-2.0 headers.
