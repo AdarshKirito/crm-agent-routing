@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="272" viewBox="0 0 960 272" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif" role="img" aria-labelledby="t d">
+<title id="t">How crmroute handles a business question</title>
+<desc id="d">In customer sessions the guard refuses private or confidential requests. Otherwise the question is routed to a model by task type and solved with read-only CRM tools in three independent runs. If the receipts check out, the runs agree and the certified release rule allows it, the answer is given with its evidence; otherwise the question goes to a person with the reason.</desc>
+<defs><marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#a3a29a"/></marker></defs>
+<rect width="960" height="272" rx="8" fill="#1a1a19"/>
+<rect x="14.0" y="92.0" width="92" height="72" rx="8" fill="#242423" stroke="#5c5b56" stroke-width="1.3"/>
+<text x="60.0" y="125.0" font-size="14" text-anchor="middle" fill="#ffffff">Business</text>
+<text x="60.0" y="142.0" font-size="14" text-anchor="middle" fill="#ffffff">question</text>
+<polygon points="136.0,128.0 152.0,92.0 252.0,92.0 268.0,128.0 252.0,164.0 152.0,164.0" fill="#242423" stroke="#5c5b56" stroke-width="1.3"/>
+<text x="202.0" y="116.5" font-size="14" font-weight="600" text-anchor="middle" fill="#ffffff">Guard</text>
+<text x="202.0" y="132.5" font-size="12.5" text-anchor="middle" fill="#c3c2b7">private or</text>
+<text x="202.0" y="148.0" font-size="12.5" text-anchor="middle" fill="#c3c2b7">confidential?</text>
+<rect x="298.0" y="92.0" width="118" height="72" rx="8" fill="#242423" stroke="#5c5b56" stroke-width="1.3"/>
+<text x="357.0" y="116.5" font-size="14" font-weight="600" text-anchor="middle" fill="#ffffff">Route</text>
+<text x="357.0" y="132.5" font-size="12.5" text-anchor="middle" fill="#c3c2b7">picks the model</text>
+<text x="357.0" y="148.0" font-size="12.5" text-anchor="middle" fill="#c3c2b7">by task type</text>
+<rect x="446.0" y="92.0" width="152" height="72" rx="8" fill="#242423" stroke="#5c5b56" stroke-width="1.3"/>
+<text x="522.0" y="116.5" font-size="14" font-weight="600" text-anchor="middle" fill="#ffffff">Solve</text>
+<text x="522.0" y="132.5" font-size="12.5" text-anchor="middle" fill="#c3c2b7">read-only CRM tools,</text>
+<text x="522.0" y="148.0" font-size="12.5" text-anchor="middle" fill="#c3c2b7">3 independent runs</text>
+<polygon points="628.0,128.0 644.0,92.0 788.0,92.0 804.0,128.0 788.0,164.0 644.0,164.0" fill="#242423" stroke="#5c5b56" stroke-width="1.3"/>
+<text x="716.0" y="116.5" font-size="14" font-weight="600" text-anchor="middle" fill="#ffffff">Check</text>
+<text x="716.0" y="132.5" font-size="12.5" text-anchor="middle" fill="#c3c2b7">receipts, agreement,</text>
+<text x="716.0" y="148.0" font-size="12.5" text-anchor="middle" fill="#c3c2b7">certified rule</text>
+<rect x="834.0" y="92.0" width="112" height="72" rx="8" fill="#16304f" stroke="#3987e5" stroke-width="1.6"/>
+<text x="890.0" y="123.5" font-size="14" font-weight="600" text-anchor="middle" fill="#3987e5">Answer +</text>
+<text x="890.0" y="140.5" font-size="14" font-weight="600" text-anchor="middle" fill="#3987e5">its evidence</text>
+<line x1="106.0" y1="128.0" x2="134.5" y2="128.0" stroke="#a3a29a" stroke-width="1.5" marker-end="url(#head)"/>
+<line x1="268.0" y1="128.0" x2="296.5" y2="128.0" stroke="#a3a29a" stroke-width="1.5" marker-end="url(#head)"/>
+<line x1="416.0" y1="128.0" x2="444.5" y2="128.0" stroke="#a3a29a" stroke-width="1.5" marker-end="url(#head)"/>
+<line x1="598.0" y1="128.0" x2="626.5" y2="128.0" stroke="#a3a29a" stroke-width="1.5" marker-end="url(#head)"/>
+<line x1="804.0" y1="128.0" x2="832.5" y2="128.0" stroke="#a3a29a" stroke-width="1.5" marker-end="url(#head)"/>
+<text x="283.0" y="120.0" font-size="12" text-anchor="middle" fill="#c3c2b7">no</text>
+<text x="819.0" y="120.0" font-size="12" text-anchor="middle" fill="#c3c2b7">pass</text>
+<rect x="144.0" y="16.0" width="116" height="38" rx="8" fill="#242423" stroke="#5c5b56" stroke-width="1.3"/>
+<text x="202.0" y="40.0" font-size="14" font-weight="600" text-anchor="middle" fill="#ffffff">Refuse</text>
+<line x1="202.0" y1="92.0" x2="202.0" y2="55.5" stroke="#a3a29a" stroke-width="1.5" marker-end="url(#head)"/>
+<text x="210.0" y="79.0" font-size="12" text-anchor="start" fill="#c3c2b7">yes</text>
+<text x="202.0" y="186.0" font-size="12" text-anchor="middle" fill="#c3c2b7">in customer sessions</text>
+<rect x="624.0" y="204.0" width="184" height="52" rx="8" fill="#242423" stroke="#5c5b56" stroke-width="1.3"/>
+<text x="716.0" y="226.2" font-size="14" font-weight="600" text-anchor="middle" fill="#ffffff">Hand to a person,</text>
+<text x="716.0" y="242.2" font-size="12.5" text-anchor="middle" fill="#c3c2b7">with the reason</text>
+<line x1="716.0" y1="164.0" x2="716.0" y2="202.5" stroke="#a3a29a" stroke-width="1.5" marker-end="url(#head)"/>
+<text x="724.0" y="193.0" font-size="12" text-anchor="start" fill="#c3c2b7">fail</text>
+</svg>
