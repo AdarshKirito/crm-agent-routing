@@ -25,10 +25,17 @@ The method behind every number: systems, splits, statistics, cost accounting, th
   directly through the benchmark's connector. crmroute goes through its MCP server, which caches responses on
   disk for seven days because the shared orgs cap daily API calls, so a repeated query gets the earlier live
   response.
-- Records. The run records (task records, harness configs, run manifests and per-call logs) are the release
-  assets [run-records-2026-10-11](https://github.com/AdarshKirito/crm-agent-routing/releases/tag/run-records-2026-10-11)
-  and [run-records-2026-10-30](https://github.com/AdarshKirito/crm-agent-routing/releases/tag/run-records-2026-10-30)
-  (the hints ablation).
+- Records. The run records (task records, harness configs, run manifests and per-call logs) are five release
+  assets:
+  - [run-records-2026-10-11](https://github.com/AdarshKirito/crm-agent-routing/releases/tag/run-records-2026-10-11):
+    every run from the 2026-09-29 pilot to the original-CRMArena test, the test set included;
+  - [run-records-2026-10-30](https://github.com/AdarshKirito/crm-agent-routing/releases/tag/run-records-2026-10-30):
+    the hints ablation;
+  - [run-records-2026-11-01](https://github.com/AdarshKirito/crm-agent-routing/releases/tag/run-records-2026-11-01),
+    [run-records-2026-11-01-round2](https://github.com/AdarshKirito/crm-agent-routing/releases/tag/run-records-2026-11-01-round2)
+    and [run-records-2026-11-05-round3](https://github.com/AdarshKirito/crm-agent-routing/releases/tag/run-records-2026-11-05-round3):
+    the three rounds of checkable answers, receipts included.
+
   Extracted at the repository root they recreate `runs/`, and every summary in `results/` that comes from them
   rebuilds row for row. Server and container logs are not published.
 
@@ -115,8 +122,11 @@ dispatch. It ran twice by manual dispatch (one failure, then a pass), then on it
 [#1](https://github.com/AdarshKirito/crm-agent-routing/pull/1), which it passed with 10 of 12 business cases and
 3 of 3 refusals (that PR leaves the agent's behaviour unchanged, so the gain over the baseline's 7 is not an
 improvement it made). It passed again on [#2](https://github.com/AdarshKirito/crm-agent-routing/pull/2) (10 of 12,
-3 of 3) and [#4](https://github.com/AdarshKirito/crm-agent-routing/pull/4) (9 of 12, 3 of 3). On #4 it first failed
-twice without running a case: the Gemini key had expired, and then the replacement key's project had no credits. It needs two repository secrets (`GEMINI_API_KEY`, `GROQ_API_KEY`); the Salesforce logins are the
+3 of 3), [#4](https://github.com/AdarshKirito/crm-agent-routing/pull/4) (9 of 12, 3 of 3) and
+[#5](https://github.com/AdarshKirito/crm-agent-routing/pull/5) (7 of 12, 3 of 3; that PR's two changed cases
+were run-to-run variation, and every knowledge search it made returned the same articles as before). On #4 it first
+failed twice without running a case: the Gemini key had expired, and then the replacement key's project had no
+credits. It needs two repository secrets (`GEMINI_API_KEY`, `GROQ_API_KEY`); the Salesforce logins are the
 benchmark's public demo-org credentials, read from the README on CRMArena's default branch because upstream
 rotates them (the harness code stays at the pinned commit).
 
@@ -130,7 +140,7 @@ and start the agent with `PHOENIX_COLLECTOR_ENDPOINT=http://localhost:6006` (fro
 ![Phoenix trace of dev task b2c/1943](img/phoenix_trace.png)
 
 This is dev task b2c/1943 on Gemini 3.8 Flash, a customer asking for a product they bought: intake → screen →
-policy_check → decide → route_task → solver (five model calls, four SOQL queries) → check → finalize. The query
+policy_check → decide → route_task → solver (its model calls and SOQL queries) → check → finalize. The query
 marked red is a nested orders-with-items query that the tool guard rejects in a customer session; the agent then
 made separate queries scoped to the customer's own account. p95 latency, tool errors and tool steps per task for
 the measured runs come from the run records (`scripts/analyze_results.py`), not from Phoenix.
