@@ -1,4 +1,5 @@
 import argparse
+import os
 
 
 def main():
@@ -21,4 +22,15 @@ def main():
     # only after we make the changes.
     from mcp_server_qdrant.server import mcp
 
-    mcp.run(transport=args.transport)
+    # fastmcp 3 no longer reads FASTMCP_SERVER_HOST/PORT/LOG_LEVEL, which every
+    # launcher here sets, so pass them on to the HTTP transports ourselves.
+    options = {}
+    if args.transport != "stdio":
+        for key, name, cast in (
+            ("host", "FASTMCP_SERVER_HOST", str),
+            ("port", "FASTMCP_SERVER_PORT", int),
+            ("log_level", "FASTMCP_SERVER_LOG_LEVEL", str),
+        ):
+            if os.getenv(name):
+                options[key] = cast(os.environ[name])
+    mcp.run(transport=args.transport, **options)
