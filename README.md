@@ -31,16 +31,10 @@ So crmroute gives **checkable answers**:
   90% confidence) on one set of questions. Only then is it used, once, on questions it has never seen.
 - **Everything else goes to a person**, with the reason.
 
-```mermaid
-flowchart LR
-  Q["Business question"] --> G{"Guard, in customer<br/>sessions: private or<br/>confidential?"}
-  G -- yes --> X["Refuse"]
-  G -- no --> RT["Route to a<br/>model"]
-  RT --> S["Answer from the CRM<br/>through read-only tools<br/>(three independent runs)"]
-  S --> C{"Receipts check out<br/>and the runs agree?<br/>Certified rule allows it?"}
-  C -- yes --> A["Answer +<br/>its evidence"]
-  C -- no --> P["Hand to a person,<br/>with the reason"]
-```
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/img/flow_dark.svg">
+  <img alt="How crmroute handles a business question. In customer sessions the guard refuses private or confidential requests. Otherwise the question is routed to a model by task type and solved with read-only CRM tools in three independent runs. If the receipts check out, the runs agree and the certified release rule allows it, the answer is given with its evidence; otherwise the question goes to a person with the reason." src="docs/img/flow_light.svg">
+</picture>
 
 ## Results in brief
 
@@ -145,9 +139,9 @@ answer:   'TX'  ->  fail
   [asked] season_months = quarter_aligned: 2023-01-01 to 2023-04-01 -> 'CA'
 ```
 
-The answer changes with the reading, so it is held back. The demo then learns from two answered questions which
-reading this organisation uses, and shows why "TX" is the wrong answer. Last, it re-runs the agent's saved query and
-shows the evidence stop matching once the data changes.
+Two readings give "CA" and one gives "TX", so the answer depends on the reading and is held back. The demo then
+learns from two answered questions which reading this organisation uses, and shows why "TX" is the wrong answer.
+Last, it re-runs the agent's saved query and shows the evidence stop matching once the data changes.
 
 To run the full agent against the benchmark, see [`docs/reproduce.md`](docs/reproduce.md). You need Docker, Node
 22+, [uv](https://docs.astral.sh/uv/), [Ollama](https://ollama.com), a Groq key, and a Gemini API key or a Vertex
