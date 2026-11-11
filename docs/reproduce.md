@@ -72,6 +72,7 @@ python scripts/analyze_results.py --system react=runs/test/react --system react_
   --system full=runs/test/full --system routed=runs/test/routed --baseline react \
   --task-ids data/test.json --big-model 3.8-flash --out results/test_summary.md
 python scripts/make_results_figure.py   # the README's results figure, from results/test_summary.md
+python scripts/make_flow_figure.py      # the README's flow diagram
 
 # a later change, measured on tasks no earlier step used: the measured and the changed image, same tasks
 python scripts/make_fresh_split.py --out data/fresh.json   # commit it before any run
