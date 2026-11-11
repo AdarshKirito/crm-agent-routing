@@ -71,7 +71,9 @@ important ones are listed below:
 | `FASTMCP_SERVER_DEPENDENCIES`              | List of dependencies to install in the server environment       | `[]`          |
 
 > [!NOTE]
-> Server-specific settings use the `FASTMCP_SERVER_` prefix. This may change in future versions.
+> Server-specific settings use the `FASTMCP_SERVER_` prefix. This fork runs on fastmcp 3, which no longer reads
+> them itself: `main.py` passes `FASTMCP_SERVER_HOST`, `FASTMCP_SERVER_PORT` and `FASTMCP_SERVER_LOG_LEVEL` to the
+> HTTP transports, and the other `FASTMCP_SERVER_` settings have no effect.
 
 ## Installation
 
